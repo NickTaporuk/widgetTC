@@ -1,0 +1,118 @@
+/***************************************
+
+    #STYLEGUIDE
+
+****************************************/
+
+#tcwlw_widget {
+
+	// Icons - Using Google's Material Design icons, included in the <head>
+
+	.tcwlw_material_icons {
+		@include icons();
+	}
+
+	// Brand Specific
+
+	.tcwlw_font_color {
+		color: $brandFont;
+	}
+
+	.tcwlw_bg_color {
+		background-color: $brandBackground;
+	}
+
+	.tcwlw_border_color {
+		border-color: $brandFont;
+	}
+
+	// Buttons
+
+	.tcwlw_btn {
+		@include button();
+	}
+
+	.tcwlw_brand_btn {
+		@include button($brandFont);
+	}
+
+	.tcwlw_brand_btn_light {
+		@include button-light($brandFont);
+	}
+
+	.tcwlw_btn_small {
+		@include font-size($baseFontSize*0.875);
+		@include padding($baseLineHeight/2, $baseLineHeight/1.5);
+
+		i,
+		.tcwlw_material_icons {
+			vertical-align: -3px;
+		}
+	}
+
+	li .tcwlw_btn {
+		@include font-size($baseFontSize);
+	}
+
+	li .tcwlw_btn_small {
+		@include font-size($baseFontSize*0.5475);
+	}
+
+	// Box
+
+	.tcwlw_box,
+	%tcwlw_box {
+		@include box();
+	}
+
+	// Loader
+
+	.tcwlw_loader {
+		@include trans-white();
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		text-align: center;
+		z-index: $zindexLoader;
+		display: none;
+
+		img {
+			background: white;
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			width: 60px;
+			height: 60px;
+			margin: -30px 0 0 -30px;
+			border: 1px solid $grayLighter;
+		}
+	}
+
+	// Faux Media
+
+	@include tireconnect-width(small) {
+		.tcwlw_btn {
+			@include font-size($baseFontSize);
+		}
+
+		.tcwlw_box,
+		%tcwlw_box {
+			@include padding($baseSpacing/2);
+		}
+	}
+
+	// Media
+
+	@include respond-to(smaller-screen) {
+		.tcwlw_btn {
+			@include font-size($baseFontSize);
+		}
+
+		.tcwlw_box,
+		%tcwlw_box {
+			@include padding($baseSpacing/2);
+		}
+	}
+}

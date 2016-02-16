@@ -1,0 +1,46 @@
+/***************************************
+
+    #VARIABLES
+
+****************************************/
+
+// Colors
+$grayDarkest:           #2f2f2f;
+$grayDarker:            #4c4c4c;
+$grayDark:              #666666;
+$gray:                  #808080;
+$grayLight:             #a0a0a0;
+$grayLighter:           #cdcdcd;
+$grayLightest:          #e8e8e8;
+$red:					#cc0000;
+$blue: 					#1137c5;
+$yellow:				#f7ea00;
+$green:					#039511;
+$orange:				#d68300;
+
+// Default brand colors
+$brandFont:				$red;
+$brandBackground: 		$gray;
+
+// Typography 
+$baseFontSize:          1.6;
+$fontSans:              "Lato", "Helvetica Neue", Helvetica, Arial, sans-serif;
+$fontSerif: 		   	Georgia, Times, serif;
+$baseLineHeight:        1.5;
+$baseSpacing:			2.4;
+$linkColor: 			$brandFont;
+
+// Weights
+$thin:      			100;
+$light:     			300;
+$regular:   			400;
+$semibold:  			600;
+$bold:      			700;
+$extrabold: 			800;
+$ultra:     			900;
+
+// z-index
+
+$zindexBrands:			100;
+$zindexModal:			9990;
+$zindexLoader:			9991;
