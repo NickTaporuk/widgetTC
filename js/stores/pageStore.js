@@ -1,5 +1,7 @@
 define([
+    'dispatcher'
 ], function(
+    dispatcher
 ) {
 
     // private section
@@ -9,17 +11,22 @@ define([
 
     // public section
     var pageStore = {
-        setPage: function(name, props) {
-            _name = name;
-            _props = props || {};
+        getName: function() {
+            return _name;
         },
-        getPage: function() {
-            return {
-                name: _name,
-                props: _props
-            }
+        getProps: function() {
+            return _props;
         }
     };
+
+    dispatcher.register(function(payload) {
+        if (payload.actionType === 'page-update') {
+            _name = payload.name || 'search';
+            _props = payload.props || {};
+
+            pageStore.trigger('change');
+        }
+    });
 
     return pageStore;
 });

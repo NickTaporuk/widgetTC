@@ -37,7 +37,7 @@
 
 		return classes.substr(1);
 	}
-	classNames.prefix = '';
+	classNames.prefix = 'tcwlw_';
 
 	if (typeof module !== 'undefined' && module.exports) {
 		module.exports = classNames;

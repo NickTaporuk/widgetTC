@@ -1,8 +1,10 @@
 define([
-    'load!lib/classnames', 
+    'react',
+    'classnames', 
     'load!components/header', 
     'load!components/content'
 ], function(
+    React,
     cn, 
     Header, 
     Content
@@ -11,7 +13,7 @@ define([
     return {
         render: function() {
             return (
-                <div id={cn('root')}>
+                <div id={cn('widget')}>
                     <Header />
                     <Content />
                 </div>

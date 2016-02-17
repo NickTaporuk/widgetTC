@@ -1,9 +1,11 @@
 define([
     'load!components/content/search',
-    'load!stores/page',
-    'load!lib/classnames'
+    'react',
+    'load!stores/pageStore',
+    'classnames'
 ], function(
     Search,
+    React,
     pageStore,
     cn
 ) {

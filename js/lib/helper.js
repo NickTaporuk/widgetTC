@@ -1,4 +1,4 @@
-define(['config'], function(config) {
+define([], function() {
 	return {
 		priceFormat: function(_number,_decimal,_separator)
 		{
