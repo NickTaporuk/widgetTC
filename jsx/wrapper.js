@@ -1,11 +1,13 @@
 define([
     'react',
     'classnames', 
+    'load!actions/actions',
     'load!components/header', 
     'load!components/content'
 ], function(
     React,
     cn, 
+    Act,
     Header, 
     Content
 ) {

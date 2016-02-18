@@ -5,6 +5,11 @@ define([
 ){
 
     return {
+        init: function() {
+            dispatcher.dispatch({
+                actionType: 'init'
+            });
+        },
         Page: {
             update: function(name, props) {
                 dispatcher.dispatch({
