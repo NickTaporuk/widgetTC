@@ -2,24 +2,26 @@ define([
     'dispatcher',
     'ajax',
     'lodash',
-    'load!stores/searchSearch'
+    'load!stores/searchStore',
+    'load!stores/locationsStore'
 ], function(
     dispatcher,
     ajax,
     _,
-    searchStore
+    searchStore,
+    locationsStore
 ) {
+    var tires = [];
+
+    function setTires(tires) {
+        console.log(tires);
+    }
 
     var resultsStore = {
 
-
         dispatcherToken: dispatcher.register(function(payload) {
             switch (payload.actionType) {
-                case 'results.list.update':
-                    // if (!self.isSearchAvailable()) {
-                    //     return;
-                    // }
-
+                case 'search.make':
                     var method;
                     var activeSection = searchStore.getActiveSection()
                     switch (activeSection) {
@@ -35,6 +37,7 @@ define([
                     }
 
                     var data = searchStore.getSectionValues(activeSection);
+                    data.location_id = locationsStore.getCurrentLocation().id;
 
 
                     ajax.make({
@@ -42,7 +45,11 @@ define([
                         data: data,
                         method: 'post',
                         success: function(response) {
-                            console.log(response.data);
+                            setTires(response.data);
+                            
+                            resultsStore.trigger('change');
+
+                            // console.log(response.data);
                             // searchWasMade = true;
                             // if (response.data.filters.brand) {
                             //     //add count tires to brand items:
@@ -70,12 +77,12 @@ define([
                     });
 
                     break;    
-                case 'search.field.update':
+                // case 'search.field.update':
                     
                 
             }
             // resultsStore.trigger('change');
-        });
+        })
     };
 
     return resultsStore;

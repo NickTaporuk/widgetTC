@@ -8,7 +8,6 @@ define([
     _
 ) {
 
-    // private section
     var activeSection = 'size';
 
     var fieldOptions = {
@@ -82,9 +81,8 @@ define([
                 });
                 options = newOptions;
             }
-
-            fieldOptions[field] = options;
         }
+        fieldOptions[field] = options;
     }
 
     function setValue(section, field, value) {
@@ -96,25 +94,26 @@ define([
         getActiveSection: function() {
             return activeSection;
         },
+        getSectionValues: function(section) {
+            return _.cloneDeep(fieldValues[section]);
+        },
         getValue: function(section, field) {
             return fieldValues[section][field];
         },
-        getValuesForSearch: function(section) {
-            // return fieldValues[section];
-        },
         getOptions: function(field) {
-            return fieldOptions[field];
+            return _.cloneDeep(fieldOptions[field]);
         },
         getAllOptions: function() {
-            return _.clone(fieldOptions);
+            return _.cloneDeep(fieldOptions);
         },
         getAllValues: function() {
-            return fieldValues;
+            return _.cloneDeep(fieldValues);
         },
 
 
         dispatcherToken: dispatcher.register(function(payload) {
             switch (payload.actionType) {
+
                 case 'init':
                     ajax.make({
                         url: 'tire/parameters',
@@ -136,6 +135,7 @@ define([
                         }
                     });
                     break;
+
                 case 'search.field.update':
                     setValue(payload.section, payload.field, payload.value);
 
@@ -153,26 +153,45 @@ define([
                                     stopDataCollect = true;
                                 }
                             } else {
+                                setOptions(fieldName, []);
+                                setValue('vehicle', fieldName, '');
+
                                 if (!fieldToFill) {
                                     fieldToFill = fieldName;
-                                } else {
-                                    setOptions(fieldName, []);
                                 }
                             }
                         });
 
-                        ajax.make({
-                            url: 'vehicle/' + ( fieldToFill == 'car_tire_id' ? tireSizes : (fieldToFill + 's') ),
-                            data: data,
-                            success: function(response) {
-                                setOptions(fieldToFill, response.data.values);
-                                searchStore.trigger('change');
-                            }
-                        });
+                        if (payload.value) {
+                            ajax.make({
+                                url: 'vehicle/' + ( fieldToFill == 'car_tire_id' ? 'tireSizes' : (fieldToFill + 's') ),
+                                data: data,
+                                success: function(response) {
+                                    var options = [];
+                                    if (fieldToFill == 'car_tire_id') {
+                                        response.data.values.map(function(option) {
+                                            options.push({
+                                                value: option.cartireid,
+                                                description: option.fitment + ' ' + option.size_description
+                                            });
+                                        });
+                                        setValue('vehicle', 'car_tire_id', options[0]['value']);
+                                    } else {
+                                        options = response.data.values;
+                                    }
+
+                                    setOptions(fieldToFill, options);
+                                    searchStore.trigger('change');
+                                }
+                            });
+                        } else {
+                            searchStore.trigger('change');
+                        }
                     } else {
                         searchStore.trigger('change');
                     }
                     break;
+
                 case 'search.active_section.update':
                     activeSection = payload.section;
                     searchStore.trigger('change');
