@@ -1,12 +1,10 @@
 define([
     'dispatcher',
-    'ajax',
     'lodash',
     'load!stores/searchStore',
     'load!stores/locationsStore'
 ], function(
     dispatcher,
-    ajax,
     _,
     searchStore,
     locationsStore
@@ -38,8 +36,8 @@ define([
 
                     var data = searchStore.getSectionValues(activeSection);
                     data.location_id = locationsStore.getCurrentLocation().id;
-
-
+                    
+                    /*
                     ajax.make({
                         url: 'tire/' + method,
                         data: data,
@@ -74,7 +72,7 @@ define([
                             //     callback(response);
                             // }
                         }
-                    });
+                    }); */
 
                     break;    
                 // case 'search.field.update':

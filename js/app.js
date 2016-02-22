@@ -36,7 +36,7 @@ window.TCWidget = {
                   'isMobile': 'bower_components/isMobile/isMobile',
                   'lodash': 'bower_components/lodash/lodash',
                   'dispatcher': 'lib/dispatcher',
-                  'ajax': 'lib/ajax',
+                  'ajax': 'lib/ajaxp',
                   'react': 'bower_components/react/react',
                   'reactDOM': 'bower_components/react/react-dom',
                   'microEvent': 'bower_components/microevent/microevent',

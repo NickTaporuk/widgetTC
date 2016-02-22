@@ -3,57 +3,115 @@ define([
 ], function(
     ajax
 ) {
-    var Promise = function() {
-        var response = null;
 
-        var methods = {
-            success: [],
-            error: []
-        };
-
-        this.resolve = function(resp) {
-            response = resp;
-            success();
-        };
-
-        var success = function() {
-            if (response) {
-                for (var i = 0; i < count; i++) {
-                    if (typeof methods.success[i] == 'function') {
-                        response = methods.success[i](response);    
-                    }
-                }
-                response = null;
-                methods.success = [];
-            }
-        }
-
-        this.then = function(callback) {
-            methods.success.push(callback);
-            success();
-            return this;
-        }
+    function prepareVehicleResponse(response) {
+        var newOptions = [];
+        response.data.values.map(function(val, i){
+            newOptions.push({
+                'value': val,
+                'description': val
+            });
+        });
+        return newOptions;
     };
 
-    return {
+
+    Api = {
         getLocations: function() {
-            var promise = new Promise();
-
-            ajax.make({
-                url: 'location/list',
-                success: function(resp) {
-                    promise.resolve(resp.data.locations);
-                },
-                error: function(resp) {
-                    promise.reject(resp);
-                }
+            return ajax.make({
+                url: 'location/list'
             });
+        },
 
-            return promise;
+        getTireParameters: function() {
+            return ajax.make({
+                url: 'tire/parameters'
+            });
+        },
+
+        searchTires: function(method, searchParams) {
+            return ajax.make({
+                url: 'tire/' + method,
+                data: searchParams,
+                method: 'post'
+            });
+        },
+
+        getVehicleYears: function() {
+            return ajax.make({
+                url: 'vehicle/years'
+            }).then(function(response) {
+                return prepareVehicleResponse(response);
+            });
+        },
+        getVehicleMakes: function(year) {
+            var p;
+            if (!year) {
+                p = Promise.resolve([]);
+            } else {
+                p = ajax.make({
+                    url: 'vehicle/makes',
+                    data: {year: year}
+                }).then(function(response) {
+                    return prepareVehicleResponse(response);
+                });
+            }
+            return p;
+        },
+        getVehicleModels: function(year, make) {
+            var p;
+            if (!make) {
+                p = Promise.resolve([]);
+            } else {
+                p = ajax.make({
+                    url: 'vehicle/models',
+                    data: {year: year, make: make}
+                }).then(function(response) {
+                    return prepareVehicleResponse(response);
+                });
+            }
+            return p;
+        },
+        getVehicleTrims: function(year, make, model) {
+            var p;
+            if (!model) {
+                p = Promise.resolve([]);
+            } else {
+                p = ajax.make({
+                    url: 'vehicle/trims',
+                    data: {year: year, make: make, model: model}
+                }).then(function(response) {
+                    return prepareVehicleResponse(response);
+                });
+            }
+            return p;
+        },
+        getVehicleTireSizes: function(year, make, model, trim) {
+            var p;
+            if (!trim) {
+                p = Promise.resolve([]);
+            } else {
+                p = ajax.make({
+                    url: 'vehicle/tireSizes',
+                    data: {year: year, make: make, model: model, trim: trim}
+                }).then(function(response) {
+                    var options = [];
+                    response.data.values.map(function(option) {
+                        options.push({
+                            value: option.cartireid,
+                            description: option.fitment + ' ' + option.size_description
+                        });
+                    });
+                    return options;
+                });
+            }
+            return p;
         }
 
+                            
 
-    }
+    };
 
+    return Api;
 
 });

@@ -1,10 +1,8 @@
 define([
     'dispatcher',
-    'ajax',
     'lodash'
 ], function(
     dispatcher,
-    ajax,
     _
 ) {
 
@@ -66,27 +64,32 @@ define([
         }
     };
 
+    var sections = ['size', 'vehicle', 'part_number', 'common'];
+
     function setOptions(field, options) {
-        if (options.length > 0) {
-            var argType = typeof options[0];
-            
-            if (argType === 'string' || argType === 'number') {
-                // adjust options to needed format:
-                var newOptions = [];
-                options.map(function(val, i){
-                    newOptions.push({
-                        'value': val,
-                        'description': val
-                    });
-                });
-                options = newOptions;
+        if (options.length === 0) {
+            var sectionsCount = sections.length;
+            for (var i = 0; i < sectionsCount; i++) {
+                if (fieldValues[sections[i]][field]) {
+                    setValue(sections[i], field, '');
+                    break;
+                }
+            }
+        } else {
+            if (field == 'car_tire_id') {
+                setValue('vehicle', 'car_tire_id', options[0].value);
             }
         }
+        
         fieldOptions[field] = options;
     }
 
     function setValue(section, field, value) {
-        fieldValues[section][field] = value;
+        if (fieldValues[section] !== undefined && fieldValues[section][field] !== undefined) {
+            fieldValues[section][field] = value;
+        } else {
+            throw new Error('Field "' + field + '" in section "' + section + '" not found');
+        }
     }
 
     // public section
@@ -114,31 +117,19 @@ define([
         dispatcherToken: dispatcher.register(function(payload) {
             switch (payload.actionType) {
 
-                case 'init':
-                    ajax.make({
-                        url: 'tire/parameters',
-                        success: function(response) {
-                            Object.keys(response.data).map(function(fieldName) {
-                                setOptions(fieldName, response.data[fieldName]);      
-                            });
-
-                            searchStore.trigger('change');
-                        }
+                case 'search.options.update':
+                    Object.keys(payload.options).map(function(fieldName) {
+                        setOptions(fieldName, payload.options[fieldName]);
                     });
 
-                    ajax.make({
-                        url: 'vehicle/years',
-                        data: data,
-                        success: function(response) {
-                            setOptions('year', response.data.values);
-                            searchStore.trigger('change');
-                        }
-                    });
+                    searchStore.trigger('change');
                     break;
 
                 case 'search.field.update':
                     setValue(payload.section, payload.field, payload.value);
 
+                    searchStore.trigger('change');
+                    /*
                     if (payload.section === 'vehicle' && payload.field !== 'car_tire_id' && payload.field !== 'base_category') {
                         var data = {};
                         var stopDataCollect = false;
@@ -189,7 +180,7 @@ define([
                         }
                     } else {
                         searchStore.trigger('change');
-                    }
+                    } */
                     break;
 
                 case 'search.active_section.update':

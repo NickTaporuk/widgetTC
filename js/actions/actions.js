@@ -1,33 +1,39 @@
 define([
     'dispatcher',
-    'load!stores/resultsStore'
-    // 'lib/api'
+    'load!stores/resultsStore',
+    'load!stores/searchStore',
+    'lib/api'
 ], function(
     dispatcher,
-    resultsStore
-    // Api
+    resultsStore,
+    searchStore,
+    Api
 ){
 
     return {
         init: function() {
-            // var promise = Api.getLocation();
-            // promise.success(function(locations) {
-            //     console.log(locations);
-            // });
-
-            dispatcher.dispatch({
-                actionType: 'init'
-            });
-        },
-        Locations: {
-            prepare: function() {
-                Api.getLocations().then(function(locations){
-                    dispatcher.dispatch({
-                        actionType: 'locations.init',
-                        locations: locations,
-                    });
+            // trigger in Location component
+            Api.getLocations().then(function(response) {
+                dispatcher.dispatch({
+                    actionType: 'locations.init',
+                    locations: response.data.locations
                 });
-            }
+            });
+
+            // trigger in Search component
+            Api.getTireParameters().then(function(response) {
+                dispatcher.dispatch({
+                    actionType: 'search.options.update',
+                    options: response.data
+                });
+            });
+
+            Api.getVehicleYears().then(function(years) {
+                dispatcher.dispatch({
+                    actionType: 'search.options.update',
+                    options: {year: years}
+                });
+            });
         },
         Page: {
             update: function(name, props) {
@@ -36,7 +42,6 @@ define([
                     name: name,
                     props: props || {}
                 });
-
             }
         },
         Search: {
@@ -46,7 +51,51 @@ define([
                     section: section,
                     field: field,
                     value: value
-                });   
+                });
+
+                if (section == 'vehicle') {
+                    if (field == 'year') {
+                        Api.getVehicleMakes(searchStore.getValue('vehicle', 'year')).then(function(makes) {
+                            dispatcher.dispatch({
+                                actionType: 'search.options.update',
+                                options: {make: makes, model: [], trim: [], car_tire_id: []}
+                            });
+                        });
+                    } else if (field == 'make') {
+                        Api.getVehicleModels(
+                            searchStore.getValue('vehicle', 'year'),
+                            searchStore.getValue('vehicle', 'make')
+                        ).then(function(models) {
+                            dispatcher.dispatch({
+                                actionType: 'search.options.update',
+                                options: {model: models, trim: [], car_tire_id: []}
+                            });
+                        });
+                    } else if (field == 'model') {
+                        Api.getVehicleTrims(
+                            searchStore.getValue('vehicle', 'year'),
+                            searchStore.getValue('vehicle', 'make'),
+                            searchStore.getValue('vehicle', 'model')
+                        ).then(function(trims) {
+                            dispatcher.dispatch({
+                                actionType: 'search.options.update',
+                                options: {trim: trims, car_tire_id: []}
+                            });
+                        });
+                    } else if (field == 'trim') {
+                        Api.getVehicleTireSizes(
+                            searchStore.getValue('vehicle', 'year'),
+                            searchStore.getValue('vehicle', 'make'),
+                            searchStore.getValue('vehicle', 'model'),
+                            searchStore.getValue('vehicle', 'trim')
+                        ).then(function(car_tire_ids) {
+                            dispatcher.dispatch({
+                                actionType: 'search.options.update',
+                                options: {car_tire_id: car_tire_ids}
+                            });
+                        });
+                    }
+                }
             },
             changeTab: function(section) {
                 dispatcher.dispatch({
@@ -55,22 +104,26 @@ define([
                 }); 
             },
             make: function() {
-                dispatcher.dispatch({
-                    actionType: 'search.make'
-                });   
+                Api.searchTires().then(function(results) {
+                    dispatcher.dispatch({
+                        actionType: 'results.fill',
+                        tires: results.tires,
+                        totalCount: results.nb_results
+                    });
+                });
             }
         },
         Customer: {
             updateParam: function(param, value) {
                 dispatcher.dispatch({
-                    actionType: 'customer-update_param',
+                    actionType: 'customer.update_param',
                     param: param,
                     value: value
                 });                
             },
             updateVehicle: function(param, value) {
                 dispatcher.dispatch({
-                    actionType: 'customer-update_vehicle',
+                    actionType: 'customer.update_vehicle',
                     param: param,
                     value: value
                 });
