@@ -10,32 +10,42 @@ define([
     locationsStore
 ) {
     var tires = [];
+    var tiresIndexes = []
+    var totalCount;
+    var filters = [];
+    var page;
 
-    function setTires(tires) {
-        console.log(tires);
+    function fillTires(_tires) {
+        _tires.map(function(tire, i) {
+            tiresIndexes[tire.id] = i; 
+        });
+        tires = _tires;
     }
 
     var resultsStore = {
+        getPage: function() {
+            return page;
+        },
+        getFilters: function() {
+            return _.cloneDeep(filters);
+        },
+        getTotalCount: function() {
+            return totalCount;
+        },
+        getTires: function() {
+            return _.cloneDeep(tires);
+        },
+        getTire: function(id) {
+            return _.cloneDeep(tires[tiresIndexes[id]]);
+        },
 
-        dispatcherToken: dispatcher.register(function(payload) {
+        dispatchToken: dispatcher.register(function(payload) {
             switch (payload.actionType) {
-                case 'search.make':
-                    var method;
-                    var activeSection = searchStore.getActiveSection()
-                    switch (activeSection) {
-                        case 'size':
-                            method = 'searchBySize';
-                            break;
-                        case 'vehicle':
-                            method = 'searchByCarTire';
-                            break;
-                        case 'part_number':
-                            method = 'searchByPartNumbers';
-                            break;
-                    }
-
-                    var data = searchStore.getSectionValues(activeSection);
-                    data.location_id = locationsStore.getCurrentLocation().id;
+                case 'results.fill':
+                    fillTires(payload.tires);
+                    totalCount = payload.totalCount;
+                    filters = payload.filters;
+                    page = payload.page;                
                     
                     /*
                     ajax.make({
@@ -79,7 +89,7 @@ define([
                     
                 
             }
-            // resultsStore.trigger('change');
+            resultsStore.trigger('change');
         })
     };
 

@@ -2,11 +2,13 @@ define([
     'dispatcher',
     'load!stores/resultsStore',
     'load!stores/searchStore',
+    'load!stores/locationsStore',
     'lib/api'
 ], function(
     dispatcher,
     resultsStore,
     searchStore,
+    locationsStore,
     Api
 ){
 
@@ -36,9 +38,9 @@ define([
             });
         },
         Page: {
-            update: function(name, props) {
+            show: function(name, props) {
                 dispatcher.dispatch({
-                    actionType: 'page-update',
+                    actionType: 'page.update',
                     name: name,
                     props: props || {}
                 });
@@ -104,11 +106,16 @@ define([
                 }); 
             },
             make: function() {
-                Api.searchTires().then(function(results) {
+                var section = searchStore.getActiveSection();
+                var searchParams = searchStore.getSectionValues(section);
+                searchParams['location_id'] = locationsStore.getCurrentLocation().id;
+                Api.searchTires(section, searchParams).then(function(results) {
                     dispatcher.dispatch({
                         actionType: 'results.fill',
                         tires: results.tires,
-                        totalCount: results.nb_results
+                        totalCount: results.nb_results,
+                        filters: results.filters,
+                        page: results.page
                     });
                 });
             }

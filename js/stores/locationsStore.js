@@ -9,8 +9,7 @@ define([
     var locations = [];
     var currectLocation;
 
-    function setLocations(locs)
-    {
+    function setLocations(locs) {
         locs.map(function(location) {
             locations[location.id] = location;
         });
@@ -19,8 +18,7 @@ define([
         currectLocation = locs[0].id;
     }
 
-    function setCurrentLocation(id) 
-    {
+    function setCurrentLocation(id) {
         currectLocation = id;
     }
 
@@ -32,7 +30,7 @@ define([
             return locations[currectLocation];
         },
 
-        dispatcherToken: dispatcher.register(function(payload) {
+        dispatchToken: dispatcher.register(function(payload) {
             switch (payload.actionType) {
                 case 'locations.init':
                     setLocations(payload.locations);

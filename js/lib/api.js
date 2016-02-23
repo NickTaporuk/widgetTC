@@ -29,11 +29,36 @@ define([
             });
         },
 
-        searchTires: function(method, searchParams) {
+        searchTires: function(type, searchParams) {
+            var method;
+            switch (type){
+                case 'size':
+                    method = 'searchByRawSize';
+                    if (!searchParams.size && searchParams.width) {
+                        searchParams.size = searchParams.width + searchParams.height + searchParams.rim;
+                        delete searchParams.width; 
+                        delete searchParams.height; 
+                        delete searchParams.rim;
+                    }
+                    break;
+                case 'vehicle':
+                    method = 'searchByCarTire';
+                    break;
+                case 'part_number':
+                    method = 'searchByPartNumbers';
+                    if (!searchParams.part_numbers && searchParams.part_number) {
+                        searchParams.part_numbers = [searchParams.part_number];
+                        delete searchParams.part_number;
+                    }
+                    break;
+
+            }
             return ajax.make({
                 url: 'tire/' + method,
                 data: searchParams,
                 method: 'post'
+            }).then(function(response) {
+                return response.data;
             });
         },
 

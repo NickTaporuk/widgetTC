@@ -106,6 +106,21 @@ define([
         getOptions: function(field) {
             return _.cloneDeep(fieldOptions[field]);
         },
+        getValueDesc: function(section, field) {
+            var options = fieldOptions[field],
+                value = searchStore.getValue(section, field);
+                desc = null;
+
+            optionsCount = options.length;
+            for (var i = 0; i < optionsCount; i++) {
+                if (options[i].value == value) {
+                    desc = options[i].description;
+                    break;
+                }
+            }
+
+            return desc;
+        },
         getAllOptions: function() {
             return _.cloneDeep(fieldOptions);
         },
@@ -114,7 +129,7 @@ define([
         },
 
 
-        dispatcherToken: dispatcher.register(function(payload) {
+        dispatchToken: dispatcher.register(function(payload) {
             switch (payload.actionType) {
 
                 case 'search.options.update':
