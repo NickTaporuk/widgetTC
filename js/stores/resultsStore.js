@@ -40,13 +40,14 @@ define([
         },
 
         dispatchToken: dispatcher.register(function(payload) {
+            var change = false;
             switch (payload.actionType) {
                 case 'results.fill':
                     fillTires(payload.tires);
                     totalCount = payload.totalCount;
                     filters = payload.filters;
                     page = payload.page;                
-                    
+                    change = true;
                     /*
                     ajax.make({
                         url: 'tire/' + method,
@@ -85,11 +86,11 @@ define([
                     }); */
 
                     break;    
-                // case 'search.field.update':
-                    
-                
             }
-            resultsStore.trigger('change');
+            
+            if (change) {
+                resultsStore.trigger('change');
+            }
         })
     };
 

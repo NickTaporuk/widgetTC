@@ -31,16 +31,22 @@ define([
         },
 
         dispatchToken: dispatcher.register(function(payload) {
+            change = false;
             switch (payload.actionType) {
                 case 'locations.init':
                     setLocations(payload.locations);
+                    change = true;
                     break;
                     
                 case 'locations.change': 
                     currectLocation = payload.id;
+                    change = true;
                     break;
             }
-            locationsStore.trigger('change');
+            
+            if (change) {
+                locationsStore.trigger('change');
+            }
         })
     };
 

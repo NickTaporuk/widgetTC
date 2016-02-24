@@ -12,7 +12,9 @@ define([
                 require: false,
                 emptyDesc: '- Select -',
                 disabled: false,
-                value: null
+                value: null,
+                defaultValue: null,
+                onChange: null
             }
         },
         render: function() {
@@ -43,7 +45,7 @@ define([
             return (
                 <div className={this.props.className}>
                     <label htmlFor={cn(name)}>{this.props.label + ' '}{req}</label>
-                    <select onChange={this._handleChange} value={this.props.value} id={cn(name)} name={name} disabled={disabled}>
+                    <select onChange={this._handleChange} value={this.props.value} id={cn(name)} name={name} disabled={disabled} defaultValue={this.props.defaultValue}>
                         {options}
                     </select>
                 </div>

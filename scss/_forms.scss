@@ -70,6 +70,12 @@
             outline: thin dotted \9;
         }
 
+        &[disabled] {
+            background: $grayLight;
+            border-color: $gray;
+            cursor: not-allowed;
+        }
+
         &.tcwlw_sixcol  {
             width: 48%;
         }

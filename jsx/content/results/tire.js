@@ -16,7 +16,6 @@ define([
             var tire = this.props.tire;
             var tab = this.state.activeTab;
 
-
             var features = null;
             if (tire.description) {
                 var items = [];
@@ -37,7 +36,7 @@ define([
                             </span>
                         </h3>
                         <label className={cn('result_compare')}>
-                            <input type="checkbox" checked /> Add to compare
+                            <input type="checkbox" defaultChecked={false} /> Add to compare
                         </label>
                     </div>
                     <div className={cn('result_body')}>

@@ -34,7 +34,6 @@ define([
         },
 
         render: function() {
-
             return this._getContent();
         },
 
@@ -74,15 +73,21 @@ define([
                         fieldOptions: {
                             display: searchStore.getOptions('display'),  
                             order_by: searchStore.getOptions('order_by'),
-                            brands: searchStore.getOptions('brand'),
+                            brand: searchStore.getOptions('brand'),
                             run_flat: searchStore.getOptions('run_flat'),
                             light_truck: searchStore.getOptions('light_truck')
                         },
-                        queryParams: queryParams,
-                        totalCount: resultsStore.getTotalCount(),
-                        tires: resultsStore.getTires()
+                        fieldValues: {
+                            display: searchStore.getValue('common', 'display'),
+                            order_by: searchStore.getValue('common', 'order_by'),
+                            brand: searchStore.getValue('common', 'brand'),
+                            run_flat: searchStore.getValue('common', 'run_flat'),
+                            light_truck: searchStore.getValue('common', 'light_truck')
+                        },
+                        queryParams: queryParams
                     }
                     content = <Results {...props} />
+                    break;
             }
 
             return content;
