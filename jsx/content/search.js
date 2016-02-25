@@ -2,12 +2,14 @@ define([
     'react',
     'classnames',
     'load!actions/actions',
+    'load!actions/apiActions',
     'load!stores/searchStore',
     'load!components/elements/select'
 ], function(
     React,
     cn,
     Act,
+    ApiAct,
     searchStore,
     SelectField
 ) {
@@ -175,7 +177,7 @@ define([
         },
         _handleSubmit: function(event) {
             event.preventDefault();
-            Act.Search.make();
+            ApiAct.searсhTires();
         },
         _handleFieldChange: function(event) {
             var fieldName = event.target.name.replace( (this.state.activeTab + '_'), '');

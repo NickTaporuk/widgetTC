@@ -222,13 +222,14 @@ define(['config', 'isMobile'], function(config, isMobile) {
 				});
 				a.error(function(response, xhrObject) {
 					reject(response);
-					// params.error ? params.error(response, xhrObject) : self.error(response, xhrObject);
+					params.error ? params.error(response, xhrObject) : self.error(response, xhrObject);
+				});
+				a.always(function(response, xhrObject) {
+					ajaxCounter--;
+					params.complete ? params.complete(response, xhrObject) : self.complete(response, xhrObject);
 				});
 			});
-			// a.always(function(response, xhrObject) {
-			// 	ajaxCounter--;
-			// 	params.complete ? params.complete(response, xhrObject) : self.complete(response, xhrObject);
-			// });
+
 
 			return p;
 		}

@@ -3,6 +3,7 @@ define([
     'classnames',
     'lodash',
     'load!actions/actions',
+    'load!actions/apiActions',
     'load!stores/resultsStore',
     'load!components/elements/select',
     'load!components/content/results/tire',
@@ -13,6 +14,7 @@ define([
     cn,
     _,
     Act,
+    ApiAct,
     resultsStore,
     SelectField,
     Tire,
@@ -112,15 +114,15 @@ define([
         _handleFieldChange: function(event) {
             var fieldName = event.target.name.replace('filter_', '');
             Act.Search.updateField('common', fieldName, event.target.value);
-            Act.Search.make();
+            ApiAct.searсhTires();
         },
         _handleFilterChange: function(name, values, event) {
             Act.Search.updateField('common', name, values);
-            Act.Search.make();
+            ApiAct.searсhTires();
         },
         _handlePageClick: function(page, event) {
             event.preventDefault();
-            Act.Results.changePage({page: page});
+            ApiAct.searсhTires({page: page});
         }
     }
 

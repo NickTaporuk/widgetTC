@@ -38,13 +38,11 @@ define([
             var step;
             switch (pageStore.getPageName()) {
                 case 'search':
+                case 'results':
                     step = 1;
                     break;
-                case 'results':
-                    step = 2;
-                    break;
                 default:
-                    step = 3;
+                    step = 2;
                     break;
 
             }
