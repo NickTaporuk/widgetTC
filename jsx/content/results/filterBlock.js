@@ -27,7 +27,7 @@ define([
             });
         },
         shouldComponentUpdate: function(nextProps, nextState) {
-            var should = this.props.values.length !== nextProps.values.length;
+            var should = this.props.values.length !== nextProps.values.length || this.state.isShown !== nextState.isShown;
             if (!should) {
                 var names = Object.keys(this.props.values);
                 var namesCount = names.length;
