@@ -27,8 +27,11 @@ define([
         render: function() {
             return (
                 <div id={cn('widget')}>
-                    <Header />
-                    <Content />
+                    <p className={cn('powered_by')}>Powered by <img src="/img/tireconnect-logo.png" alt="TireConnect" /></p>
+                    <div className={cn('wrapper')}>
+                        <Header />
+                        <Content />
+                    </div>
                 </div>
             );
         },

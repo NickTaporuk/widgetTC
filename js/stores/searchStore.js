@@ -5,7 +5,6 @@ define([
     dispatcher,
     _
 ) {
-
     var activeSection = 'size';
 
     var fieldOptions = {
@@ -66,6 +65,23 @@ define([
 
     var sections = ['size', 'vehicle', 'part_number', 'common'];
 
+    function setDefaultValue(field) {
+        if (field == 'car_tire_id') {
+            var options = fieldOptions['car_tire_id'];
+            setValue('vehicle', 'car_tire_id', options[0].value);
+        } else if (field == 'display') {
+            var options = fieldOptions['display'];
+            setValue('common', 'display', options[0].value);
+        } else if (field == 'brand' || field == 'run_flat' || field == 'light_truck') {
+            var options = fieldOptions[field];
+            var value = [];
+            options.forEach(function(option, i, options) {
+                value.push(option.value);
+            });
+            setValue('common', field, value);
+        }
+    }
+
     function setOptions(field, options) {
         if (options.length === 0) {
             // if no options set value of field to empty
@@ -77,20 +93,9 @@ define([
                 }
             }
         } else {
-            if (field == 'car_tire_id') {
-                setValue('vehicle', 'car_tire_id', options[0].value);
-            } else if (field == 'display') {
-                setValue('common', 'display', options[0].value);
-            } else if (field == 'brand' || field == 'run_flat' || field == 'light_truck') {
-                var value = [];
-                options.forEach(function(option, i, options) {
-                    value.push(option.value);
-                });
-                setValue('common', field, value);
-            }
+            fieldOptions[field] = options;
+            setDefaultValue(field);
         }
-        
-        fieldOptions[field] = options;
     }
 
     function setValue(section, field, value) {
@@ -101,7 +106,6 @@ define([
         }
     }
 
-    // public section
     var searchStore = {
         getActiveSection: function() {
             return activeSection;
@@ -141,7 +145,6 @@ define([
         dispatchToken: dispatcher.register(function(payload) {
             var change = false;
             switch (payload.actionType) {
-
                 case 'search.options.update':
                     Object.keys(payload.options).map(function(fieldName) {
                         setOptions(fieldName, payload.options[fieldName]);
@@ -155,6 +158,42 @@ define([
                 case 'search.active_section.update':
                     activeSection = payload.section;
                     change = true;
+                    break;
+                case 'results.fill':
+                    var pageStore = require('load!stores/pageStore');
+                    if (pageStore.getPageName() == 'search') {
+                        // adding count info for filter items
+                        var resultsStore = require('load!stores/resultsStore');
+                        dispatcher.waitFor([resultsStore.dispatchToken]);
+                        var filters = resultsStore.getFilters();
+                        Object.keys(filters).forEach(function(filterName, i) {
+                            var filterItems = {};
+                            filters[filterName].parameters.forEach(function(param, i) {
+                                filterItems[param.value] = param;
+                            });
+
+                            fieldOptions[filterName].forEach(function(option, i) {
+                                if (filterItems[option.value]) {
+                                    fieldOptions[filterName][i].description = filterItems[option.value].description + ' (' + filterItems[option.value].count + ')';
+                                } else {
+                                    fieldOptions[filterName][i].description = option.description.replace(/ \([^\)]+\)/, '');
+                                }
+                            });
+
+                        });
+                        change = true;
+                    }
+                    break;
+                case 'page.update':
+                    var pageStore = require('load!stores/pageStore');
+                    dispatcher.waitFor([pageStore.dispatchToken]);
+                    if (pageStore.getPageName() == 'search') {
+                        setDefaultValue('display');
+                        setDefaultValue('brand');
+                        setDefaultValue('run_flat');
+                        setDefaultValue('light_truck');
+                        change = true;
+                    }
                     break;
             }
 

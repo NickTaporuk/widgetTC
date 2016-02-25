@@ -33,13 +33,7 @@ define([
             var method;
             switch (type){
                 case 'size':
-                    method = 'searchByRawSize';
-                    if (!searchParams.size && searchParams.width) {
-                        searchParams.size = searchParams.width + searchParams.height + searchParams.rim;
-                        delete searchParams.width; 
-                        delete searchParams.height; 
-                        delete searchParams.rim;
-                    }
+                    method = 'searchBySize';
                     break;
                 case 'vehicle':
                     method = 'searchByCarTire';

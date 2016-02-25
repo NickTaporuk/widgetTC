@@ -40,7 +40,7 @@ define([
         },
 
         render: function() {
-            console.log('results render');
+            // console.log('results render');
 
             var tires = [];
             this.state.tires.map(function(tire, i) {
@@ -67,8 +67,8 @@ define([
                             <SelectField onChange={this._handleFieldChange} options={this.props.fieldOptions.order_by} label="Sort by:" name="order_by" className={cn('filter_field')} emptyDesc={false} defaultValue={this.props.fieldValues.display} />
                         </div>
                         <div className={cn('brands_types_filters')} id={cn('brands_types_filters')}>
-                            <FilterBlock key={1} by="type" options={ {run_flat: this.props.fieldOptions.run_flat, light_truck: this.props.fieldOptions.light_truck} } values={ {run_flat: this.props.fieldValues.run_flat, light_truck: this.props.fieldValues.light_truck} } onChange={this._handleFilterChange} />
-                            <FilterBlock key={2} by="brand" options={ {brand: this.props.fieldOptions.brand} } values={ {brand: this.props.fieldValues.brand} } onChange={this._handleFilterChange} />
+                            <FilterBlock key={1} by="type" allDesc="All Tires" options={ {run_flat: this.props.fieldOptions.run_flat, light_truck: this.props.fieldOptions.light_truck} } values={ {run_flat: this.props.fieldValues.run_flat, light_truck: this.props.fieldValues.light_truck} } onChange={this._handleFilterChange} />
+                            <FilterBlock key={2} by="brand" allDesc="All Brands" options={ {brand: this.props.fieldOptions.brand} } values={ {brand: this.props.fieldValues.brand} } onChange={this._handleFilterChange} />
                         </div>
                         <div className={cn('results')}>
                             <div className={cn('twelvecol')}>
@@ -120,7 +120,7 @@ define([
         },
         _handlePageClick: function(page, event) {
             event.preventDefault();
-            Act.Results.updatePage({page: page});
+            Act.Results.changePage({page: page});
         }
     }
 
