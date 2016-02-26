@@ -35,9 +35,9 @@ define([
                                 <span className={cn('result_type')}>{tire.category}</span><span className={cn('warranty')}>Warranty: <strong className={cn('warranty_value')}>65000</strong> km</span>
                             </span>
                         </h3>
-                        <label className={cn('result_compare')}>
+                        {/*<label className={cn('result_compare')}>
                             <input type="checkbox" defaultChecked={false} /> Add to compare
-                        </label>
+                        </label>*/}
                     </div>
                     <div className={cn('result_body')}>
                         <div className={cn('result_left')}>

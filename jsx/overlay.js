@@ -1,20 +1,14 @@
 define([
     'react',
-    'reactDOM',
     'classnames', 
-    'load!actions/actions',
-    'load!components/header', 
-    'load!components/content'
+    'load!stores/ajaxStore',
+    'load!components/popup',
 ], function(
     React,
-    ReactDOM,
-    cn, 
-    Act,
-    Header, 
-    Content
+    cn,
+    ajaxStore,
+    Popup
 ) {
-
-
     return {
 
        getInitialState: function() {
@@ -35,14 +29,17 @@ define([
 
         render: function() {
             return (
-                <div className={cn('loader')} style={ {display: this.state.loader ? 'block' : 'none' } }>
-                    <img src="/img/loader.gif" alt="Loading" />
+                <div>
+                    <div className={cn('loader')} style={ {display: this.state.loader ? 'block' : 'none' } }>
+                        <img src="/img/loader.gif" alt="Loading" />
+                    </div>
+                    <Popup />
                 </div>
             )
         },
 
         _updateStatus: function() {
-            this.setStatus({
+            this.setState({
                 loader: ajaxStore.isInProcess()
             });
         }

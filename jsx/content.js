@@ -5,6 +5,7 @@ define([
     'load!stores/pageStore',
     'load!stores/searchStore',
     'load!stores/resultsStore',
+    'load!stores/locationsStore',
     'classnames'
 ], function(
     Search,
@@ -13,6 +14,7 @@ define([
     pageStore,
     searchStore,
     resultsStore,
+    locationsStore,
     cn
 ) {
 
@@ -20,7 +22,7 @@ define([
 
         getInitialState: function() {
             return {
-                name: 'search',
+                name: '',
                 props: {}
             }
         },
@@ -42,7 +44,11 @@ define([
             var content = null;
             switch (this.state.name) {
                 case 'search':
-                    content = <Search />;
+                    var props = {
+                        canChangeLocation: locationsStore.getLocations().length > 1
+                    };
+
+                    content = <Search {...props} />;
                     break;
                 case 'results':
                     var tab = searchStore.getActiveSection();

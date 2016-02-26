@@ -1,13 +1,9 @@
 define([
     'dispatcher',
-    'lodash',
-    'load!stores/searchStore',
-    'load!stores/locationsStore'
+    'lodash'
 ], function(
     dispatcher,
-    _,
-    searchStore,
-    locationsStore
+    _
 ) {
 
     var tires = [];

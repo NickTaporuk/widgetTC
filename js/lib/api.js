@@ -1,11 +1,9 @@
 define([
     'dispatcher',
     'ajax'
-    // 'load!actions/apiActions'
 ], function(
     dispatcher,
     ajax
-    // ApiAct
 ) {
 
     ajax.beforeSend = function() {
@@ -14,11 +12,9 @@ define([
         });
     };
     ajax.complete = function() {
-        if (!ajax.isBusy()) {
-            dispatcher.dispatch({
-                actionType: 'ajax.complete'
-            });
-        }
+        dispatcher.dispatch({
+            actionType: 'ajax.complete'
+        });
     };
     ajax.error = function(error) {
         dispatcher.dispatch({
@@ -69,7 +65,6 @@ define([
                         delete searchParams.part_number;
                     }
                     break;
-
             }
             return ajax.make({
                 url: 'tire/' + method,

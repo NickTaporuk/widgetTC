@@ -98,33 +98,6 @@
 		}
 	}
 
-	.tcwlw_locations {
-		@include margin-bottom(-$baseSpacing);
-		padding: 0 0 0 4px;
-		list-style: none;
-
-		li {
-			width: 50%;
-			margin-left: -4px;
-			padding-right: 2%;
-			@include margin-bottom($baseSpacing);
-			display: inline-block;
-			@include ie7-inline-block();
-			vertical-align: top;
-		}
-
-		h4,
-		h5 {
-			font-weight: bold;
-			padding-bottom: 0;
-		}
-
-		.tcwlw_location_btn {
-			@include margin-top(0.5);
-			display: block;
-		}
-	}
-
 
 	// Faux Media
 
@@ -167,6 +140,10 @@
 					@include margin-top(-0.1);
 					@include padding(0, 0, 0.1, 2);
 				}
+			}
+
+			.tcwlw_brand_btn {
+				margin-left: -4px;
 			}
 		}
 	}
@@ -211,8 +188,47 @@
 					@include padding(0, 0, 0.1, 2);
 				}
 			}
+
+			.tcwlw_brand_btn {
+				margin-left: -4px;
+			}
+		}
+	}
+}
+
+/* Items outside of the main widget wrapper */
+
+#tcwlw_widget_outer {
+	.tcwlw_locations {
+		@include margin-bottom(-$baseSpacing);
+		padding: 0 0 0 4px;
+		list-style: none;
+
+		li {
+			width: 50%;
+			margin-left: -4px;
+			padding-right: 2%;
+			@include margin-bottom($baseSpacing);
+			display: inline-block;
+			@include ie7-inline-block();
+			vertical-align: top;
 		}
 
+		h4,
+		h5 {
+			font-weight: bold;
+			padding-bottom: 0;
+		}
+
+		.tcwlw_location_btn {
+			@include margin-top(0.5);
+			display: block;
+		}
+	}
+
+	// Media
+
+	@include respond-to(smaller-screen) {
 		.tcwlw_locations {
 			li {
 				width: 100%;

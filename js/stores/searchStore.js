@@ -145,6 +145,7 @@ define([
         dispatchToken: dispatcher.register(function(payload) {
             var change = false;
             switch (payload.actionType) {
+                case 'tire.parameters.set':
                 case 'search.options.update':
                     Object.keys(payload.options).map(function(fieldName) {
                         setOptions(fieldName, payload.options[fieldName]);
@@ -158,31 +159,6 @@ define([
                 case 'search.active_section.update':
                     activeSection = payload.section;
                     change = true;
-                    break;
-                case 'results.fill':
-                    var pageStore = require('load!stores/pageStore');
-                    if (pageStore.getPageName() == 'search') {
-                        // adding count info for filter items
-                        var resultsStore = require('load!stores/resultsStore');
-                        dispatcher.waitFor([resultsStore.dispatchToken]);
-                        var filters = resultsStore.getFilters();
-                        Object.keys(filters).forEach(function(filterName, i) {
-                            var filterItems = {};
-                            filters[filterName].parameters.forEach(function(param, i) {
-                                filterItems[param.value] = param;
-                            });
-
-                            fieldOptions[filterName].forEach(function(option, i) {
-                                if (filterItems[option.value]) {
-                                    fieldOptions[filterName][i].description = filterItems[option.value].description + ' (' + filterItems[option.value].count + ')';
-                                } else {
-                                    fieldOptions[filterName][i].description = option.description.replace(/ \([^\)]+\)/, '');
-                                }
-                            });
-
-                        });
-                        change = true;
-                    }
                     break;
                 case 'page.update':
                     var pageStore = require('load!stores/pageStore');

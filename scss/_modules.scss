@@ -63,77 +63,6 @@
 		}
 	}
 
-	// Modals
-	
-	.tcwlw_modal {
-		@include trans-black();
-		position: fixed;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100%;
-		@include padding-top(8);
-		@include padding-bottom(4);
-		overflow: auto;
-		-webkit-overflow-scrolling: touch;
-		display: none;
-		z-index: $zindexModal;
-
-		&[aria-hidden="false"] {
-			display: block;
-		}
-
-		p {
-			&:last-child {
-				margin-bottom: 0;
-			}
-		}
-
-		.tcwlw_row {
-			@include max-width(75);
-			@include padding-left(1);
-			@include padding-right(1);
-		}
-
-		.tcwlw_modal_content {
-			background: white;
-			position: relative;
-			width: 100%;
-			margin: 0 auto;
-			outline: 0;
-		}
-
-		.tcwlw_modal_content_top,
-		.tcwlw_modal_content_inner {
-			@include padding($baseSpacing);
-		}
-
-		.tcwlw_modal_content_top {
-			border-bottom: 1px solid $grayLight;
-			text-align: center;
-
-			h2
-			h3,
-			h4 {
-				padding: 0;
-			}
-		}
-
-		.tcwlw_modal_close {
-			position: absolute;
-			@include top(-1.4);
-			@include right(1);
-			width: auto;
-		}
-	}
-
-	// Alert - extending above modal styling
-
-	.tcwlw_alert {
-		@include padding-top(12);
-	}
-
-
 	// Pagination
 
 	.tcwlw_paginator {
@@ -254,6 +183,66 @@
 		}
 	}
 
+	// Tooltips
+
+	.tcwlw_tooltip {
+		position: relative;
+
+		&:hover {
+			.tcwlw_tooltip_content {
+				display: block;
+			}
+		}
+	}
+
+	.tcwlw_tooltip_content {
+		@include trans-black();
+		color: white;
+		position: absolute;
+		bottom: 100%;
+		left: 50%;
+		@include width(16);
+		margin-bottom: 5px;
+		@include margin-left(-8);
+		@include padding($baseSpacing/3);
+		display: none;
+		z-index: $zindexTooltip;
+
+		&:before,
+		&:after {
+			content: '';
+			position: absolute;
+			top: 100%;
+		}
+
+		&:before {
+			left: 0;
+			width: 100%;
+			height: 5px;
+		}
+
+		&:after {
+			left: 50%;
+			width: 0;
+			height: 0;
+			margin-left: -10px;
+			border-style: solid;
+			border-width: 10px 10px 0 10px;
+			border-left-color: transparent;
+			border-right-color: transparent;
+			border-top-color: $grayDarkest;
+			border-top-color: fade-out(black, 0.3);
+		}
+
+		a {
+			color: white;
+		}
+
+		p:last-child {
+			margin: 0 !important;
+		}
+	}
+
 	// Media
 
 	@include respond-to(smaller-screen) {
@@ -283,6 +272,105 @@
 					display: none;
 				}
 			}
+		}
+	}
+}
+
+/* Items that appear outside of the main widget wrapper */
+
+#tcwlw_widget_outer {
+	// Modals
+	
+	.tcwlw_modal {
+		@include trans-black();
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		@include padding-top(8);
+		@include padding-bottom(4);
+		overflow: auto;
+		-webkit-overflow-scrolling: touch;
+		display: none;
+		z-index: $zindexModal;
+
+		&[aria-hidden="false"] {
+			display: block;
+		}
+
+		p {
+			&:last-child {
+				margin-bottom: 0;
+			}
+		}
+
+		.tcwlw_row {
+			@include max-width(75);
+			@include padding-left(1);
+			@include padding-right(1);
+		}
+
+		.tcwlw_modal_content {
+			background: white;
+			position: relative;
+			width: 100%;
+			margin: 0 auto;
+			outline: 0;
+		}
+
+		.tcwlw_modal_content_top,
+		.tcwlw_modal_content_inner {
+			@include padding($baseSpacing);
+		}
+
+		.tcwlw_modal_content_top {
+			border-bottom: 1px solid $grayLight;
+			text-align: center;
+
+			h2
+			h3,
+			h4 {
+				padding: 0;
+			}
+		}
+
+		.tcwlw_modal_close {
+			position: absolute;
+			@include top(-1.4);
+			@include right(1);
+			width: auto;
+		}
+	}
+
+	// Alert - extending above modal styling
+
+	.tcwlw_alert {
+		@include padding-top(12);
+	}
+
+	// Loader
+
+	.tcwlw_loader {
+		@include trans-white();
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		text-align: center;
+		z-index: $zindexLoader;
+		display: none;
+
+		img {
+			background: white;
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			width: 60px;
+			height: 60px;
+			margin: -30px 0 0 -30px;
+			border: 1px solid $grayLighter;
 		}
 	}
 }

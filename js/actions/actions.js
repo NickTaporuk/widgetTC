@@ -25,7 +25,7 @@ define([
             // trigger in Search component
             Api.getTireParameters().then(function(response) {
                 dispatcher.dispatch({
-                    actionType: 'search.options.update',
+                    actionType: 'tire.parameters.set',
                     options: response.data
                 });
             });
@@ -43,6 +43,28 @@ define([
                     actionType: 'page.update',
                     name: name,
                     props: props || {}
+                });
+            }
+        },
+        Popup: {
+            show: function(name, props) {
+                dispatcher.dispatch({
+                    actionType: 'popup.update',
+                    name: name,
+                    props: props || {}
+                });
+            },
+            close: function() {
+                dispatcher.dispatch({
+                    actionType: 'popup.close'
+                });
+            }
+        },
+        Locations: {
+            select: function(id) {
+                dispatcher.dispatch({
+                    actionType: 'locations.current.change',
+                    id: id
                 });
             }
         },

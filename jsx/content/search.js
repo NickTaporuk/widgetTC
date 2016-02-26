@@ -47,7 +47,6 @@ define([
             //         }
             //     }
             // }
-
             // return should;
         },
 
@@ -58,7 +57,7 @@ define([
                     <div className={cn('search_inner')}>
                         <p className={cn('search_intro')}>Find your tires using the form below. You can search by vehicle or tire size. You can also narrow down your search by tire category and brand.</p>
                         <form id={cn('search_by')} className={cn('search_by')} role="search" onSubmit={this._handleSubmit}>
-                            <a href="#locations" className={cn(['change_location', 'modal_open'])}><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE0C8;' }} />Change Location</a>
+                            <a href="#locations" onClick={this._handleLocationsClick} className={cn(['change_location', 'modal_open'])}><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE0C8;' }} />Change Location</a>
                             <div className={cn('tabs')}>
                                 <ul role="tablist">
                                     <li className={cn('tab')} role="presentation">
@@ -182,6 +181,10 @@ define([
         _handleFieldChange: function(event) {
             var fieldName = event.target.name.replace( (this.state.activeTab + '_'), '');
             Act.Search.updateField(this.state.activeTab, fieldName, event.target.value);
+        },
+        _handleLocationsClick: function(event) {
+            event.preventDefault();
+            Act.Popup.show('locations');
         }
     }
 

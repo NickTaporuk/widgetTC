@@ -46,7 +46,7 @@ window.TCWidget = {
             });
 
 //'load!components/overlay', Overlay
-            requirejs(['react', 'reactDOM', 'load!components/wrapper',  'load!actions/actions'], function(React, ReactDOM, Wrapper, Act) {
+            requirejs(['react', 'reactDOM', 'load!components/wrapper',  'load!actions/actions', 'load!components/overlay', 'classnames'], function(React, ReactDOM, Wrapper, Act, Overlay, cn) {
                 var container = document.getElementById(params.container);
 
                 ReactDOM.render(
@@ -58,18 +58,14 @@ window.TCWidget = {
                   // append overlays (popup/message/loading/shadow) to the end of body
                   var body = document.getElementsByTagName('body')[0];
                   self.overlayNode = document.createElement("div");
-                  self.overlayNode.style.position = 'absolute';
-                  self.overlayNode.style.top = 0;
-                  self.overlayNode.style.width = '100%';
-                  self.overlayNode.style.zIndex = 999999;
-                  self.overlayNode.style.overflow = 'visible';
+                  self.overlayNode.id = cn('widget_outer');
                   body.appendChild(self.overlayNode);
                 }
 
-                // ReactDOM.render(
-                //   React.createElement(Overlay, props),
-                //   self.overlayNode
-                // );
+                ReactDOM.render(
+                  React.createElement(Overlay),
+                  self.overlayNode
+                );
 
                 Act.init();
             });

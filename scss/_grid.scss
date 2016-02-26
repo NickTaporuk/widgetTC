@@ -4,7 +4,8 @@
 
 ****************************************/
 
-#tcwlw_widget {
+#tcwlw_widget,
+#tcwlw_widget_outer {
     .tcwlw_container {
         @include clearfix();
     }

@@ -193,17 +193,17 @@ define(['config', 'isMobile'], function(config, isMobile) {
 		this.error = function(e){};
 		this.complete = function(){};
 
-		var ajaxCounter = 0;
-		this.isBusy = function() {
-			return ajaxCounter > 0;
-		};
+		// var ajaxCounter = 0;
+		// this.isBusy = function() {
+		// 	return ajaxCounter > 0;
+		// };
 
 		this.make = function(params) {
 			var url = config.apiBaseUrl + params.url + (/\?/.test(params.url) ? '&' : '?') + 'key=' + config.apikey + (config.sessionId ? '&session_id=' + config.sessionId : '')
 			var a;
 
 			self.beforeSend();
-			ajaxCounter++;
+			// ajaxCounter++;
 
 			var ajax_a = new Ajax();
 			var data = params.data || {}
@@ -225,7 +225,7 @@ define(['config', 'isMobile'], function(config, isMobile) {
 					params.error ? params.error(response, xhrObject) : self.error(response, xhrObject);
 				});
 				a.always(function(response, xhrObject) {
-					ajaxCounter--;
+					// ajaxCounter--;
 					params.complete ? params.complete(response, xhrObject) : self.complete(response, xhrObject);
 				});
 			});

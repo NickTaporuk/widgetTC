@@ -1,52 +1,47 @@
 define([
-    'dispatcher',
-    'load!stores/resultsStore'
+    'dispatcher'
 ], function(
-    dispatcher,
-    resultsStore
+    dispatcher
 ) {
 
     // private section
-    var name = 'search';
+    var name = '';
     var props = {};
+    var hidden = true;
 
     // public section
-    var pageStore = {
-        getPageName: function() {
+    var popupStore = {
+        getPopupName: function() {
             return name;
         },
         getProps: function() {
             return props;
         },
+        isHidden: function() {
+            return hidden;
+        },
 
         dispatchToken:  dispatcher.register(function(payload) {
             var change = false;
             switch (payload.actionType) {
-                case 'tire.parameters.set':
-                case 'page.update':
+                case 'popup.update':
                     name = payload.name || 'search';
                     props = payload.props || {};
+                    hidden = false;
                     change = true;
                     break;
-
-                case 'results.fill':
-                    dispatcher.waitFor([resultsStore.dispatchToken]);
-                    if (name !== 'results') {
-                        name = 'results';
-                        change = true;
-                    }
+                case 'locations.current.change':
+                case 'popup.close':
+                    hidden = true;
+                    change = true;
                     break;
-
-
             }
 
             if (change) {
-                pageStore.trigger('change');
+                popupStore.trigger('change');
             }
         })
     };
 
-   
-
-    return pageStore;
+    return popupStore;
 });

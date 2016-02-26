@@ -20,6 +20,14 @@ body {
 	@include clearfix();
 }
 
+#tcwlw_widget_outer {
+	position: absolute; 
+	top: 0; 
+	width: 100%; 
+	z-index: 999999; 
+	overflow: visible;
+}
+
 #tcwlw_widget {
 	@include margin-bottom($baseSpacing);
 

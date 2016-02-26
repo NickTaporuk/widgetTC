@@ -1,9 +1,11 @@
 define([
     'dispatcher',
-    'ajax'
+    'ajax',
+    'lodash'
 ], function(
     dispatcher,
-    ajax
+    ajax,
+    _
 ) {
 
     var locations = [];
@@ -14,8 +16,9 @@ define([
             locations[location.id] = location;
         });
         
-        //temp code.:
-        currectLocation = locs[0].id;
+        if (locs.length == 1) {
+            currectLocation = locs[0].id;
+        }
     }
 
     function setCurrentLocation(id) {
@@ -26,8 +29,11 @@ define([
         getLocation: function(id) {
             return locations[id];
         },
+        getLocations: function() {
+            return locations;
+        },
         getCurrentLocation: function() {
-            return locations[currectLocation];
+            return this.getLocation(currectLocation);
         },
 
         dispatchToken: dispatcher.register(function(payload) {
@@ -38,7 +44,7 @@ define([
                     change = true;
                     break;
                     
-                case 'locations.change': 
+                case 'locations.current.change': 
                     currectLocation = payload.id;
                     change = true;
                     break;

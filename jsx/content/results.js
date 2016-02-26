@@ -27,7 +27,8 @@ define([
             return {
                 tires: [],
                 totalCount: 0,
-                page: null
+                page: null,
+                filters: []
             };
         },
 
@@ -51,6 +52,19 @@ define([
                 ));
             }.bind(this));
 
+            var filters = null;
+            if (Object.keys(this.state.filters).length > 0) {
+                var filtersInfo = [{key: 'run_flat', desc: 'Run-Flat', all: ''}, {key: 'light_truck', desc: 'Light Track', all: ''}, {key: 'brand', desc: 'Brand', all: 'All Brands'}];
+                filters = [];
+                filtersInfo.forEach(function(info, i) {
+                    if (this.state.filters[info.key].parameters.length > 1) {
+                        filters.push((
+                            <FilterBlock key={i} by={info.desc} name={info.key} allDesc={info.all} params={ this.state.filters[info.key].parameters } onChange={this._handleFilterChange} />
+                        ));
+                    }
+                }, this);
+            }
+
             return (
                 <div>
                     <a href="#search" onClick={this._handleBackClick} className={cn('back_link')}><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE5C4;' }} />Back to search</a>
@@ -68,22 +82,27 @@ define([
                             <SelectField onChange={this._handleFieldChange} options={this.props.fieldOptions.display}  label="Display:" name="display"  className={cn('filter_field')} emptyDesc={false} defaultValue={this.props.fieldValues.display} />
                             <SelectField onChange={this._handleFieldChange} options={this.props.fieldOptions.order_by} label="Sort by:" name="order_by" className={cn('filter_field')} emptyDesc={false} defaultValue={this.props.fieldValues.display} />
                         </div>
-                        <div className={cn('brands_types_filters')} id={cn('brands_types_filters')}>
-                            <FilterBlock key={1} by="type" allDesc="All Tires" options={ {run_flat: this.props.fieldOptions.run_flat, light_truck: this.props.fieldOptions.light_truck} } values={ {run_flat: this.props.fieldValues.run_flat, light_truck: this.props.fieldValues.light_truck} } onChange={this._handleFilterChange} />
-                            <FilterBlock key={2} by="brand" allDesc="All Brands" options={ {brand: this.props.fieldOptions.brand} } values={ {brand: this.props.fieldValues.brand} } onChange={this._handleFilterChange} />
+                        <div className={cn('filters')} id={cn('filters')}>
+                            {filters}
                         </div>
                         <div className={cn('results')}>
                             <div className={cn('twelvecol')}>
                                 <Pagination activePage={this.state.page} itemsOnPage={6} totalItems={this.state.totalCount} onPageClick={this._handlePageClick} />
-                                <div className={cn('compare_btn_wrapper')}>
+                                {/*<div className={cn('compare_btn_wrapper')}>
                                     <span className={cn(['font_color', 'compare_number'])}>2</span>
                                     <a href="#compare" className={cn(['brand_btn_light', 'btn_small', 'compare_btn'])}><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE915;' }} /> Compare Selected Tires</a>
-                                </div>
+                                </div>*/}
                             </div>
                             <div className={cn('twelvecol')}>
-                                <ol className={cn('results_list')}>
-                                    {tires}                                    
-                                </ol>
+                                {
+                                    (tires.length > 0)
+                                    ? 
+                                    <ol className={cn('results_list')}>
+                                        {tires}                                    
+                                    </ol>
+                                    : 
+                                    <h3 className={cn('message')}><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE000;' }} /> We did not find any tires based on your search criteria. Please try searching again later as inventory changes frequently.</h3>
+                                }
                             </div>
                             <div className={cn('twelvecol')}>
                                 <Pagination activePage={this.state.page} itemsOnPage={6} totalItems={this.state.totalCount} onPageClick={this._handlePageClick} />
@@ -95,10 +114,12 @@ define([
         },
 
         _updateStatus: function() {
+            // console.log(resultsStore.getFilters());
             this.setState({
                 tires: resultsStore.getTires(),
                 totalCount: resultsStore.getTotalCount(),
-                page: resultsStore.getPage()
+                page: resultsStore.getPage(),
+                filters: resultsStore.getFilters()
             })
         },
         _handleBackClick: function(event) {
