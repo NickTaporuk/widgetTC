@@ -6,17 +6,28 @@ define([
     _
 ) {
 
+    var itemsPerPage = 6;
+    var showInStock = true;
+    var defaultSelectedQuantity = 4;
+
     var tires = [];
     var tiresIndexes = []
     var totalCount;
     var filters = [];
     var page;
 
+    function changeSelectedQuantity(tireId, quantity) {
+        var tire = tires[tiresIndexes[tireId]];
+        tire.selected_quantity = quantity <= tire.quantity ? quantity : tire.quantity;
+        tire.calculated_price = tire.selected_quantity * tire.price;
+    }
+
     function fillTires(_tires) {
-        _tires.map(function(tire, i) {
-            tiresIndexes[tire.id] = i; 
-        });
         tires = _tires;
+        _tires.map(function(tire, i) {
+            tiresIndexes[tire.id] = i;
+            changeSelectedQuantity(tire.id, defaultSelectedQuantity);
+        });
     }
 
     var resultsStore = {
@@ -35,6 +46,12 @@ define([
         getTire: function(id) {
             return _.cloneDeep(tires[tiresIndexes[id]]);
         },
+        getItemsPerPage: function() {
+            return itemsPerPage;
+        },
+        // getShowInStock: function() {
+        //     return showInStock;
+        // },
 
         dispatchToken: dispatcher.register(function(payload) {
             var change = false;
@@ -45,7 +62,18 @@ define([
                     filters = payload.filters;
                     page = payload.page;                
                     change = true;
-                    break;    
+                    break;
+                case 'dealer.config.set':
+                    var c = payload.config;
+                    itemsPerPage = c.items_per_page;
+                    defaultSelectedQuantity = c.default_selected_quantity;
+                    // showInStock = c.show_in_stock;
+                    change = true;
+                    break;
+                case 'quote.display.update':
+                    changeSelectedQuantity(payload.tireId, payload.quantity);
+                    change = true;
+                    break;
             }
             
             if (change) {

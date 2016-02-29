@@ -29,7 +29,7 @@ define([
             var section = searchStore.getActiveSection();
             var searchParams = searchStore.getSectionValues(section);
             searchParams.location_id = locationsStore.getCurrentLocation().id;
-            searchParams.items_per_page = 6;
+            searchParams.items_per_page = resultsStore.getItemsPerPage();
 
             searchParams.display = searchStore.getValue('common', 'display');
             searchParams.order_by = searchStore.getValue('common', 'order_by');

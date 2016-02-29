@@ -1,9 +1,11 @@
 define([
     'dispatcher',
-    'load!stores/resultsStore'
+    'load!stores/resultsStore',
+    'load!stores/customerStore'
 ], function(
     dispatcher,
-    resultsStore
+    resultsStore,
+    customerStore
 ) {
 
     // private section
@@ -37,7 +39,13 @@ define([
                     }
                     break;
 
-
+                case 'quote.display.update':
+                    dispatcher.waitFor([customerStore.dispatchToken, resultsStore.dispatchToken]);
+                    if (name !== 'quote') {
+                        name = 'quote';
+                        change = true;
+                    }
+                    break;
             }
 
             if (change) {

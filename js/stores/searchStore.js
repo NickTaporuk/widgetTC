@@ -156,6 +156,14 @@ define([
                     setValue(payload.section, payload.field, payload.value);
                     change = true;
                     break;
+                case 'dealer.config.set':
+                    var c = payload.config;
+                    setValue('common', 'order_by', c.default_order.iframe);
+                    setValue('size', 'base_category', c.default_base_category);
+                    setValue('vehicle', 'base_category', c.default_base_category);
+                    activeSection = c.default_searching.iframe.replace('by_', '');
+                    change = true;
+                    break;
                 case 'search.active_section.update':
                     activeSection = payload.section;
                     change = true;

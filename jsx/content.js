@@ -1,20 +1,26 @@
 define([
     'load!components/content/search',
     'load!components/content/results',
+    'load!components/content/quote',
+    'load!components/content/appointment',
     'react',
     'load!stores/pageStore',
     'load!stores/searchStore',
     'load!stores/resultsStore',
     'load!stores/locationsStore',
+    'load!stores/customerStore',
     'classnames'
 ], function(
     Search,
     Results,
+    Quote,
+    Appointment,
     React,
     pageStore,
     searchStore,
     resultsStore,
     locationsStore,
+    customerStore,
     cn
 ) {
 
@@ -91,8 +97,17 @@ define([
                             light_truck: searchStore.getValue('common', 'light_truck')
                         },
                         queryParams: queryParams
-                    }
+                    };
                     content = <Results {...props} />
+                    break;
+                case 'quote':
+                    var props = {
+                        tire: customerStore.getSelectedTire()
+                    };
+                    content = <Quote {...props} />
+                    break;
+                case 'appointment':
+                    content = <Appointment />
                     break;
             }
 

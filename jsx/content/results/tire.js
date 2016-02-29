@@ -1,17 +1,29 @@
 define([
     'react',
-    'classnames'
+    'classnames',
+    'load!actions/actions',
+    'lib/helper'
 ], function(
     React,
-    cn
+    cn,
+    Act,
+    h
 ) {
 
     return {
         getInitialState: function() {
             return {
-                activeTab: 'specs'
+                activeTab: 'specs',
+                quantity: 4
             }
         },
+
+        componentWillMount: function() {
+            this.setState({
+                quantity: this.props.tire.selected_quantity
+            });
+        },
+
         render: function() {
             var tire = this.props.tire;
             var tab = this.state.activeTab;
@@ -25,7 +37,11 @@ define([
                 features = <div className={cn('tab_cont')} id={cn('features_result_1')} aria-hidden={!(tab == 'features')}><ul>{items}</ul></div>;
             }
 
-            // console.log(tire);
+            var quantityItems = [];
+            for(var q = 1; q <= tire.quantity && q <= 8; q++) {
+                quantityItems.push(<option key={q} value={q}>{q}</option>);
+            }
+
             return (
                 <li className={cn({result: true, result_featured: this.props.isTop})}>
                     <div className={cn('result_header')}>
@@ -50,24 +66,17 @@ define([
                                     <div className={cn('result_price')}>
                                         <label className={cn('qty')}>
                                             <span className={cn('qty_label')}>Qty:</span>
-                                            <select name={cn('qty_result_1')} defaultValue="4">
-                                                <option value="1">1</option>
-                                                <option value="2">2</option>
-                                                <option value="3">3</option>
-                                                <option value="4" selected="selected">4</option>
-                                                <option value="5">5</option>
-                                                <option value="6">6</option>
-                                                <option value="7">7</option>
-                                                <option value="8">8</option>
+                                            <select name={cn('qty_result_1')} onChange={this._handleQuantityChange} defaultValue={tire.selected_quantity} ref="quantity">
+                                                {quantityItems}
                                             </select>
                                         </label>
                                         <h5 className={cn('price')}>
-                                            <strong className={cn('price_value')}>${tire.price}</strong>
+                                            <strong className={cn('price_value')}>${h.priceFormat(tire.price * this.state.quantity)}</strong>
                                         </h5>
                                     </div>
                                 </div>
                                 <div className={cn('select_btn_wrapper')}>
-                                    <a href="#summary" className={cn(['btn', 'brand_btn', 'select_btn'])}>Select Tire <i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE5C8;' }} /></a>
+                                    <a href="#summary" onClick={this._handleSelectClick} className={cn(['btn', 'brand_btn', 'select_btn'])}>Select Tire <i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE5C8;' }} /></a>
                                 </div>
                             </div>
                             <div className={cn(['tabs', 'result_tabs'])}>
@@ -133,6 +142,15 @@ define([
             this.setState({
                 activeTab: tab
             });
+        },
+        _handleQuantityChange: function() {
+            this.setState({
+                quantity: parseInt(this.refs.quantity.value)
+            });
+        },
+        _handleSelectClick: function(event) {
+            event.preventDefault();
+            Act.Quote.update(this.props.tire.id, this.state.quantity);
         }
     }
 

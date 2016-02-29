@@ -26,6 +26,15 @@ window.TCWidget = {
                 apikey: params.apikey,
                 container: params.container
             });
+            if (params.sa) {
+              config.setParam('sa', params.sa);
+            }
+            if (params.scriptPlace) {
+              config.setParam('scriptPlace', params.scriptPlace);
+            }
+            if (params.apiBaseUrl) {
+              config.setParam('apiBaseUrl', params.apiBaseUrl); 
+            }
 
 
             h.loadCss( 'css/style.css' );
@@ -45,7 +54,6 @@ window.TCWidget = {
                 }
             });
 
-//'load!components/overlay', Overlay
             requirejs(['react', 'reactDOM', 'load!components/wrapper',  'load!actions/actions', 'load!components/overlay', 'classnames'], function(React, ReactDOM, Wrapper, Act, Overlay, cn) {
                 var container = document.getElementById(params.container);
 

@@ -41,8 +41,11 @@ define([
                 case 'results':
                     step = 1;
                     break;
-                default:
+                case 'quote':
                     step = 2;
+                    break;
+                default:
+                    step = 3;
                     break;
 
             }

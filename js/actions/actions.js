@@ -36,6 +36,13 @@ define([
                     options: {year: years}
                 });
             });
+
+            Api.getDealerConfig().then(function(config) {
+                dispatcher.dispatch({
+                    actionType: 'dealer.config.set',
+                    config: config
+                });
+            });
         },
         Page: {
             show: function(name, props) {
@@ -145,14 +152,34 @@ define([
             }
         },
         Quote: {
-            update: function() {
-                //quantity
-                //optionalServices
-                //discount
-                dispatcher.dispatch({
-                    actionType: 'quote-update_param',
-                    param: param,
-                    value: value
+            /*
+            display: function(tireId, quantity) {
+                Api.getQuoteDisplay({
+                    tire_id: tireId,
+                    quantity: quantity
+                }).then(function(quote) {
+                    dispatcher.dispatch({
+                        actionType: 'quote.display.show',
+                        tireId: tireId,
+                        quantity: quantity,
+                        quote: quote
+                    });
+                });
+            }, */
+            update: function(tireId, quantity, services, withDiscount, customDiscount) {
+                Api.getQuoteDisplay({
+                    tire_id: tireId,
+                    quantity: quantity,
+                    optional_services: services || 'use_default',
+                    with_discount: withDiscount || false,
+                    custom_discount: customDiscount || null
+                }).then(function(quote) {
+                    dispatcher.dispatch({
+                        actionType: 'quote.display.update',
+                        tireId: tireId,
+                        quantity: quantity,
+                        quote: quote
+                    });
                 });
             }
         }

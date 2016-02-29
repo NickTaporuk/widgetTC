@@ -144,6 +144,28 @@ define([
                 });
             }
             return p;
+        },
+
+        getDealerConfig: function() {
+            var p = ajax.make({
+                url: 'dealer/config'
+            }).then(function(response) {
+                return response.data;
+            });
+
+            return p;
+        },
+
+        getQuoteDisplay: function(data) {
+            var p = ajax.make({
+                url: 'quote/display',
+                method: 'post',
+                data: data
+            }).then(function(response) {
+                return response.data;
+            });
+
+            return p;
         }
 
                             
