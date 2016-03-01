@@ -166,6 +166,18 @@ define([
             });
 
             return p;
+        },
+
+        sendAppointment: function(data) {
+            var p = ajax.make({
+                url: 'quote/appointment',
+                method: 'post',
+                data: data
+            }).then(function(response) {
+                return response;
+            });
+
+            return p;
         }
 
                             

@@ -103,7 +103,7 @@ define([
                                     </tr>
                                     { recyclingFee && quote.recycling_fee.is_taxable ? recyclingFee : null }
                                     <tr>
-                                        <td>Taxes</td>
+                                        <td>{quote.tax.name}</td>
                                         <td>${h.priceFormat(quote.tax.total_value)}</td>
                                     </tr>
                                     { recyclingFee && quote.recycling_fee.is_taxable ? null : recyclingFee }

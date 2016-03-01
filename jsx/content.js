@@ -107,7 +107,14 @@ define([
                     content = <Quote {...props} />
                     break;
                 case 'appointment':
-                    content = <Appointment />
+                    var props = {
+                        quote: customerStore.getQuote(),
+                        tire: customerStore.getSelectedTire(),
+                        vehicleInfo: searchStore.getActiveSection() == 'vehicle'
+                            ? searchStore.getValue('vehicle', 'year') + ' ' + searchStore.getValue('vehicle', 'make') + ' ' + searchStore.getValue('vehicle', 'model') + ' ' + searchStore.getValue('vehicle', 'trim')
+                            : null
+                    };
+                    content = <Appointment {...props} />
                     break;
             }
 

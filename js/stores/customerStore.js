@@ -1,18 +1,64 @@
 define([
     'dispatcher',
     'load!stores/resultsStore',
-    'lodash'
+    'lodash',
+    'validate',
+    'moment'
 ], function(
     dispatcher,
     resultsStore,
-    _
+    _,
+    validate,
+    moment
 ) {
 
     // private section
-    var selectedTire;
-    var selectedQuantity;
-    var quote;
-    
+    var selectedTire,
+        selectedQuantity,
+        quote;
+
+    var customer = {
+        name: '',
+        email: '',
+        phone: '',
+        preferred_time: '',
+        way_to_contact: '',
+        vehicle_info: '',
+        notes: ''
+    };
+    var validationErrors = {};
+
+
+    validate.extend(validate.validators.datetime, {
+      // The value is guaranteed not to be null or undefined but otherwise it
+      // could be anything.
+      parse: function(value, options) {
+        return +moment(value);
+      },
+      // Input is a unix timestamp
+      format: function(value, options) {
+        var format = options.dateOnly ? 'YYYY-MM-DD' : this.timeFormat;
+        return moment(value).format(format);
+      }
+    });
+    var constraints = {
+        email: {
+            email: true
+        },
+        phone: {
+            presence: true,
+            format: {
+                pattern: "^\\(?[0-9]{3}\\)?[-. ]?[0-9]{3}[-. ]?[0-9]{4}$",
+                message: "is not valid phone number"
+            }
+        },
+        preferred_time: {
+            datetime: {
+                earliest: moment()
+            },
+        }
+    };
+
     function setQuote(q) {
         //convert objects to array if needed
         var objToArr = ['services', 'optional_services'];
@@ -43,6 +89,9 @@ define([
 
     // public section
     var store = {
+        getSelectedTireId: function() {
+            return selectedTire;
+        },
         getSelectedTire: function() {
             return resultsStore.getTire(selectedTire);
         },
@@ -51,6 +100,12 @@ define([
         },
         getQuote: function() {
             return _.cloneDeep(quote);
+        },
+        getValidationErrors: function() {
+            return validationErrors;
+        },
+        getCustomer: function() {
+            return _.cloneDeep(customer);
         },
     
         dispatchToken:  dispatcher.register(function(payload) {
@@ -61,6 +116,15 @@ define([
                     selectedQuantity = payload.quantity;
 
                     setQuote(payload.quote);
+                    change = true;
+                    break;
+
+                case 'customer.values.update':
+                    validationErrors = validate(payload.values, constraints);
+                    if (validationErrors === undefined) {
+                        validationErrors = {};
+                        _.assign(customer, payload.values);
+                    }
                     change = true;
                     break;
             }

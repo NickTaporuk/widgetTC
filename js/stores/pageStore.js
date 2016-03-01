@@ -39,6 +39,11 @@ define([
                     }
                     break;
 
+                case 'quote.appointment.success':
+                    name = 'quote';
+                    change = true;
+                    break;
+
                 case 'quote.display.update':
                     dispatcher.waitFor([customerStore.dispatchToken, resultsStore.dispatchToken]);
                     if (name !== 'quote') {

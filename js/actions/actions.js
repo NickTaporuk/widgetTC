@@ -3,12 +3,14 @@ define([
     'load!stores/resultsStore',
     'load!stores/searchStore',
     'load!stores/locationsStore',
+    'load!stores/customerStore',
     'lib/api'
 ], function(
     dispatcher,
     resultsStore,
     searchStore,
     locationsStore,
+    customerStore,
     Api
 ) {
 
@@ -152,20 +154,6 @@ define([
             }
         },
         Quote: {
-            /*
-            display: function(tireId, quantity) {
-                Api.getQuoteDisplay({
-                    tire_id: tireId,
-                    quantity: quantity
-                }).then(function(quote) {
-                    dispatcher.dispatch({
-                        actionType: 'quote.display.show',
-                        tireId: tireId,
-                        quantity: quantity,
-                        quote: quote
-                    });
-                });
-            }, */
             update: function(tireId, quantity, services, withDiscount, customDiscount) {
                 Api.getQuoteDisplay({
                     tire_id: tireId,
@@ -181,6 +169,37 @@ define([
                         quote: quote
                     });
                 });
+            },
+            sendAppointment: function(values) {
+                dispatcher.dispatch({
+                    actionType: 'customer.values.update',
+                    values: values
+                });
+
+
+                if (Object.keys(customerStore.getValidationErrors()).length == 0) {
+                    values.tire_id = customerStore.getSelectedTireId();
+                    values.quantity = customerStore.getSelectedQuantity();
+                    values.way_to_contact = 'phone';
+
+                    var quote = customerStore.getQuote();
+                    values.with_discount = quote.discount ? quote.discount.applied : false;
+                    var optionalServices = [];
+                    quote.optional_services.map(function(service) {
+                        if (service.applied) {
+                            optionalServices.push(service.key);
+                        }
+                    });
+                    values.optional_services = optionalServices;
+
+                    Api.sendAppointment(values).then(function(response) {
+                        dispatcher.dispatch({
+                            actionType: 'quote.appointment.success',
+                            title: 'Thank you!', 
+                            content: response.notice
+                        });
+                    });
+                }
             }
         }
     }

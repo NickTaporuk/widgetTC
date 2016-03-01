@@ -45,6 +45,8 @@ window.TCWidget = {
                 paths: {
                   'isMobile': 'bower_components/isMobile/isMobile',
                   'lodash': 'bower_components/lodash/lodash',
+                  'validate': 'bower_components/validate/validate',
+                  'moment': 'bower_components/moment/moment',
                   'dispatcher': 'lib/dispatcher',
                   'ajax': 'lib/ajax',
                   'react': 'bower_components/react/react',

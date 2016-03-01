@@ -1,11 +1,13 @@
 define([
     'dispatcher',
     'ajax',
-    'lodash'
+    'lodash',
+    'lockr',
 ], function(
     dispatcher,
     ajax,
-    _
+    _,
+    lockr
 ) {
 
     var locations = [];
@@ -18,6 +20,8 @@ define([
         
         if (locs.length == 1) {
             currectLocation = locs[0].id;
+        } else if (lockr.get('location_id')) {
+            currectLocation = lockr.get('location_id');
         }
     }
 
@@ -33,7 +37,7 @@ define([
             return locations;
         },
         getCurrentLocation: function() {
-            return this.getLocation(currectLocation);
+            return currectLocation ? this.getLocation(currectLocation) : null;
         },
 
         dispatchToken: dispatcher.register(function(payload) {
@@ -46,6 +50,7 @@ define([
                     
                 case 'locations.current.change': 
                     currectLocation = payload.id;
+                    lockr.set('location_id', currectLocation);
                     change = true;
                     break;
             }

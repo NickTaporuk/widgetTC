@@ -39,9 +39,10 @@ define([
                     title = 'Please select a preferred location:';
                     content = <Locations />;
                     break;
-                // case 'alert':
-                //     content = <Message />
-                //     break;
+                case 'alert':
+                    var title = this.state.props.title;
+                    content = <p dangerouslySetInnerHTML={ {__html: this.state.props.content} } />;
+                    break;
 
                 default:
                     title = '';

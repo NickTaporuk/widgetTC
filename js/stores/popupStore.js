@@ -35,6 +35,16 @@ define([
                     hidden = true;
                     change = true;
                     break;
+
+                case 'quote.appointment.success':
+                    name = 'alert';
+                    props = {
+                        title: payload.title,
+                        content: payload.content
+                    }
+                    hidden = false;
+                    change = true;
+                    break;
             }
 
             if (change) {
