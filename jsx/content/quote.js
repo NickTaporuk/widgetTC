@@ -125,7 +125,7 @@ define([
                                 <a href="#appointment" onClick={this._handleAppoimtmentClick} className={cn(['brand_btn_light', 'btn_small'])}><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE192;' }} /> Make an Appointment</a>
                             </div>
                             <div className={cn(['sixcol', 'last', 'col_right'])}>
-                                <a href="#order" className={cn('brand_btn')}>Order Your Tires <i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE5C8;' }} /></a>
+                                <a href="#order" onClick={this._handleOrderClick} className={cn('brand_btn')}>Order Your Tires <i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE5C8;' }} /></a>
                             </div>
                         </div>
                     </div>
@@ -253,6 +253,9 @@ define([
         },
         _handleAppoimtmentClick: function() {
             Act.Page.show('appointment');
+        },
+        _handleOrderClick: function() {
+            Act.Page.show('order');
         }
 
     } 

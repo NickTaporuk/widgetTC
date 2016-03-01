@@ -3,6 +3,7 @@ define([
     'load!components/content/results',
     'load!components/content/quote',
     'load!components/content/appointment',
+    'load!components/content/order',
     'react',
     'load!stores/pageStore',
     'load!stores/searchStore',
@@ -15,6 +16,7 @@ define([
     Results,
     Quote,
     Appointment,
+    Order,
     React,
     pageStore,
     searchStore,
@@ -107,6 +109,7 @@ define([
                     content = <Quote {...props} />
                     break;
                 case 'appointment':
+                case 'order':
                     var props = {
                         quote: customerStore.getQuote(),
                         tire: customerStore.getSelectedTire(),
@@ -114,7 +117,11 @@ define([
                             ? searchStore.getValue('vehicle', 'year') + ' ' + searchStore.getValue('vehicle', 'make') + ' ' + searchStore.getValue('vehicle', 'model') + ' ' + searchStore.getValue('vehicle', 'trim')
                             : null
                     };
-                    content = <Appointment {...props} />
+                    if (this.state.name == 'appointment') {
+                        content = <Appointment {...props} />
+                    } else if (this.state.name == 'order') {
+                        content = <Order {...props} />
+                    }
                     break;
             }
 
