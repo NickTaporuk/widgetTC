@@ -16,15 +16,15 @@
 	// Brand Specific
 
 	.tcwlw_font_color {
-		color: $brandFont;
+		color: $primaryColor;
 	}
 
 	.tcwlw_bg_color {
-		background-color: $brandBackground;
+		background-color: $secondaryColor;
 	}
 
 	.tcwlw_border_color {
-		border-color: $brandFont;
+		border-color: $primaryColor;
 	}
 
 	// Buttons
@@ -34,11 +34,11 @@
 	}
 
 	.tcwlw_brand_btn {
-		@include button($brandFont);
+		@include button($primaryColor);
 	}
 
 	.tcwlw_brand_btn_light {
-		@include button-light($brandFont);
+		@include button-light($primaryColor);
 	}
 
 	.tcwlw_btn_small {

@@ -19,8 +19,8 @@ $green:					#039511;
 $orange:				#d68300;
 
 // Default brand colors
-$brandFont:				$red;
-$brandBackground: 		$gray;
+$primaryColor:			$red;
+$secondaryColor: 		$gray;
 
 // Typography 
 $baseFontSize:          1.6;
@@ -28,7 +28,7 @@ $fontSans:              "Lato", "Helvetica Neue", Helvetica, Arial, sans-serif;
 $fontSerif: 		   	Georgia, Times, serif;
 $baseLineHeight:        1.5;
 $baseSpacing:			2.4;
-$linkColor: 			$brandFont;
+$linkColor: 			$primaryColor;
 
 // Weights
 $thin:      			100;

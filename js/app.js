@@ -53,6 +53,7 @@ window.TCWidget = {
                   'reactDOM': 'bower_components/react/react-dom',
                   'microEvent': 'bower_components/microevent/microevent',
                   'load': 'loader',
+                  'stripe': 'https://js.stripe.com/v2/stripe'
                 }
             });
 

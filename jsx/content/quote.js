@@ -62,14 +62,14 @@ define([
                                         <td>{tire.brand + ' ' + tire.model}</td>
                                         <td>${ h.priceFormat(tire.price) }</td>
                                         <td>
-                                            <select onChange={this._handleQuantityChange} defaultValue={this.state.quantity}>
+                                            <select className={cn(['qty', 'compare_qty'])} onChange={this._handleQuantityChange} defaultValue={this.state.quantity}>
                                                 {quantityItems}
                                             </select>
                                         </td>
                                         <td>${ h.priceFormat(this.state.quantity * tire.price) }</td>
                                     </tr>
                                     <tr>
-                                        <td>{ tire.size_short + ' ' + tire.load_index + tire.speed_rating} </td>
+                                        <td>{ tire.size_short + ' ' + tire.load_index + tire.speed_rating}</td>
                                         <td></td>
                                         <td></td>
                                         <td></td>
@@ -119,15 +119,29 @@ define([
 
                         <p dangerouslySetInnerHTML={{ __html: quote.legal_information.replace(/(?:\r\n|\r|\n)/g, "<br />")}} />
 
-                        <div className={cn(['twelvecol', 'bottom_btns'])}>
-                            <div className={cn(['sixcol', 'col_left'])}>
-                                <a href="#quote" className={cn(['brand_btn_light', 'btn_small'])}><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE14F;' }} /> Get a Quote</a>
-                                <a href="#appointment" onClick={this._handleAppoimtmentClick} className={cn(['brand_btn_light', 'btn_small'])}><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE192;' }} /> Make an Appointment</a>
-                            </div>
-                            <div className={cn(['sixcol', 'last', 'col_right'])}>
-                                <a href="#order" onClick={this._handleOrderClick} className={cn('brand_btn')}>Order Your Tires <i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE5C8;' }} /></a>
-                            </div>
-                        </div>
+                        {this._getButtons()}
+                    </div>
+                </div>
+            );
+        },
+
+        _getButtons: function() {
+            var btns = {
+                'quote': <a href="#quote" className={cn(['brand_btn_light', 'btn_small'])}><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE14F;' }} /> Get a Quote</a>,
+                'appointment': <a href="#appointment" onClick={this._handleAppoimtmentClick} className={cn(['brand_btn_light', 'btn_small'])}><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE192;' }} /> Make an Appointment</a>
+            }
+            if (this.props.withOrderBtn) {
+                btns.order = <a href="#order" onClick={this._handleOrderClick} className={cn('brand_btn')}>Order Your Tires <i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE5C8;' }} /></a>
+            }
+            
+            return (
+                <div className={cn(['twelvecol', 'bottom_btns'])}>
+                    <div className={cn(['sixcol', 'col_left'])}>
+                        {btns.quote}
+                        {this.props.withOrderBtn ? btns.appointment : null}
+                    </div>
+                    <div className={cn(['sixcol', 'last', 'col_right'])}>
+                        {this.props.withOrderBtn ? btns.order : btns.appointment}
                     </div>
                 </div>
             );
@@ -251,11 +265,13 @@ define([
 
             return keys;
         },
-        _handleAppoimtmentClick: function() {
+        _handleAppoimtmentClick: function(event) {
+            event.preventDefault();
             Act.Page.show('appointment');
         },
-        _handleOrderClick: function() {
-            Act.Page.show('order');
+        _handleOrderClick: function(event) {
+            event.preventDefault();
+            Act.Order.create();
         }
 
     } 

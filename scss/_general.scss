@@ -87,13 +87,12 @@ body {
 		text-align: center;
 
 		.tcwlw_steps_list_item {
-			background: $grayLightest;
 			@include font-size($baseFontSize*0.875);
 			font-weight: bold;
 			@include line-height($baseLineHeight*0.917);
 			text-transform: uppercase;
 			letter-spacing: 0.05em;
-			color: $grayDarker;
+			color: white;
 			position: relative;
 			width: 28.3%;
 			min-width: 158px;
@@ -103,7 +102,7 @@ body {
 			margin-left: 2%;
 			margin-right: 2%;
 			@include padding($baseLineHeight/2, 0.5);
-			border-color: $grayLightest;
+			border-color: $secondaryColor;
 			display: inline-block;
 			@include ie7-inline-block();
 
@@ -137,9 +136,8 @@ body {
 			}
 
 			&.tcwlw_active {
-				background: $brandBackground;
-				color: white;
-				border-color: $brandBackground;
+				background: $primaryColor;
+				border-color: $primaryColor;
 			}
 		}
 	}

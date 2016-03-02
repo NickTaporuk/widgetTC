@@ -178,7 +178,42 @@ define([
             });
 
             return p;
+        },
+
+        orderCreate: function(data) {
+            var p = ajax.make({
+                url: 'order',
+                method: 'post',
+                data: data
+            }).then(function(response) {
+                return response.data;
+            });
+
+            return p;
+        },
+        orderCheckout: function(orderId, data) {
+            var p = ajax.make({
+                url: 'order/' + orderId + '/checkout',
+                method: 'post',
+                data: data
+            }).then(function(response) {
+                return response.data;
+            });
+
+            return p;
+        },
+        orderPayment: function(orderId, token) {
+            var p = ajax.make({
+                url: 'order/' + orderId + '/payment',
+                method: 'post',
+                data: {token: token}
+            }).then(function(response) {
+                return response;
+            });
+
+            return p;
         }
+
 
                             
 

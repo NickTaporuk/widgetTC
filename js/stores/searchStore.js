@@ -32,9 +32,9 @@ define([
 
     var fieldValues = {
         size: {
-            width: '',
-            height: '',
-            rim: '',
+            width: '195',
+            height: '65',
+            rim: '15',
             speed_rating: '',
             load_index: '',
             base_category: ''

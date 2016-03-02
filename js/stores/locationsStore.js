@@ -1,15 +1,12 @@
 define([
     'dispatcher',
-    'ajax',
     'lodash',
     'lockr',
 ], function(
     dispatcher,
-    ajax,
     _,
     lockr
 ) {
-
     var locations = [];
     var currectLocation;
 

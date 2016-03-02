@@ -4,12 +4,14 @@ define([
     'load!components/content/quote',
     'load!components/content/appointment',
     'load!components/content/order',
+    'load!components/content/confirmation',
     'react',
     'load!stores/pageStore',
     'load!stores/searchStore',
     'load!stores/resultsStore',
     'load!stores/locationsStore',
     'load!stores/customerStore',
+    'load!stores/dealerStore',
     'classnames'
 ], function(
     Search,
@@ -17,12 +19,14 @@ define([
     Quote,
     Appointment,
     Order,
+    Confirmation,
     React,
     pageStore,
     searchStore,
     resultsStore,
     locationsStore,
     customerStore,
+    dealerStore,
     cn
 ) {
 
@@ -104,15 +108,19 @@ define([
                     break;
                 case 'quote':
                     var props = {
-                        tire: customerStore.getSelectedTire()
+                        tire: customerStore.getSelectedTire(),
+                        withOrderBtn: dealerStore.getStripeKey() !== null
                     };
                     content = <Quote {...props} />
                     break;
                 case 'appointment':
                 case 'order':
+                case 'confirmation':
                     var props = {
                         quote: customerStore.getQuote(),
                         tire: customerStore.getSelectedTire(),
+                        order: customerStore.getOrder(),
+                        stripeKey: dealerStore.getStripeKey(),
                         vehicleInfo: searchStore.getActiveSection() == 'vehicle'
                             ? searchStore.getValue('vehicle', 'year') + ' ' + searchStore.getValue('vehicle', 'make') + ' ' + searchStore.getValue('vehicle', 'model') + ' ' + searchStore.getValue('vehicle', 'trim')
                             : null
@@ -121,6 +129,9 @@ define([
                         content = <Appointment {...props} />
                     } else if (this.state.name == 'order') {
                         content = <Order {...props} />
+                    } else if (this.state.name == 'confirmation') {
+                        props.location = locationsStore.getCurrentLocation();
+                        content = <Confirmation {...props} />
                     }
                     break;
             }

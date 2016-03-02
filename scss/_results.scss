@@ -271,7 +271,6 @@
 
 	.tcwlw_result_brand_logo,
 	.tcwlw_result_tire {
-		@include margin-bottom(0.5);
 		margin-left: auto;
 		margin-right: auto;
 		display: block;
@@ -281,12 +280,41 @@
 		width: auto;
 		max-width: 140px;
 		max-height: 20px;
+		@include margin-bottom(0.5);
+	}
+
+	.tcwlw_result_tire_wrapper {
+		position: relative;
+		width: 100%;
+		@include margin-bottom(0.5);
+		@include padding($baseSpacing/4);
+		border: 1px solid $grayLighter;
 	}
 
 	.tcwlw_result_tire {
 		width: auto;
 		max-width: 100%;
 		max-height: 140px;
+	}
+
+	.tcwlw_tire_enlarge {
+		background: none;
+		@include font-size(1.4);
+		line-height: 1;
+		position: absolute;
+		bottom: 0;
+		right: 0;
+		@include padding(0.2);
+		border: none;
+		display: block;
+		z-index: 10;
+
+		i {
+			line-height: 1;
+			color: inherit;
+			margin: 0;
+			vertical-align: middle;
+		}
 	}
 
 	.tcwlw_result_rebate,
@@ -298,14 +326,38 @@
 		@include padding($baseSpacing/6, $baseSpacing/4);
 		display: block;
 		text-align: center;
+
+		i {	
+			font-size: 120%;
+			line-height: 1;
+			color: inherit;
+			vertical-align: -3px;
+		}
+
+		a {
+			color: white;
+
+			&:hover,
+			&:focus {
+				color: #f2f2f2;
+			}
+		}
 	}
 
 	.tcwlw_result_rebate {
 		background: $green;
+
+		i {
+			background: $green;
+		}
 	}
 
 	.tcwlw_result_original_equip {
 		background: $orange;
+
+		i {
+			background: $orange;
+		}
 	}
 
 	.tcwlw_result_select_actions {
@@ -422,12 +474,18 @@
 		}
 
 		.tcwlw_result {
+			background: white;
 			position: relative;
 			max-width: none;
 			@include margin-bottom($baseSpacing/1.5);
 			@include padding($baseSpacing/2, $baseSpacing/2, $baseSpacing/6);
-			border: 1px solid $grayLight;
+			border-width: 1px;
+			border-style: solid;
 			display: block;
+
+			&:not(.tcwlw_result_featured) {
+				border-color: $grayLight;
+			}
 
 			p,
 			li {
@@ -711,14 +769,13 @@
 		// Variations for "featured" results
 
 		.tcwlw_result_featured {
-			@extend %tcwlw_box;
 			border-width: 3px;
-			border-color: $brandFont;
+			@include box-shadow();
 			counter-increment: featured-counter;
 
 			&:after {
 				content: counter(featured-counter);
-				background: $brandFont;
+				background: $primaryColor;
 				@include font-size($baseFontSize);
 				font-weight: bold;
 				line-height: 2.4;
@@ -1120,5 +1177,15 @@
 				min-width: 0;
 			}
 		}
+	}
+}
+
+/* Items outside of the main widget wrapper */
+
+#tcwlw_widget_outer {	
+	.tcwlw_result_tire_lrg {
+		margin-left: auto;
+		margin-right: auto;
+		display: block;
 	}
 }

@@ -44,12 +44,27 @@ define([
                     change = true;
                     break;
 
+                case 'order.create.success':
+                    if (payload.tires && payload.tires[0]) {
+                        dispatcher.waitFor([customerStore.dispatchToken]);
+                        name = 'order';
+                        change = true;
+                    }
+                    break;
+
                 case 'quote.display.update':
                     dispatcher.waitFor([customerStore.dispatchToken, resultsStore.dispatchToken]);
                     if (name !== 'quote') {
                         name = 'quote';
                         change = true;
                     }
+                    break;
+
+                case 'order.payment.success':
+                    dispatcher.waitFor([customerStore.dispatchToken]);
+                    name = 'confirmation';
+                    props.notice = payload.notice;
+                    change = true;
                     break;
             }
 

@@ -297,7 +297,6 @@
 	}
 	
 	&:active {
-		background-color: $buttonColor;
 		@include translateY(2px);
 		@include box-shadow(none);
 	}
@@ -318,7 +317,7 @@
 	}
 }
 
-@mixin button-light($buttonColor: $brandFont) {
+@mixin button-light($buttonColor: $primaryColor) {
 	background-color: white;
 	font-family: $fontSans;
 	@include font-size($baseFontSize*1.25);
@@ -360,7 +359,6 @@
 	}
 	
 	&:active {
-		color: $buttonColor;
 		@include translateY(2px);
 		@include box-shadow(none);
 	}

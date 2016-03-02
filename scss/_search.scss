@@ -61,7 +61,7 @@
 
 		.tcwlw_field {
 			float: none;
-			color: $brandBackground;
+			color: $secondaryColor;
 			position: relative;
 			min-width: 248px;
 			margin-left: -4px;
@@ -73,7 +73,7 @@
 
 			&:before {
 				content: counter(steps-counter);
-				background: $brandBackground;
+				background: $secondaryColor;
 				@include font-size($baseFontSize);
 				font-weight: bold;
 				line-height: 2.1;

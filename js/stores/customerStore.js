@@ -15,17 +15,27 @@ define([
     // private section
     var selectedTire,
         selectedQuantity,
-        quote;
+        quote = {};
 
     var customer = {
-        name: '',
-        email: '',
-        phone: '',
+        name: 'Roamn',
+        email: 'mromanp@ukr.net',
+        phone: '2342343245',
         preferred_time: '',
         way_to_contact: '',
         vehicle_info: '',
         notes: ''
     };
+
+    var order = {
+        order_number: null,
+        order_id: null,
+        status: null,
+        deposit_payment: null,
+        outstanding_balance: null,
+        payment_percentage: null
+    };
+
     var validationErrors = {};
 
 
@@ -74,7 +84,7 @@ define([
             }
         }
         //make shop supply fee as service
-        if (q.shop_supply_fee) {
+        if (q.shop_supply_fee && Object.keys(q.shop_supply_fee).length > 0) {
             q.services.push({
                 name: q.shop_supply_fee.name,
                 description: '',
@@ -107,6 +117,9 @@ define([
         getCustomer: function() {
             return _.cloneDeep(customer);
         },
+        getOrder: function() {
+            return _.cloneDeep(order);
+        },
     
         dispatchToken:  dispatcher.register(function(payload) {
             var change = false;
@@ -119,11 +132,39 @@ define([
                     change = true;
                     break;
 
+                case 'order.create.success':
+                    if (payload.tires && payload.tires[0]) {
+                        order.order_id = payload.order_id;
+                        order.order_number = payload.order_number;
+                        order.status = payload.status;
+                        order.deposit_payment = payload.tires[0].prices.deposit_payment;
+                        order.outstanding_balance = payload.tires[0].prices.outstanding_balance;
+                        order.payment_percentage = payload.tires[0].prices.payment_percentage;
+                        change = true;
+                    }
+                    break;
+
+                case 'order.payment':
                 case 'customer.values.update':
                     validationErrors = validate(payload.values, constraints);
                     if (validationErrors === undefined) {
                         validationErrors = {};
                         _.assign(customer, payload.values);
+                    }
+                    change = true;
+                    break;
+
+                case 'order.checkout.success':
+                case 'order.payment.success':
+                    order.status = payload.status;
+                    change = true;
+                    break;
+
+                case 'order.checkout.error':
+                case 'order.payment.error':
+                    validationErrors = payload.errors;
+                    if (validationErrors.prefered_time) {
+                        validationErrors.preferred_time = validationErrors.prefered_time; //temporary for compatibility
                     }
                     change = true;
                     break;

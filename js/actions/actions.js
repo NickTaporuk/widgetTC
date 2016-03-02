@@ -201,7 +201,79 @@ define([
                     });
                 }
             }
+        },
+        Order: {
+            create: function() {
+                var quote = customerStore.getQuote();
+                var optionalServices = [];
+                quote.optional_services.map(function(service) {
+                    if (service.applied) {
+                        optionalServices.push(service.key);
+                    }
+                });
+
+                data = {
+                    tires: [{
+                        id: customerStore.getSelectedTireId(),
+                        quantity: customerStore.getSelectedQuantity(),
+                        with_discount: quote.discount ? quote.discount.applied : false,
+                        optional_services: optionalServices
+                    }]
+                };
+
+                Api.orderCreate(data).then(function(orderInfo) {
+                    orderInfo.actionType = 'order.create.success';
+
+                    dispatcher.dispatch(orderInfo);
+                })
+            },
+
+            payment: function(values) {
+                dispatcher.dispatch({
+                    actionType: 'order.payment',
+                    values: values
+                });
+
+                if (Object.keys(customerStore.getValidationErrors()).length == 0) {
+                    var order = customerStore.getOrder();
+
+
+                    function payment() {
+                        Api.orderPayment(order.order_id, values.token).then(function(response) {
+                            var info = response.data;
+                            info.notice = response.notice;
+                            info.actionType = 'order.payment.success';
+                            dispatcher.dispatch(info);
+                        }, function(response) {
+                            if (response.error_code == 400001) {
+                                dispatcher.dispatch({
+                                    actionType: 'order.payment.error',
+                                    errors: {number: response.errors.token}
+                                });
+                            }
+                        });
+                    }
+
+                    if (order.status === 'initiated') {
+                        Api.orderCheckout(order.order_id, values).then(function(orderInfo) {
+                            orderInfo.actionType = 'order.checkout.success';
+                            dispatcher.dispatch(orderInfo);
+                            payment();
+                        }, function(response) {
+                            if (response.error_code == 400001) {
+                                dispatcher.dispatch({
+                                    actionType: 'order.checkout.error',
+                                    errors: response.errors
+                                });
+                            }
+                        });
+                    } else {
+                        payment();
+                    }
+                }
+            }
         }
+
     }
 
     return Actions;

@@ -2,19 +2,22 @@ define([
     'react',
     'classnames',
     'load!actions/actions',
-    'lib/helper'
+    'lib/helper',
+    'moment'
 ], function(
     React,
     cn,
     Act,
-    h
+    h,
+    moment
 ) {
 
     return {
         getInitialState: function() {
             return {
                 activeTab: 'specs',
-                quantity: 4
+                quantity: 4,
+                showRebate: false
             }
         },
 
@@ -43,7 +46,7 @@ define([
             }
 
             return (
-                <li className={cn({result: true, result_featured: this.props.isTop})}>
+                <li className={cn({result: true, result_featured: this.props.isTop, border_color: this.props.isTop})}>
                     <div className={cn('result_header')}>
                         <h3 className={cn(['result_title', 'font_color'])}>
                             {tire.model}
@@ -58,7 +61,15 @@ define([
                     <div className={cn('result_body')}>
                         <div className={cn('result_left')}>
                             <img src={tire.brand_logo} alt={tire.brand + ' Tire'} className={cn('result_brand_logo')} />
-                            <img src={tire.image} alt="An image of the tire" className={cn('result_tire')} />
+                            <div className={cn('result_tire_wrapper')}>
+                                <img src={tire.image} alt="An image of the tire" className={cn('result_tire')} />
+                                <a href="#tire_modal" className={cn(['modal_open', 'tire_enlarge', 'font_color'])}>
+                                    <i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE147;'}} /><span className={cn('hidden')}>Enlarge</span>
+                                </a>
+                            </div>
+                            {this._getRebateBlock()}
+                            {this._getOemBlock()}
+                            {this._getRatingBlock(3, true)}
                         </div>
                         <div className={cn('result_right')}>
                             <div className={cn('result_select_actions')}>
@@ -104,13 +115,7 @@ define([
 
                                     <div className={cn('result_review')}>
                                         <h5 className={cn('result_review_title')}>A great tire!</h5>
-                                        <div className={cn('result_rating')} aria-label="Tire rating: 3.5 stars">
-                                            <i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE838;' }} />
-                                            <i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE838;' }} />
-                                            <i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE838;' }} />
-                                            <i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE839;' }} />
-                                            <i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE83A;' }} />
-                                        </div>
+                                        {this._getRatingBlock()}
                                         <span className={cn('result_review_date')}>November 15, 2015</span>
                                         <div className={cn('result_review_content')}>
                                             <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque dui leo, mollis ac condimentum nec, iaculis non mi. Duis dictum dui a velit aliquet, ac consequat risus accumsan. </p>
@@ -119,13 +124,7 @@ define([
 
                                     <div className={cn('result_review')}>
                                         <h5 className={cn('result_review_title')}>A much longer review title for testing layout adjustments</h5>
-                                        <div className={cn('result_rating')} aria-label="Tire rating: 4 stars">
-                                            <i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE838;' }} />
-                                            <i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE838;' }} />
-                                            <i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE838;' }} />
-                                            <i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE839;' }} />
-                                            <i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE83A;' }} />
-                                        </div>
+                                        {this._getRatingBlock()}
                                         <span className={cn('result_review_date')}>November 6, 2015</span>
                                         <div className={cn('result_review_content')}>
                                             <p>Suspendisse congue laoreet nulla ut mattis. Duis at sem rutrum, varius orci at, suscipit lectus. Phasellus ac magna semper, luctus sapien non, tempus sapien. </p>
@@ -138,6 +137,86 @@ define([
                 </li>
             );
         },
+
+        _getRatingBlock: function(rating, withLink) {
+            var withLink = withLink || false;
+            return (
+                <div className={cn('result_rating')} aria-label="Tire rating: 3.5 stars">
+                    <i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE838;' }} />
+                    <i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE838;' }} />
+                    <i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE838;' }} />
+                    <i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE839;' }} />
+                    <i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE83A;' }} />
+                    {withLink ? <a href="#reviews_result_1" className={cn('result_rating_link')}>10 Reviews</a> : null}
+                </div>
+            );
+        },
+
+        _getRebateBlock: function() {
+            var tire = this.props.tire,
+                block;
+
+            var offer = null;
+
+            var rebates = tire.rebates;
+            if (rebates && rebates[0] && rebates[0].valid_range) {
+                offer = rebates[0];
+            } else if (tire.discount) {
+                offer = tire.discount;
+                if (offer[0] !== undefined) { // needed as there are bug in response (if no discont we receive array. But it must be null)
+                    offer = null;
+                }
+            }
+
+            if (offer) {
+                var link;
+                if (offer.coupon_link && offer.coupon_line) {
+                    link = <a target="_blank" rel="nofollow" href={offer.coupon_link}>{offer.coupon_line}</a>          
+                }
+                var range;
+                if (offer.valid_range.is_ongoing) {
+                    range = 'Valid from ' + moment(offer.valid_range.start_date).format('MMM. DD') + ' to ' + moment(offer.valid_range.end_date).format('MMM. DD, YYYY');
+                }
+
+                block = (
+                    <span className={cn(['result_rebate', 'tooltip'])}>
+                        {offer.name} <a href="#show_rebate" onClick={this._showRebate} className={cn({toggle: true, toggle_open: this.state.showRebate})}><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE887;'}} /></a>
+
+                        <span className={cn(['tooltip_content', 'toggle_content']) + ' ' + cn({toggle_hidden: !this.state.showRebate})} id={cn('result_2_rebate')}>
+                            <p>
+                                {offer.description} {range ? <br /> : null}
+                                {range} {link ? <br /> : null}
+                                {link}
+                            </p>
+                        </span>
+                    </span>
+                );
+            }
+
+            return block;
+        },
+
+        _showRebate: function() {
+            this.setState({
+                showRebate: !this.state.showRebate
+            });
+        },
+
+        _getOemBlock: function() {
+            var tire = this.props.tire,
+                block;
+
+            if (tire.is_oem) {
+                block = (
+                    <span className={cn('result_original_equip')}>
+                        Original Equipment Tire
+                    </span>
+                );
+            }
+
+            return block;
+        },
+
         _handleTabClick: function(tab, event) {
             this.setState({
                 activeTab: tab
