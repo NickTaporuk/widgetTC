@@ -15,264 +15,80 @@ define([
    
     return {
         componentWillMount: function() {
-            this._updateQuote();
+            this._updateState();
         },
         componentDidMount: function() {
-            customerStore.bind('change', this._updateQuote);
+            customerStore.bind('change', this._updateState);
         },
         componentWillUnmount: function() {
-            customerStore.unbind('change', this._updateQuote);    
+            customerStore.unbind('change', this._updateState);    
         },
 
 
         render: function() {
-            var tire = this.props.tire;
-            var quote = this.state.quote;
-
-            var recyclingFee = null;
-            if (quote.recycling_fee) {
-                recyclingFee = <tr>
-                    <td>{quote.recycling_fee.name}</td>
-                    <td>${h.priceFormat(quote.recycling_fee.total_value)}</td>
-                </tr>;
-            }
-
-            var quantityItems = [];
-            for(var q = 1; q <= tire.quantity && q <= 8; q++) {
-                quantityItems.push(<option key={q} value={q}>{q}</option>);
-            }
-
             return (
                 <div>
-                    <a href="#results" onClick={this._handleBackClick} className={cn('back_link')}><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE5C4;' }} />Back to results</a>
+                    <a href="#results" onClick={this._handleBackClick} className={cn('back_link')}><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE5C4;' }} />Back to summary</a>
 
-                    <div className={cn(['max_width', 'summary_wrapper'])}>
-                        <div className={cn('table_wrapper')}>
-                            <table className={cn('table')}>
-                                <thead>
-                                    <tr>
-                                        <th>Tires</th>
-                                        <th>Price</th>
-                                        <th>Qty</th>
-                                        <th></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>{tire.brand + ' ' + tire.model}</td>
-                                        <td>${ h.priceFormat(tire.price) }</td>
-                                        <td>
-                                            <select className={cn(['qty', 'compare_qty'])} onChange={this._handleQuantityChange} defaultValue={this.state.quantity}>
-                                                {quantityItems}
-                                            </select>
-                                        </td>
-                                        <td>${ h.priceFormat(this.state.quantity * tire.price) }</td>
-                                    </tr>
-                                    <tr>
-                                        <td>{ tire.size_short + ' ' + tire.load_index + tire.speed_rating}</td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Part #{ tire.part_number }</td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                    <div className={cn('quote_wrapper')}>
+                        <div className={cn(['sixcol', 'quote_left'])}>
+                            <h3>Email Yourself</h3>
+                            <p>A tire specialist is standing by to call and answer any questions you may have or help you schedule an appointment.</p>
+                            <form action="#quote_submit" onSubmit={this._handleEmailClick} className={cn('appointment_form')}>
+                                <fieldset>
+                                    <div className={cn('control_wrapper')}>
+                                        <label htmlFor={cn('order_email')}>Email Address <span className="req">*</span></label>
+                                        <input type="email" id={cn('order_email')} defaultValue={this.state.email} required ref="email" />
+                                    </div>
+                                    <div className={cn('control_wrapper')}>
+                                        <label>
+                                            <input type="checkbox" ref="follow_up" /> Please follow up regarding this quote
+                                        </label>
+                                    </div>
+                                    <button type="submit" className={cn('brand_btn')}><i className={cn('material_icons')}>&#xE0BE;</i> Send</button>
+                                </fieldset>
+                            </form>
                         </div>
-
-                        {this._getServicesBlock(quote.services)}
-                        {this._getServicesBlock(quote.optional_services, true)}
-                        {this._getDiscountBlock()}
-
-                        <div className={cn('table_wrapper')}>
-                            <table className={cn('table')}>
-                                <thead>
-                                    <tr>
-                                        <th>Total</th>
-                                        <th></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>Sub-total</td>
-                                        <td>${h.priceFormat(quote.total.sub_total)}</td>
-                                    </tr>
-                                    { recyclingFee && quote.recycling_fee.is_taxable ? recyclingFee : null }
-                                    <tr>
-                                        <td>{quote.tax.name}</td>
-                                        <td>${h.priceFormat(quote.tax.total_value)}</td>
-                                    </tr>
-                                    { recyclingFee && quote.recycling_fee.is_taxable ? null : recyclingFee }
-                                </tbody>
-                                <tfoot>
-                                    <tr>
-                                        <td>Total Price:</td>
-                                        <td>${h.priceFormat(quote.total.price)}</td>
-                                    </tr>
-                                </tfoot>
-                            </table>
+                        <div className={cn(['sixcol', 'last', 'quote_right'])}>
+                            <h3>Or</h3>
+                            <a href="#print" onClick={this._handlePrintClick}  className={cn('brand_btn')}><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE8AD;' }} /> Print Quote</a>
                         </div>
-
-                        <p dangerouslySetInnerHTML={{ __html: quote.legal_information.replace(/(?:\r\n|\r|\n)/g, "<br />")}} />
-
-                        {this._getButtons()}
                     </div>
                 </div>
             );
         },
 
-        _getButtons: function() {
-            var btns = {
-                'quote': <a href="#quote" className={cn(['brand_btn_light', 'btn_small'])}><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE14F;' }} /> Get a Quote</a>,
-                'appointment': <a href="#appointment" onClick={this._handleAppoimtmentClick} className={cn(['brand_btn_light', 'btn_small'])}><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE192;' }} /> Make an Appointment</a>
-            }
-            if (this.props.withOrderBtn) {
-                btns.order = <a href="#order" onClick={this._handleOrderClick} className={cn('brand_btn')}>Order Your Tires <i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE5C8;' }} /></a>
-            }
-            
-            return (
-                <div className={cn(['twelvecol', 'bottom_btns'])}>
-                    <div className={cn(['sixcol', 'col_left'])}>
-                        {btns.quote}
-                        {this.props.withOrderBtn ? btns.appointment : null}
-                    </div>
-                    <div className={cn(['sixcol', 'last', 'col_right'])}>
-                        {this.props.withOrderBtn ? btns.order : btns.appointment}
-                    </div>
-                </div>
-            );
-        },
-
-        _getServicesBlock: function(servicesInfo, isOptional) {
-            if (servicesInfo.length == 0) {
-                return null;
-            }
-
-            var isOptional = isOptional || false,
-                services = [];
-
-            servicesInfo.map(function(info, i){
-                var toggleCell = null;
-
-                if (isOptional) {
-                    toggleCell = <td className={cn('toggle_cell')}>
-                        <button onClick={this._handleServiceClick.bind(this, info.key)} className={cn({toggle_cell_btn: true, toggle_remove: info.applied, toggle_add: !info.applied})}>
-                            <i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: (info.applied ? '&#xE15C;' : '&#xE147;') }} /><span>{ info.applied ? 'Remove' : 'Add' }</span>
-                        </button>
-                    </td>
-                }
-
-                services.push((
-                    <tr key={i} className={ cn({service_added: (isOptional && info.applied)}) }>
-                        {toggleCell}
-                        <td>
-                            {info.name}
-                            <small>{info.description}</small>
-                        </td>
-                        <td>${h.priceFormat(info.total_price)}</td>
-                    </tr>
-                ));
-            }.bind(this));
-
-
-            return <div className={cn('table_wrapper')}>
-                <table className={cn({table: true, toggle_table: isOptional, optional_services: isOptional})}>
-                    <thead>
-                        <tr>
-                            <th colSpan={isOptional ? 2 : null}>{isOptional ? 'Optional Services' : 'Installation'}</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {services}
-                    </tbody>
-                </table>
-            </div>
-        },
-        _getDiscountBlock: function() {
-            var discount = this.state.quote.discount;
-            if (!discount) {
-                return null;
-            }
-
-            return (
-                <div className={cn('table_wrapper')}>
-                    <table className={cn('table')}>
-                        <thead>
-                            <tr>
-                                <th colSpan="2">Discount</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>
-                                    <button onClick={this._handleDiscountClick} className={cn({toggle_cell_btn: true, toggle_remove: discount.applied, toggle_add: !discount.applied})}>
-                                        <i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: (discount.applied ? '&#xE15C;' : '&#xE147;') }} /><span>{ discount.applied ? 'Remove' : 'Add' }</span>
-                                    </button>
-                                </td>
-                                <td>Discount</td>
-                                <td>${h.priceFormat(discount.total_value)}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            );
-        },
-
-        _updateQuote: function() {
+        _updateState: function() {
             this.setState({
-                quote: customerStore.getQuote(),
-                quantity: customerStore.getSelectedQuantity()
-            });
+                email: customerStore.getCustomer().email
+            })
         },
+
         _handleBackClick: function(event) {
             event.preventDefault();
-            Act.Page.show('results');
+            Act.Page.show('summary');
         },
-        _handleServiceClick: function(serviceKey, event) {
+
+        _handleEmailClick: function(event) {
             event.preventDefault();
-            var optServices = this._getActiveOptServicesKeys();
-            //add/remove clicked service
-            if (optServices.indexOf(serviceKey) === -1) {
-                optServices.push(serviceKey);
+            var email = this.refs.email.value;
+
+            if ( this.refs.follow_up.checked ) {
+                Act.Quote.appointmentForm('email', { email: email } );
             } else {
-                _.remove(optServices, function(key) {
-                  return key == serviceKey;
-                });
+                Act.Quote.sendEmail(email);
             }
-
-            Act.Quote.update(this.props.tire.id, this.state.quantity, optServices, this.state.quote.discount.applied);
-        },
-        _handleQuantityChange: function(event) {
-            Act.Quote.update(this.props.tire.id, event.target.value, this._getActiveOptServicesKeys(), this.state.quote.discount.applied);
-        },
-        _handleDiscountClick: function() {
-            Act.Quote.update(this.props.tire.id, this.state.quantity, this._getActiveOptServicesKeys(), !this.state.quote.discount.applied);
         },
 
-        _getActiveOptServicesKeys: function() {
-            var keys = [];
-            this.state.quote.optional_services.map(function(service) {
-                if (service.applied) {
-                    keys.push(service.key);
-                }
-            });
-
-            return keys;
-        },
-        _handleAppoimtmentClick: function(event) {
+        _handlePrintClick: function(event) {
             event.preventDefault();
-            Act.Page.show('appointment');
-        },
-        _handleOrderClick: function(event) {
-            event.preventDefault();
-            Act.Order.create();
+            if ( this.refs.follow_up.checked ) {
+                Act.Quote.appointmentForm('print');
+            } else {
+                Act.Quote.print();
+            }
         }
+     
 
     } 
 

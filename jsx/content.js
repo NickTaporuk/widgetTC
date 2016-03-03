@@ -1,10 +1,11 @@
 define([
     'load!components/content/search',
     'load!components/content/results',
-    'load!components/content/quote',
+    'load!components/content/summary',
     'load!components/content/appointment',
     'load!components/content/order',
     'load!components/content/confirmation',
+    'load!components/content/quote',
     'react',
     'load!stores/pageStore',
     'load!stores/searchStore',
@@ -16,10 +17,11 @@ define([
 ], function(
     Search,
     Results,
-    Quote,
+    Summary,
     Appointment,
     Order,
     Confirmation,
+    Quote,
     React,
     pageStore,
     searchStore,
@@ -106,12 +108,12 @@ define([
                     };
                     content = <Results {...props} />
                     break;
-                case 'quote':
+                case 'summary':
                     var props = {
                         tire: customerStore.getSelectedTire(),
                         withOrderBtn: dealerStore.getStripeKey() !== null
                     };
-                    content = <Quote {...props} />
+                    content = <Summary {...props} />
                     break;
                 case 'appointment':
                 case 'order':
@@ -134,6 +136,8 @@ define([
                         content = <Confirmation {...props} />
                     }
                     break;
+                case 'quote':
+                    content = <Quote />
             }
 
             return content;

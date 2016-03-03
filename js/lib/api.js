@@ -179,6 +179,17 @@ define([
 
             return p;
         },
+        quotePrint: function(data) {
+            var p = ajax.make({
+                url: 'quote/print',
+                method: 'post',
+                data: data
+            }).then(function(response) {
+                return response;
+            });
+
+            return p;
+        },
 
         orderCreate: function(data) {
             var p = ajax.make({

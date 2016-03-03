@@ -56,7 +56,6 @@ define([
             email: true
         },
         phone: {
-            presence: true,
             format: {
                 pattern: "^\\(?[0-9]{3}\\)?[-. ]?[0-9]{3}[-. ]?[0-9]{4}$",
                 message: "is not valid phone number"
@@ -145,6 +144,7 @@ define([
                     break;
 
                 case 'order.payment':
+                case 'quote.appointment.form.show':
                 case 'customer.values.update':
                     validationErrors = validate(payload.values, constraints);
                     if (validationErrors === undefined) {

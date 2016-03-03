@@ -39,8 +39,18 @@ define([
                     }
                     break;
 
+                case 'quote.appointment.form.show':
+                    dispatcher.waitFor([customerStore.dispatchToken]);
+                    name = 'appointment';
+                    props = {
+                        type: payload.type
+                    };
+                    change = true;
+                    break;
+
+                case 'quote.print.success':
                 case 'quote.appointment.success':
-                    name = 'quote';
+                    name = 'summary';
                     change = true;
                     break;
 
@@ -54,8 +64,8 @@ define([
 
                 case 'quote.display.update':
                     dispatcher.waitFor([customerStore.dispatchToken, resultsStore.dispatchToken]);
-                    if (name !== 'quote') {
-                        name = 'quote';
+                    if (name !== 'summary') {
+                        name = 'summary';
                         change = true;
                     }
                     break;

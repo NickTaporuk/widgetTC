@@ -190,7 +190,7 @@ define([
         },
         _handleBackClick: function(event) {
             event.preventDefault();
-            Act.Page.show('quote');
+            Act.Page.show('summary');
         },
 
         _checkStripeValues: function(stripeValues) {

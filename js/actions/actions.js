@@ -170,6 +170,13 @@ define([
                     });
                 });
             },
+            appointmentForm: function(type, values) {
+                dispatcher.dispatch({
+                    actionType: 'quote.appointment.form.show',
+                    type: type || 'appointment', 
+                    values: values || {}
+                });
+            },
             sendAppointment: function(values) {
                 dispatcher.dispatch({
                     actionType: 'customer.values.update',
@@ -200,6 +207,38 @@ define([
                         });
                     });
                 }
+            },
+            email: function(followUp) {
+
+            },
+            print: function(followUp) {
+                followUp = followUp || false;
+                var values = {};
+                if (followUp) {
+                    values = customerStore.getCustomer();
+                }
+                values.tire_id = customerStore.getSelectedTireId();
+                values.quantity = customerStore.getSelectedQuantity();
+                var quote = customerStore.getQuote();
+                values.with_discount = quote.discount ? quote.discount.applied : false;
+                var optionalServices = [];
+                quote.optional_services.map(function(service) {
+                    if (service.applied) {
+                        optionalServices.push(service.key);
+                    }
+                });
+                values.optional_services = optionalServices;
+
+                var WinPrint = window.open('', '', 'left=0,top=0,width=800,height=800,toolbar=0,scrollbars=0,status=0');
+                Api.quotePrint(values).then(function(response){
+                    console.log('okokokokokokokoko!!!!');
+                    WinPrint.focus();
+                    WinPrint.document.write(response.data.html);
+                    WinPrint.document.close();
+                    dispatcher.dispatch({
+                        actionType: 'quote.print.success'
+                    });
+                });
             }
         },
         Order: {
