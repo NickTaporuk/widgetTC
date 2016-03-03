@@ -4,6 +4,7 @@ define([
     'load!actions/actions',
     'lib/helper',
     'load!stores/customerStore',
+    'load!stores/vehicleStore',
     'validate'
 ], function(
     React,
@@ -11,6 +12,7 @@ define([
     Act,
     h,
     customerStore,
+    vehicleStore,
     validate
 ) {
 
@@ -112,15 +114,42 @@ define([
                                     {this._getError('exp_year')}
                                 </div>
                                 <div className={cn('control_wrapper')}>
-                                    <label htmlFor={cn('vehicle_info')}>Vehicle Info</label>
-                                    <textarea id={cn('vehicle_info')} defaultValue={this.state.values.vehicle_info ? this.state.values.vehicle_info : this.props.vehicleInfo} ref="vehicle_info" disabled={this.state.status == 'incomplete'} />
-                                </div>
-                                <div className={cn('control_wrapper')}>
                                     <label htmlFor={cn('order_notes')}>Notes</label>
                                     <textarea id={cn('order_notes')} defaultValue={this.state.values.notes} ref="notes" disabled={this.state.status == 'incomplete'} />
                                 </div>
                             </fieldset>
                             <div className={cn(['sixcol', 'last', 'col_right', 'order_info'])}>
+                                
+                                {/*<div className={cn('control_wrapper')}>
+                                    <label htmlFor={cn('vehicle_info')}>Vehicle Info</label>
+                                    <textarea id={cn('vehicle_info')} defaultValue={this.state.values.vehicle_info ? this.state.values.vehicle_info : this.props.vehicleInfo} ref="vehicle_info" disabled={this.state.status == 'incomplete'} />
+                                </div>*/}
+
+                                <div className={cn('control_wrapper')}>
+                                    <label htmlFor={cn('vehicle_year')}>Vehicle Info <span className="req">*</span></label>
+                                    <div className={cn(['sixcol', 'field'])}>
+                                        <select id={cn('vehicle_year')} name="year">
+                                            <option value="">- Year -</option>
+                                        </select>
+                                    </div>
+                                    <div className={cn(['sixcol', 'last', 'field'])}>
+                                        <select id={cn('vehicle_make')} name="make"><option value="">- Make -</option></select>
+                                    </div>
+                                </div>
+
+                                <div className={cn('control_wrapper')}>
+                                    <div className={cn(['sixcol', 'field'])}>
+                                        <select id={cn('vehicle_model')} name="model">
+                                            <option value="">- Model -</option>
+                                        </select>
+                                    </div>
+                                    <div className={cn(['sixcol', 'last', 'field'])}>
+                                        <select id={cn('vehicle_trim')} name="trim">
+                                            <option value="">- Trim -</option>
+                                        </select>
+                                    </div>
+                                </div>
+
                                 <div className={cn('table_wrapper')}>
                                     <table className={cn('table')}>
                                         <thead>
@@ -142,7 +171,7 @@ define([
                                             { recyclingFee && quote.recycling_fee.is_taxable ? null : recyclingFee }
                                         </tbody>
                                         <tfoot>
-                                            <tr className="light">
+                                            <tr className={cn('light')}>
                                                 <td>Total Price:</td>
                                                 <td>${h.priceFormat(quote.total.price)}</td>
                                             </tr>
@@ -150,7 +179,7 @@ define([
                                                 <td>What you pay today:</td>
                                                 <td>${h.priceFormat(order.deposit_payment)}</td>
                                             </tr>
-                                            <tr className="light">
+                                            <tr className={cn('light')}>
                                                 <td>Outstanding Balance:</td>
                                                 <td>${h.priceFormat(order.outstanding_balance)}</td>
                                             </tr>
@@ -181,11 +210,13 @@ define([
         },
         _updateState: function() {
             var order = customerStore.getOrder();
+
             this.setState({
                 errors: customerStore.getValidationErrors(),
                 values: customerStore.getCustomer(),
                 status: order.status,
-                disabled: false
+                disabled: false,
+                vehicle: vehicleStore.getAll()
             });
         },
         _handleBackClick: function(event) {

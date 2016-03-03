@@ -176,7 +176,7 @@
 		tbody,
 		tfoot {
 			tr {
-				&.light.light {
+				&.tcwlw_light.tcwlw_light {
 					background: $grayLighter;
 
 					td {
@@ -184,7 +184,7 @@
 					}
 				}
 
-				&.dark.dark {
+				&.tcwlw_dark.tcwlw_dark {
 					background: $grayDarker;
 
 					td {

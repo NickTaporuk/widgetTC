@@ -4,6 +4,7 @@ define([
     'load!stores/searchStore',
     'load!stores/locationsStore',
     'load!stores/customerStore',
+    'load!stores/vehicleStore',
     'lib/api'
 ], function(
     dispatcher,
@@ -11,6 +12,7 @@ define([
     searchStore,
     locationsStore,
     customerStore,
+    vehicleStore,
     Api
 ) {
 
@@ -33,6 +35,11 @@ define([
             });
 
             Api.getVehicleYears().then(function(years) {
+                console.log('df');
+                dispatcher.dispatch({
+                    actionType: 'vehicle.years.success',
+                    options: years
+                });
                 dispatcher.dispatch({
                     actionType: 'search.options.update',
                     options: {year: years}
@@ -183,7 +190,6 @@ define([
                     values: values
                 });
 
-
                 if (Object.keys(customerStore.getValidationErrors()).length == 0) {
                     values.tire_id = customerStore.getSelectedTireId();
                     values.quantity = customerStore.getSelectedQuantity();
@@ -208,37 +214,72 @@ define([
                     });
                 }
             },
-            email: function(followUp) {
+            email: function(followUp, values) {
+                dispatcher.dispatch({
+                    actionType: 'customer.values.update',
+                    values: values
+                });
 
-            },
-            print: function(followUp) {
-                followUp = followUp || false;
-                var values = {};
-                if (followUp) {
-                    values = customerStore.getCustomer();
-                }
-                values.tire_id = customerStore.getSelectedTireId();
-                values.quantity = customerStore.getSelectedQuantity();
-                var quote = customerStore.getQuote();
-                values.with_discount = quote.discount ? quote.discount.applied : false;
-                var optionalServices = [];
-                quote.optional_services.map(function(service) {
-                    if (service.applied) {
-                        optionalServices.push(service.key);
+                if (Object.keys(customerStore.getValidationErrors()).length == 0) {
+                    followUp = followUp || false;
+                    if (followUp) {
+                        values = customerStore.getCustomer();
                     }
-                });
-                values.optional_services = optionalServices;
-
-                var WinPrint = window.open('', '', 'left=0,top=0,width=800,height=800,toolbar=0,scrollbars=0,status=0');
-                Api.quotePrint(values).then(function(response){
-                    console.log('okokokokokokokoko!!!!');
-                    WinPrint.focus();
-                    WinPrint.document.write(response.data.html);
-                    WinPrint.document.close();
-                    dispatcher.dispatch({
-                        actionType: 'quote.print.success'
+                    values.tire_id = customerStore.getSelectedTireId();
+                    values.quantity = customerStore.getSelectedQuantity();
+                    var quote = customerStore.getQuote();
+                    values.with_discount = quote.discount ? quote.discount.applied : false;
+                    var optionalServices = [];
+                    quote.optional_services.map(function(service) {
+                        if (service.applied) {
+                            optionalServices.push(service.key);
+                        }
                     });
+                    values.optional_services = optionalServices;
+
+                    Api.quoteEmail(values).then(function(response){
+                        dispatcher.dispatch({
+                            actionType: 'quote.email.success',
+                            title: response.notice, 
+                            content: ''
+                        });
+                    });
+                }
+            },
+            print: function(followUp, values) {
+                dispatcher.dispatch({
+                    actionType: 'customer.values.update',
+                    values: values || {}
                 });
+
+                if (Object.keys(customerStore.getValidationErrors()).length == 0) {
+                    followUp = followUp || false;
+                    var values = {};
+                    if (followUp) {
+                        values = customerStore.getCustomer();
+                    }
+                    values.tire_id = customerStore.getSelectedTireId();
+                    values.quantity = customerStore.getSelectedQuantity();
+                    var quote = customerStore.getQuote();
+                    values.with_discount = quote.discount ? quote.discount.applied : false;
+                    var optionalServices = [];
+                    quote.optional_services.map(function(service) {
+                        if (service.applied) {
+                            optionalServices.push(service.key);
+                        }
+                    });
+                    values.optional_services = optionalServices;
+
+                    var WinPrint = window.open('', '', 'left=0,top=0,width=800,height=800,toolbar=0,scrollbars=0,status=0');
+                    Api.quotePrint(values).then(function(response){
+                        WinPrint.focus();
+                        WinPrint.document.write(response.data.html);
+                        WinPrint.document.close();
+                        dispatcher.dispatch({
+                            actionType: 'quote.print.success'
+                        });
+                    });
+                }
             }
         },
         Order: {

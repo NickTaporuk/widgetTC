@@ -37,6 +37,7 @@ define([
                     break;
 
                 case 'quote.appointment.success':
+                case 'quote.email.success':
                     name = 'alert';
                     props = {
                         title: payload.title,

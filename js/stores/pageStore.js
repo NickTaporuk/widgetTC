@@ -49,6 +49,7 @@ define([
                     break;
 
                 case 'quote.print.success':
+                case 'quote.email.success':
                 case 'quote.appointment.success':
                     name = 'summary';
                     change = true;

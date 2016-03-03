@@ -30,7 +30,7 @@ define([
                 case 'results':
                     step = 1;
                     break;
-                case 'quote':
+                case 'summary':
                     step = 2;
                     break;
                 default:

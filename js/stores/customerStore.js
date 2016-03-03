@@ -23,7 +23,12 @@ define([
         phone: '2342343245',
         preferred_time: '',
         way_to_contact: '',
-        vehicle_info: '',
+        vehicle_info: {
+            year: '',
+            make: '',
+            model: '',
+            trim: ''
+        },
         notes: ''
     };
 

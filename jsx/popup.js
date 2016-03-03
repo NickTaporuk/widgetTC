@@ -41,7 +41,7 @@ define([
                     break;
                 case 'alert':
                     var title = this.state.props.title;
-                    content = <p dangerouslySetInnerHTML={ {__html: this.state.props.content} } />;
+                    content = this.state.props.content ? <div className={cn('modal_content_inner')}><p dangerouslySetInnerHTML={ {__html: this.state.props.content} } /></div> : null;
                     break;
 
                 default:
@@ -58,9 +58,7 @@ define([
                                 <h4>{title}</h4>
                                 <button onClick={this._handleCloseClick} className={cn(['brand_btn_light', 'btn_small', 'modal_close'])} title="Close this modal" aria-label="Close this modal"><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE5C9;' }} /> Close</button>
                             </div>
-                            <div className={cn('modal_content_inner')}>
-                                {content}
-                            </div>
+                            {content}
                         </div>
                     </div>
                 </div>

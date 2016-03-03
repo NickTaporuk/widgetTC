@@ -76,7 +76,7 @@ define([
             if ( this.refs.follow_up.checked ) {
                 Act.Quote.appointmentForm('email', { email: email } );
             } else {
-                Act.Quote.sendEmail(email);
+                Act.Quote.email(false, {email: email} );
             }
         },
 

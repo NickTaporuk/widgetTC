@@ -190,6 +190,17 @@ define([
 
             return p;
         },
+        quoteEmail: function(data) {
+            var p = ajax.make({
+                url: 'quote/email',
+                method: 'post',
+                data: data
+            }).then(function(response) {
+                return response;
+            });
+
+            return p;
+        },
 
         orderCreate: function(data) {
             var p = ajax.make({

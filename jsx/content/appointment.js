@@ -13,12 +13,6 @@ define([
 ) {
 
     return {
-        // getInitialState: function() {
-        //     return {
-        //         errors: {}
-        //     }
-        // },
-
         componentWillMount: function() {
             this._updateState();
         },
@@ -114,7 +108,7 @@ define([
                                     <label htmlFor={cn('order_notes')}>Notes</label>
                                     <textarea id={cn('order_notes')} ref="notes" defaultValue={this.state.values.notes} />
                                 </div>
-                                <button type="submit" className={cn('brand_btn')}><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE0BE;' }} /> Send</button>
+                                <button type="submit" className={cn('brand_btn')}><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE0BE;' }} /> {this.props.type == 'print' ? 'Print quote' : 'Send'}</button>
                             </fieldset>
                         </form>
                     </div>
@@ -134,7 +128,6 @@ define([
             }
         },
         _updateState: function() {
-            console.log( customerStore.getValidationErrors() );
             this.setState({
                 errors: customerStore.getValidationErrors(),
                 values: customerStore.getCustomer()
@@ -155,7 +148,16 @@ define([
                 vehicle_info: this.refs.vehicle_info.value
             };
 
-            Act.Quote.sendAppointment(values);
+            switch (this.props.type) {
+                case 'email':
+                    Act.Quote.email(true, values);
+                    break;
+                case 'print':
+                    Act.Quote.print(true, values);
+                    break;
+                default:
+                    Act.Quote.sendAppointment(values);
+            }
         }
     }
 

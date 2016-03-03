@@ -128,6 +128,7 @@ define([
                             : null
                     };
                     if (this.state.name == 'appointment') {
+                        props.type = this.state.props.type;
                         content = <Appointment {...props} />
                     } else if (this.state.name == 'order') {
                         content = <Order {...props} />
