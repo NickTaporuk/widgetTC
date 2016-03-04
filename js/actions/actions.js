@@ -35,14 +35,9 @@ define([
             });
 
             Api.getVehicleYears().then(function(years) {
-                console.log('df');
                 dispatcher.dispatch({
                     actionType: 'vehicle.years.success',
                     options: years
-                });
-                dispatcher.dispatch({
-                    actionType: 'search.options.update',
-                    options: {year: years}
                 });
             });
 
@@ -92,50 +87,6 @@ define([
                     field: field,
                     value: value
                 });
-
-                if (section == 'vehicle') {
-                    if (field == 'year') {
-                        Api.getVehicleMakes(searchStore.getValue('vehicle', 'year')).then(function(makes) {
-                            dispatcher.dispatch({
-                                actionType: 'search.options.update',
-                                options: {make: makes, model: [], trim: [], car_tire_id: []}
-                            });
-                        });
-                    } else if (field == 'make') {
-                        Api.getVehicleModels(
-                            searchStore.getValue('vehicle', 'year'),
-                            searchStore.getValue('vehicle', 'make')
-                        ).then(function(models) {
-                            dispatcher.dispatch({
-                                actionType: 'search.options.update',
-                                options: {model: models, trim: [], car_tire_id: []}
-                            });
-                        });
-                    } else if (field == 'model') {
-                        Api.getVehicleTrims(
-                            searchStore.getValue('vehicle', 'year'),
-                            searchStore.getValue('vehicle', 'make'),
-                            searchStore.getValue('vehicle', 'model')
-                        ).then(function(trims) {
-                            dispatcher.dispatch({
-                                actionType: 'search.options.update',
-                                options: {trim: trims, car_tire_id: []}
-                            });
-                        });
-                    } else if (field == 'trim') {
-                        Api.getVehicleTireSizes(
-                            searchStore.getValue('vehicle', 'year'),
-                            searchStore.getValue('vehicle', 'make'),
-                            searchStore.getValue('vehicle', 'model'),
-                            searchStore.getValue('vehicle', 'trim')
-                        ).then(function(car_tire_ids) {
-                            dispatcher.dispatch({
-                                actionType: 'search.options.update',
-                                options: {car_tire_id: car_tire_ids}
-                            });
-                        });
-                    }
-                }
             },
             changeTab: function(section) {
                 dispatcher.dispatch({
@@ -177,6 +128,13 @@ define([
                     });
                 });
             },
+            requestForm: function(tireId, quantity) {
+                dispatcher.dispatch({
+                    actionType: 'quote.request.form.show',
+                    tireId: tireId,
+                    quantity: quantity
+                });
+            },
             appointmentForm: function(type, values) {
                 dispatcher.dispatch({
                     actionType: 'quote.appointment.form.show',
@@ -187,7 +145,8 @@ define([
             sendAppointment: function(values) {
                 dispatcher.dispatch({
                     actionType: 'customer.values.update',
-                    values: values
+                    values: values,
+                    required:  ['name', 'email', 'phone', 'vehicle_info']
                 });
 
                 if (Object.keys(customerStore.getValidationErrors()).length == 0) {
@@ -217,7 +176,8 @@ define([
             email: function(followUp, values) {
                 dispatcher.dispatch({
                     actionType: 'customer.values.update',
-                    values: values
+                    values: values,
+                    required: values.name ? ['name', 'email', 'phone', 'vehicle_info'] : ['email']
                 });
 
                 if (Object.keys(customerStore.getValidationErrors()).length == 0) {
@@ -249,7 +209,8 @@ define([
             print: function(followUp, values) {
                 dispatcher.dispatch({
                     actionType: 'customer.values.update',
-                    values: values || {}
+                    values: values || {},
+                    required: values ? ['name', 'email', 'phone', 'vehicle_info'] : []
                 });
 
                 if (Object.keys(customerStore.getValidationErrors()).length == 0) {
@@ -277,6 +238,26 @@ define([
                         WinPrint.document.close();
                         dispatcher.dispatch({
                             actionType: 'quote.print.success'
+                        });
+                    });
+                }
+            },
+            request: function(values) {
+                dispatcher.dispatch({
+                    actionType: 'customer.values.update',
+                    values: values || {},
+                    required:  ['name', 'email', 'phone', 'vehicle_info']
+                });
+
+                if (Object.keys(customerStore.getValidationErrors()).length == 0) {
+                    values.tire_id = customerStore.getSelectedTireId();
+                    values.quantity = customerStore.getSelectedQuantity();
+
+                    Api.quoteRequest(values).then(function(response){
+                        dispatcher.dispatch({
+                            actionType: 'quote.request.success',
+                            title: 'Thank you!',
+                            content: response.notice
                         });
                     });
                 }
@@ -311,7 +292,8 @@ define([
             payment: function(values) {
                 dispatcher.dispatch({
                     actionType: 'order.payment',
-                    values: values
+                    values: values,
+                    required: ['name', 'email', 'phone', 'vehicle_info']
                 });
 
                 if (Object.keys(customerStore.getValidationErrors()).length == 0) {
@@ -350,6 +332,68 @@ define([
                     } else {
                         payment();
                     }
+                }
+            }
+        },
+        Vehicle: {
+            change: function(values, type) {
+                dispatcher.dispatch({
+                    actionType: type + '.vehicle.change',
+                    values: values
+                });
+
+                if (values.trim) {
+                    Api.getVehicleTireSizes(
+                        values.year,
+                        values.make,
+                        values.model,
+                        values.trim
+                    ).then(function(car_tire_ids) {
+                        dispatcher.dispatch({
+                            actionType: 'vehicle.tireSizes.success',
+                            options: car_tire_ids,
+                            values: values
+                        });
+                    });
+                } else if (values.model) {
+                    Api.getVehicleTrims(
+                        values.year,
+                        values.make,
+                        values.model
+                    ).then(function(trims) {
+                        dispatcher.dispatch({
+                            actionType: 'vehicle.trims.success',
+                            options: trims,
+                            values: values
+                        });
+                    });
+                } else if (values.make) {
+                    Api.getVehicleModels(
+                        values.year,
+                        values.make
+                    ).then(function(models) {
+                        dispatcher.dispatch({
+                            actionType: 'vehicle.models.success',
+                            options: models,
+                            values: values
+                        });
+                    });
+                } else if (values.year) {
+                    Api.getVehicleMakes(values.year).then(function(makes) {
+                        dispatcher.dispatch({
+                            actionType: 'vehicle.makes.success',
+                            options: makes,
+                            values: values
+                        });
+                    });
+                } else {
+                    // Api.getVehicleYears().then(function(years) {
+                        dispatcher.dispatch({
+                            actionType: 'vehicle.years.success',
+                            options: vehicleStore.getYears(),
+                            values: values
+                        });
+                    // });
                 }
             }
         }

@@ -39,6 +39,8 @@ define([
                     }
                     break;
 
+                case 'quote.request.form.show':
+                    payload.type = 'request';
                 case 'quote.appointment.form.show':
                     dispatcher.waitFor([customerStore.dispatchToken]);
                     name = 'appointment';
@@ -52,6 +54,11 @@ define([
                 case 'quote.email.success':
                 case 'quote.appointment.success':
                     name = 'summary';
+                    change = true;
+                    break;
+                    
+                case 'quote.request.success':
+                    name = 'results';
                     change = true;
                     break;
 

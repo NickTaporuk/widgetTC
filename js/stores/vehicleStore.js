@@ -6,31 +6,11 @@ define([
     _
 ) {
 
-    var years = [];
-    var makes = {
-        2016: []
-    };
-    var models = {
-        2016: {
-            Acura: []
-        }
-    };
-    var trims = {
-        2016: {
-            Acura: {
-                MX: []
-            }
-        }
-    };
-    var tireSizes = {
-        2016: {
-            Acura: {
-                MX: {
-                    Base: []
-                }
-            }
-        }  
-    };
+    var years = [],
+        makes = [],
+        models = [],
+        trims = [],
+        tireSizes = [];
 
     var getKey = function(year, make, model, trim) {
         var key = year + (make ? make : '') + (model ? model : '') + (trim ? trim : '');
@@ -42,7 +22,7 @@ define([
             return years;
         },
         getMakes: function(year) {
-            return makes[year+''];
+            return makes[year+''] ? makes[year+''] : [];
         },
         getModels: function(year, make) {
             var key = getKey(year, make);
@@ -57,6 +37,7 @@ define([
             return tireSizes[key] ? tireSizes[key] : [];
         },
         getAll: function(year, make, model, trim) {
+            var key = getKey(year, make, model, trim)
             var all = {
                 years: store.getYears(),
                 makes: year ? store.getMakes(year) : [],
@@ -67,13 +48,14 @@ define([
             return all;
         },
         dispatchToken:  dispatcher.register(function(payload) {
-            var key = getKey(payload.year, payload.make, payload.model, payload.trim);
+            var values = payload.values || {}
+            var key = getKey(values.year, values.make, values.model, values.trim);
             switch (payload.actionType) {
                 case 'vehicle.years.success':
                     years = payload.options;
                     break;
                 case 'vehicle.makes.success':
-                    makes[payload.year] = payload.options;
+                    makes[key] = payload.options;
                     break;
                 case 'vehicle.models.success':
                     models[key] = payload.options;

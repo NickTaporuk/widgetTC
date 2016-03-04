@@ -4,14 +4,16 @@ define([
     'classnames', 
     'load!actions/actions',
     'load!components/header', 
-    'load!components/content'
+    'load!components/content',
+    'load!stores/dealerStore'
 ], function(
     React,
     ReactDOM,
     cn, 
     Act,
     Header, 
-    Content
+    Content,
+    dealerStore
 ) {
 
     return {
@@ -25,9 +27,10 @@ define([
         },
 
         render: function() {
+            var showTCLogo = dealerStore.getShowTCLogo();
             return (
                 <div id={cn('widget')}>
-                    <p className={cn('powered_by')}>Powered by <img src="/img/tireconnect-logo.png" alt="TireConnect" /></p>
+                    {showTCLogo ? <p className={cn('powered_by')}>Powered by <img src="/img/tireconnect-logo.png" alt="TireConnect" /></p> : null}
                     <div className={cn('wrapper')}>
                         <Header />
                         <Content />

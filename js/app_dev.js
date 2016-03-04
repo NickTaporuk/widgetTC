@@ -15,9 +15,9 @@ for (var i = 0; i < urlParamsLength; i++) {
 
 // local settings for different domains
 var localSettings = {
-	'wlwidget.mrp2': {
+	'tcwidget.mrp2': {
 		apikey: '73ae3b76653aabf5eea018b1a98532a2',
-		scriptPlace: 'http://wlwidget.mrp2',
+		scriptPlace: 'http://tcwidget.mrp2',
 		apiBaseUrl: 'http://gmtwl.mrp/api/v1/'
 	},
 	'tcwidget.local': {

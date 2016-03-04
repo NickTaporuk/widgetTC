@@ -41,13 +41,16 @@ define([
                     break;
                 case 'alert':
                     var title = this.state.props.title;
-                    content = this.state.props.content ? <div className={cn('modal_content_inner')}><p dangerouslySetInnerHTML={ {__html: this.state.props.content} } /></div> : null;
+                    content = this.state.props.content ? <p dangerouslySetInnerHTML={ {__html: this.state.props.content} } /> : null;
                     break;
 
                 default:
-                    title = '';
-                    content = '';
+                    title = null;
+                    content = null;
                     break;
+            }
+            if (content) {
+                content = <div className={cn('modal_content_inner')}>{content}</div>              
             }
 
             return (

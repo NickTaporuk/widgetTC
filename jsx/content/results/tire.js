@@ -51,7 +51,7 @@ define([
                         <h3 className={cn(['result_title', 'font_color'])}>
                             {tire.model}
                             <span className={cn('result_subtitle')}>
-                                <span className={cn('result_type')}>{tire.category}</span><span className={cn('warranty')}>Warranty: <strong className={cn('warranty_value')}>65000</strong> km</span>
+                                <span className={cn('result_type')}>{tire.category}</span><span className={cn('warranty')}>Warranty: <strong className={cn('warranty_value')}>{tire.kilometer_rating ? tire.kilometer_rating : 'NA'}</strong> km</span>
                             </span>
                         </h3>
                         {/*<label className={cn('result_compare')}>
@@ -63,9 +63,9 @@ define([
                             <img src={tire.brand_logo} alt={tire.brand + ' Tire'} className={cn('result_brand_logo')} />
                             <div className={cn('result_tire_wrapper')}>
                                 <img src={tire.image} alt="An image of the tire" className={cn('result_tire')} />
-                                <a href="#tire_modal" className={cn(['modal_open', 'tire_enlarge', 'font_color'])}>
+                                {/*<a href="#tire_modal" className={cn(['modal_open', 'tire_enlarge', 'font_color'])}>
                                     <i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE147;'}} /><span className={cn('hidden')}>Enlarge</span>
-                                </a>
+                                </a>*/}
                             </div>
                             {this._getRebateBlock()}
                             {this._getOemBlock()}
@@ -82,12 +82,15 @@ define([
                                             </select>
                                         </label>
                                         <h5 className={cn('price')}>
-                                            <strong className={cn('price_value')}>${h.priceFormat(tire.price * this.state.quantity)}</strong>
+                                            <strong className={cn('price_value')}>{tire.price ? '$' + h.priceFormat(tire.price * this.state.quantity) : null}</strong>
                                         </h5>
                                     </div>
                                 </div>
                                 <div className={cn('select_btn_wrapper')}>
-                                    <a href="#summary" onClick={this._handleSelectClick} className={cn(['btn', 'brand_btn', 'select_btn'])}>Select Tire <i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE5C8;' }} /></a>
+                                    { tire.price
+                                        ? <a href="#summary" onClick={this._handleSelectClick} className={cn(['btn', 'brand_btn', 'select_btn'])}>Select Tire <i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE5C8;' }} /></a>
+                                        : <a href="#summary" onClick={this._handleGetQuoteClick} className={cn(['btn', 'brand_btn', 'select_btn'])}>Get a quote</a>
+                                    }
                                 </div>
                             </div>
                             <div className={cn(['tabs', 'result_tabs'])}>
@@ -139,14 +142,32 @@ define([
         },
 
         _getRatingBlock: function(rating, withLink) {
+            var rating = this.props.tire.external_info.rating;
+            if (!rating) {
+                return null;
+            }
+            var fullStars = parseInt(rating);
+            var halfStars = rating - fullStars > 0 ? 1 : 0;
+            var emptyStars = 5 - fullStars - halfStars;
+
+            var stars = [];
+            for (var i = 1; i <= 5; i++) {
+                var star;
+                if ( i <= fullStars ) {
+                    star = '&#xE838;';
+                } else if ( halfStars ) {
+                    star = '&#xE839;';
+                    halfStars = 0;
+                } else {
+                    star = '&#xE83A;';
+                }
+                stars.push(<i key={i} className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: star }} />);
+            }
+
             var withLink = withLink || false;
             return (
                 <div className={cn('result_rating')} aria-label="Tire rating: 3.5 stars">
-                    <i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE838;' }} />
-                    <i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE838;' }} />
-                    <i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE838;' }} />
-                    <i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE839;' }} />
-                    <i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE83A;' }} />
+                    {stars}
                     {withLink ? <a href="#reviews_result_1" className={cn('result_rating_link')}>10 Reviews</a> : null}
                 </div>
             );
@@ -180,7 +201,7 @@ define([
 
                 block = (
                     <span className={cn(['result_rebate', 'tooltip'])}>
-                        {offer.name} <a href="#show_rebate" onClick={this._showRebate} className={cn({toggle: true, toggle_open: this.state.showRebate})}><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE887;'}} /></a>
+                        <a href="#show_rebate" onClick={this._showRebate} className={cn({toggle: true, toggle_open: this.state.showRebate})}>{offer.name} <i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE887;'}} /></a>
 
                         <span className={cn(['tooltip_content', 'toggle_content']) + ' ' + cn({toggle_hidden: !this.state.showRebate})} id={cn('result_2_rebate')}>
                             <p>
@@ -196,7 +217,8 @@ define([
             return block;
         },
 
-        _showRebate: function() {
+        _showRebate: function(event) {
+            event.preventDefault();
             this.setState({
                 showRebate: !this.state.showRebate
             });
@@ -230,6 +252,10 @@ define([
         _handleSelectClick: function(event) {
             event.preventDefault();
             Act.Quote.update(this.props.tire.id, this.state.quantity);
+        },
+        _handleGetQuoteClick: function(event) {
+            event.preventDefault();
+            Act.Quote.requestForm(this.props.tire.id, this.state.quantity);
         }
     }
 

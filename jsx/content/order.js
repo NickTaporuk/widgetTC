@@ -5,6 +5,7 @@ define([
     'lib/helper',
     'load!stores/customerStore',
     'load!stores/vehicleStore',
+    'load!components/elements/select',
     'validate'
 ], function(
     React,
@@ -13,6 +14,7 @@ define([
     h,
     customerStore,
     vehicleStore,
+    SelectField,
     validate
 ) {
 
@@ -28,6 +30,7 @@ define([
         },
         componentDidMount: function() {
             customerStore.bind('change', this._updateState);
+            vehicleStore.bind('change', this._updateState);
 
             var self = this;
             // load stripe here
@@ -40,7 +43,8 @@ define([
             }
         },
         componentWillUnmount: function() {
-            customerStore.unbind('change', this._updateState);    
+            customerStore.unbind('change', this._updateState);
+            vehicleStore.unbind('change', this._updateState);    
         },
 
         render: function() {
@@ -128,27 +132,22 @@ define([
                                 <div className={cn('control_wrapper')}>
                                     <label htmlFor={cn('vehicle_year')}>Vehicle Info <span className="req">*</span></label>
                                     <div className={cn(['sixcol', 'field'])}>
-                                        <select id={cn('vehicle_year')} name="year">
-                                            <option value="">- Year -</option>
-                                        </select>
+                                        <SelectField name="year" options={this.state.options.years} emptyDesc="- Year -" withWrapper={false} onChange={this._vehicleChange} value={this.state.values.vehicle.year} />
                                     </div>
                                     <div className={cn(['sixcol', 'last', 'field'])}>
-                                        <select id={cn('vehicle_make')} name="make"><option value="">- Make -</option></select>
+                                        <SelectField name="make" options={this.state.options.makes} emptyDesc="- Make -" withWrapper={false} onChange={this._vehicleChange} value={this.state.values.vehicle.make} />
                                     </div>
                                 </div>
 
                                 <div className={cn('control_wrapper')}>
                                     <div className={cn(['sixcol', 'field'])}>
-                                        <select id={cn('vehicle_model')} name="model">
-                                            <option value="">- Model -</option>
-                                        </select>
+                                        <SelectField name="model" options={this.state.options.models} emptyDesc="- Model -" withWrapper={false} onChange={this._vehicleChange} value={this.state.values.vehicle.model} />
                                     </div>
                                     <div className={cn(['sixcol', 'last', 'field'])}>
-                                        <select id={cn('vehicle_trim')} name="trim">
-                                            <option value="">- Trim -</option>
-                                        </select>
+                                        <SelectField name="trim" options={this.state.options.trims} emptyDesc="- Trim -" withWrapper={false} onChange={this._vehicleChange} value={this.state.values.vehicle.trim} />
                                     </div>
                                 </div>
+                                {this._getError('vehicle_info')}
 
                                 <div className={cn('table_wrapper')}>
                                     <table className={cn('table')}>
@@ -198,6 +197,18 @@ define([
             );
         },
 
+        _getVehicleSelector: function(fieldName) {
+            var options = [];
+            this.state.vehicle[fieldName]
+
+
+            return (
+                <select id={cn('vehicle_' + fieldName)} name={fieldName}>
+                    <option value="">- Year -</option>
+                </select>
+            );
+        },
+
         _isStripeLoaded: false,
         _getError: function(fieldName) {
             if (this.state.errors[fieldName]) {
@@ -210,13 +221,14 @@ define([
         },
         _updateState: function() {
             var order = customerStore.getOrder();
+            var values = customerStore.getCustomer();
 
             this.setState({
                 errors: customerStore.getValidationErrors(),
-                values: customerStore.getCustomer(),
+                values: values,
                 status: order.status,
                 disabled: false,
-                vehicle: vehicleStore.getAll()
+                options: vehicleStore.getAll(values.vehicle.year, values.vehicle.make, values.vehicle.model, values.vehicle.trim)
             });
         },
         _handleBackClick: function(event) {
@@ -295,7 +307,7 @@ define([
                             phone: self.refs.phone.value,
                             preferred_time: self.refs.preferred_time.value,
                             notes: self.refs.notes.value,
-                            vehicle_info: self.refs.vehicle_info.value
+                            vehicle_info: self._getVehicleInfo()
                         };
 
                         Act.Order.payment(values); 
@@ -304,6 +316,33 @@ define([
             } else {
                 this.setState({'disabled': false});
             }
+        },
+
+        _getVehicleInfo: function() {
+            if (this.state.values.vehicle.trim) {
+                return this.state.values.vehicle.year + ' ' + this.state.values.vehicle.make + ' ' + this.state.values.vehicle.model + ' ' + this.state.values.vehicle.trim;
+            } else {
+                return '';
+            }
+        },
+
+        _vehicleChange: function(event) {
+            var fields = ['year', 'make', 'model', 'trim'];
+            var fieldName = event.target.name;
+            var index = fields.indexOf(fieldName);
+
+            // var value = event.traget.value;
+            var values = this.state.values.vehicle;
+            values[fieldName] = event.target.value;
+            
+            var values = {
+                year: values.year,
+                make: index < 1 ? '' : values.make,
+                model: index < 2 ? '' : values.model,
+                trim: index < 3 ? '' : values.trim
+            };
+
+            Act.Vehicle.change(values, 'customer');
         }
     }
 

@@ -148,7 +148,8 @@ define([
 
         getDealerConfig: function() {
             var p = ajax.make({
-                url: 'dealer/config'
+                url: 'dealer/config',
+                data: {wdg:true}
             }).then(function(response) {
                 return response.data;
             });
@@ -201,6 +202,18 @@ define([
 
             return p;
         },
+        quoteRequest: function(data) {
+            var p = ajax.make({
+                url: 'quote/request',
+                method: 'post',
+                data: data
+            }).then(function(response) {
+                return response;
+            });
+
+            return p;
+        },
+
 
         orderCreate: function(data) {
             var p = ajax.make({

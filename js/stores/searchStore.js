@@ -1,9 +1,11 @@
 define([
     'dispatcher',
-    'lodash'
+    'lodash',
+    'load!stores/vehicleStore'
 ], function(
     dispatcher,
-    _
+    _,
+    vehicleStore
 ) {
     var activeSection = 'size';
 
@@ -92,6 +94,7 @@ define([
                     break;
                 }
             }
+            fieldOptions[field] = [];
         } else {
             fieldOptions[field] = options;
             setDefaultValue(field);
@@ -156,6 +159,12 @@ define([
                     setValue(payload.section, payload.field, payload.value);
                     change = true;
                     break;
+                case 'search.vehicle.change':
+                    Object.keys(payload.values).map(function(fieldName) {
+                        setValue('vehicle', fieldName, payload.values[fieldName]);
+                    });
+                    change = true;
+                    break;
                 case 'dealer.config.set':
                     var c = payload.config;
                     setValue('common', 'order_by', c.default_order.iframe);
@@ -178,6 +187,20 @@ define([
                         setDefaultValue('light_truck');
                         change = true;
                     }
+                    break;
+                case 'vehicle.years.success':
+                case 'vehicle.makes.success':
+                case 'vehicle.models.success':
+                case 'vehicle.trims.success':
+                case 'vehicle.tireSizes.success':
+                    dispatcher.waitFor([vehicleStore.dispatchToken]);
+                    
+                    setOptions('year', vehicleStore.getYears());
+                    setOptions('make', vehicleStore.getMakes(fieldValues.vehicle.year));
+                    setOptions('model', vehicleStore.getModels(fieldValues.vehicle.year, fieldValues.vehicle.make));
+                    setOptions('trim', vehicleStore.getTrims(fieldValues.vehicle.year, fieldValues.vehicle.make, fieldValues.vehicle.model));
+                    setOptions('car_tire_id', vehicleStore.getTireSizes(fieldValues.vehicle.year, fieldValues.vehicle.make, fieldValues.vehicle.model, fieldValues.vehicle.trim));
+                    change = true;
                     break;
             }
 

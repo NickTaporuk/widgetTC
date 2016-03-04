@@ -14,7 +14,8 @@ define([
                 disabled: false,
                 value: null,
                 defaultValue: null,
-                onChange: null
+                onChange: null,
+                withWrapper: true
             }
         },
         render: function() {
@@ -42,14 +43,20 @@ define([
                 req = <span className="req">*</span>;
             }
 
-            return (
-                <div className={this.props.className}>
-                    <label htmlFor={cn(name)}>{this.props.label + ' '}{req}</label>
-                    <select onChange={this._handleChange} value={this.props.value} id={cn(name)} name={name} disabled={disabled} defaultValue={this.props.defaultValue}>
-                        {options}
-                    </select>
-                </div>
-            );
+            var select = <select onChange={this._handleChange} value={this.props.value} ref={name} id={cn(name)} name={name} disabled={disabled} defaultValue={this.props.defaultValue}>
+                            {options}
+                        </select>;
+
+            if (this.props.withWrapper) {
+                return (
+                    <div className={this.props.className}>
+                        <label htmlFor={cn(name)}>{this.props.label + ' '}{req}</label>
+                        {select}
+                    </div>
+                );
+            } else {
+                return select
+            }
         },
 
         _handleChange: function(event) {

@@ -24,7 +24,6 @@ define([
             customerStore.unbind('change', this._updateState);    
         },
 
-
         render: function() {
             return (
                 <div>

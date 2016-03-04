@@ -1,12 +1,14 @@
 define([
     'dispatcher',
     'load!stores/resultsStore',
+    'load!stores/searchStore',
     'lodash',
     'validate',
     'moment'
 ], function(
     dispatcher,
     resultsStore,
+    searchStore,
     _,
     validate,
     moment
@@ -23,11 +25,12 @@ define([
         phone: '2342343245',
         preferred_time: '',
         way_to_contact: '',
-        vehicle_info: {
-            year: '',
-            make: '',
-            model: '',
-            trim: ''
+        vehicle_info: '',
+        vehicle: {
+            year: null,
+            make: null,
+            model: null,
+            trim: null
         },
         notes: ''
     };
@@ -119,7 +122,14 @@ define([
             return validationErrors;
         },
         getCustomer: function() {
-            return _.cloneDeep(customer);
+            var _customer = _.cloneDeep(customer);
+            if (_customer.vehicle.year === null && searchStore.getActiveSection() == 'vehicle') {
+                _customer.vehicle.year = searchStore.getValue('vehicle', 'year');
+                _customer.vehicle.make = searchStore.getValue('vehicle', 'make');
+                _customer.vehicle.model = searchStore.getValue('vehicle', 'model');
+                _customer.vehicle.trim = searchStore.getValue('vehicle', 'trim');
+            }
+            return _customer;
         },
         getOrder: function() {
             return _.cloneDeep(order);
@@ -129,10 +139,12 @@ define([
             var change = false;
             switch (payload.actionType) {
                 case 'quote.display.update':
+                case 'quote.request.form.show':
                     selectedTire = payload.tireId;
                     selectedQuantity = payload.quantity;
-
-                    setQuote(payload.quote);
+                    if (payload.quote) {
+                        setQuote(payload.quote);
+                    }
                     change = true;
                     break;
 
@@ -151,11 +163,26 @@ define([
                 case 'order.payment':
                 case 'quote.appointment.form.show':
                 case 'customer.values.update':
-                    validationErrors = validate(payload.values, constraints);
+                    var c = _.cloneDeep(constraints);
+                    if (payload.required) {
+                        payload.required.map(function(field) {
+                            if (!c[field]) {
+                                c[field] = {};
+                            }
+                            c[field].presence = true;
+                        });
+                    }
+
+                    validationErrors = validate(payload.values, c);
                     if (validationErrors === undefined) {
                         validationErrors = {};
-                        _.assign(customer, payload.values);
+                        _.merge(customer, payload.values);
                     }
+                    change = true;
+                    break;
+
+                case 'customer.vehicle.change':
+                    customer.vehicle = payload.values;
                     change = true;
                     break;
 

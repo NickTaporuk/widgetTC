@@ -38,6 +38,7 @@ define([
 
                 case 'quote.appointment.success':
                 case 'quote.email.success':
+                case 'quote.request.success':
                     name = 'alert';
                     props = {
                         title: payload.title,

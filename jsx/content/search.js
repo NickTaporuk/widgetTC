@@ -4,6 +4,7 @@ define([
     'load!actions/actions',
     'load!actions/apiActions',
     'load!stores/searchStore',
+    'load!stores/vehicleStore',
     'load!components/elements/select'
 ], function(
     React,
@@ -11,6 +12,7 @@ define([
     Act,
     ApiAct,
     searchStore,
+    vehicleStore,
     SelectField
 ) {
 
@@ -28,9 +30,11 @@ define([
         },
         componentDidMount: function() {
             searchStore.bind('change', this._updateStatus);
+            // vehicleStore.bind('change', this._updateStatus);
         },
         componentWillUnmount: function() {
             searchStore.unbind('change', this._updateStatus);    
+            // vehicleStore.unbind('change', this._updateStatus);    
         },
         shouldComponentUpdate: function(nextProps, nextState) {
             return true;
@@ -71,27 +75,27 @@ define([
                                     <fieldset className={cn('fields_wrapper')}>
                                         <SelectField 
                                                     options={this.state.fieldOptions.year}                                                                     
-                                                    value={this.state.fieldValues.vehicle.year} onChange={this._handleFieldChange} 
+                                                    value={this.state.fieldValues.vehicle.year} onChange={this._handleVehicleChange} 
                                                     name="vehicle_year" label="Choose Year"
                                                     className={cn(['sixcol', 'field'])} require={true} />
                                         <SelectField 
                                                     options={this.state.fieldOptions.make}          
-                                                    value={this.state.fieldValues.vehicle.make} onChange={this._handleFieldChange}
+                                                    value={this.state.fieldValues.vehicle.make} onChange={this._handleVehicleChange}
                                                     name="vehicle_make" label="Choose Make" require={true}
                                                     className={cn(['sixcol', 'last', 'field'])} disabled={this.state.fieldOptions.make.length <= 0} />
                                         <SelectField 
                                                     options={this.state.fieldOptions.model}         
-                                                    value={this.state.fieldValues.vehicle.model} onChange={this._handleFieldChange}
+                                                    value={this.state.fieldValues.vehicle.model} onChange={this._handleVehicleChange}
                                                     name="vehicle_model" label="Choose Model"
                                                     className={cn(['sixcol', 'field'])} disabled={this.state.fieldOptions.model.length <= 0} require="1" />
                                         <SelectField 
                                                     options={this.state.fieldOptions.trim}          
-                                                    value={this.state.fieldValues.vehicle.trim} onChange={this._handleFieldChange}
+                                                    value={this.state.fieldValues.vehicle.trim} onChange={this._handleVehicleChange}
                                                     name="vehicle_trim" label="Choose Trim"
                                                     className={cn(['sixcol', 'last', 'field'])} disabled={this.state.fieldOptions.trim.length <= 0} require="1" />
                                         <SelectField 
                                                     options={this.state.fieldOptions.base_category}                                                            
-                                                    value={this.state.fieldValues.vehicle.base_category} onChange={this._handleFieldChange} 
+                                                    value={this.state.fieldValues.vehicle.base_category} onChange={this._handleVehicleChange} 
                                                     name="vehicle_base_category" label="Tire Type"
                                                     className={cn(['sixcol', 'field'])} emptyDesc="All Tires" />
                                         <SelectField 
@@ -164,10 +168,14 @@ define([
             return isReady;
         },
         _updateStatus: function() {
+            var fieldValues = searchStore.getAllValues();
+            // var vehicleOptions = vehicleStore.getAll(fieldValues.vehicle.year, fieldValues.vehicle.make, fieldValues.vehicle.model, fieldValues.vehicle.trim);
+            var options = searchStore.getAllOptions();
+            // console.log(vehicleOptions);
             this.setState({
                 'activeTab': searchStore.getActiveSection(),
-                'fieldOptions': searchStore.getAllOptions(),
-                'fieldValues': searchStore.getAllValues()
+                'fieldOptions': options, //_.merge(options, vehicleOptions),
+                'fieldValues': fieldValues
             });
         },
         _handleTabClick: function(tab, event) {
@@ -181,6 +189,24 @@ define([
         _handleFieldChange: function(event) {
             var fieldName = event.target.name.replace( (this.state.activeTab + '_'), '');
             Act.Search.updateField(this.state.activeTab, fieldName, event.target.value);
+        },
+        _handleVehicleChange: function(event) {
+            var fields = ['year', 'make', 'model', 'trim'];
+            var fieldName = event.target.name.replace( (this.state.activeTab + '_'), '');
+            var index = fields.indexOf(fieldName);
+
+            // var value = event.traget.value;
+            var values = this.state.fieldValues.vehicle;
+            values[fieldName] = event.target.value;
+            
+            var values = {
+                year: values.year,
+                make: index < 1 ? '' : values.make,
+                model: index < 2 ? '' : values.model,
+                trim: index < 3 ? '' : values.trim
+            };
+
+            Act.Vehicle.change(values, 'search');
         },
         _handleLocationsClick: function(event) {
             event.preventDefault();

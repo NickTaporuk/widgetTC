@@ -43,8 +43,6 @@ define([
         },
 
         render: function() {
-            // console.log('results render');
-
             var tires = [];
             this.state.tires.map(function(tire, i) {
                 tires.push((
@@ -82,6 +80,9 @@ define([
                             <SelectField onChange={this._handleFieldChange} options={this.props.fieldOptions.display}  label="Display:" name="display"  className={cn('filter_field')} emptyDesc={false} defaultValue="full" />
                             <SelectField onChange={this._handleFieldChange} options={this.props.fieldOptions.order_by} label="Sort by:" name="order_by" className={cn('filter_field')} emptyDesc={false} defaultValue={this.props.fieldValues.order_by} />
                         </div>
+                        {
+                            tires.length > 0 ? null : <h3 className={cn('message')}><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE000;' }} /> We did not find any tires based on your search criteria. Please try searching again later as inventory changes frequently.</h3>
+                        }
                         <div className={cn('filters')} id={cn('filters')}>
                             {filters}
                         </div>
@@ -101,7 +102,7 @@ define([
                                         {tires}                                    
                                     </ol>
                                     : 
-                                    <h3 className={cn('message')}><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE000;' }} /> We did not find any tires based on your search criteria. Please try searching again later as inventory changes frequently.</h3>
+                                    null
                                 }
                             </div>
                             <div className={cn('twelvecol')}>
