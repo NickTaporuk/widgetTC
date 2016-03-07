@@ -146,6 +146,16 @@ define([
             return p;
         },
 
+        getDealerList: function() {
+            var p = ajax.make({
+                url: 'dealer/list'
+            }).then(function(response) {
+                return response.data.dealers[0]; 
+            });
+
+            return p;
+        },
+
         getDealerConfig: function() {
             var p = ajax.make({
                 url: 'dealer/config',
@@ -247,8 +257,27 @@ define([
             });
 
             return p;
-        }
+        },
 
+        getFullStock: function(tireId) {
+            var p = ajax.make({
+                url: 'tire/' + tireId + '/fullStock',
+            }).then(function(response) {
+                return response.data.stock;
+            });
+
+            return p;
+        },
+
+        getStock: function(tireId) {
+            var p = ajax.make({
+                url: 'tire/' + tireId + '/stock',
+            }).then(function(response) {
+                return response.data.branches;
+            });
+
+            return p;
+        }
 
                             
 

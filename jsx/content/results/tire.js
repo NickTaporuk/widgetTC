@@ -1,15 +1,19 @@
 define([
     'react',
+    'config',
     'classnames',
     'load!actions/actions',
     'lib/helper',
-    'moment'
+    'moment',
+    'load!stores/stockStore'
 ], function(
     React,
+    config,
     cn,
     Act,
     h,
-    moment
+    moment,
+    stockStore
 ) {
 
     return {
@@ -17,7 +21,10 @@ define([
             return {
                 activeTab: 'specs',
                 quantity: 4,
-                showRebate: false
+                showRebate: false,
+                fullStock: [],
+                stock: [],
+                stockFor: null
             }
         },
 
@@ -26,10 +33,17 @@ define([
                 quantity: this.props.tire.selected_quantity
             });
         },
+        componentDidMount: function() {
+            stockStore.bind('change', this._updateStatus);
+        },
+        componentWillUnmount: function() {
+            stockStore.unbind('change', this._updateStatus);    
+        },
 
         render: function() {
             var tire = this.props.tire;
             var tab = this.state.activeTab;
+            var warranty = this.props.isInMile ? tire.mileage_rating : tire.kilometer_rating;
 
             var features = null;
             if (tire.description) {
@@ -51,7 +65,7 @@ define([
                         <h3 className={cn(['result_title', 'font_color'])}>
                             {tire.model}
                             <span className={cn('result_subtitle')}>
-                                <span className={cn('result_type')}>{tire.category}</span><span className={cn('warranty')}>Warranty: <strong className={cn('warranty_value')}>{tire.kilometer_rating ? tire.kilometer_rating : 'NA'}</strong> km</span>
+                                <span className={cn('result_type')}>{tire.category}</span><span className={cn('warranty')}>Warranty: <strong className={cn('warranty_value')}>{warranty ? warranty : 'NA'}</strong> {this.props.isInMile ? 'mi' : 'km'}</span>
                             </span>
                         </h3>
                         {/*<label className={cn('result_compare')}>
@@ -102,8 +116,15 @@ define([
                                         : null
                                     }
                                     <li className={cn('tab')}><a href="#reviews_result_1" onClick={this._handleTabClick.bind(this, 'reviews')} className={cn('font_color')}  aria-selected={(tab == 'reviews')}>Reviews</a></li>
+                                    {
+                                        config.sa
+                                        ? <li className={cn(['tab', 'stock_tab'])} role="presentation">
+                                            <a href="#stock" onClick={this._handleTabClick.bind(this, 'stock')} aria-selected={(tab == 'stock')}>Stock</a>
+                                        </li>
+                                        : null
+                                    }
                                 </ul>
-                                <div className={cn('tab_cont')} id={cn('specs_result_1')} aria-hidden={!(tab == 'specs')}>
+                                <div className={cn('tab_cont')} aria-hidden={!(tab == 'specs')}>
                                     <ul className={cn('result_specs_list')}>
                                         <li>Size: <strong className={cn('result_spec_value')}>{tire.size_short}</strong></li>
                                         <li>Speed Rating: <strong className={cn('result_spec_value')}>{tire.speed_rating}</strong></li>
@@ -113,7 +134,7 @@ define([
                                     </ul>
                                 </div>
                                 {features}
-                                <div className={cn('tab_cont')} id={cn('reviews_result_1')} aria-hidden={!(tab == 'reviews')}>
+                                <div className={cn('tab_cont')} aria-hidden={!(tab == 'reviews')}>
                                     <h4 className={cn('result_reviews_heading')}><strong>10</strong> reviews:</h4>
 
                                     <div className={cn('result_review')}>
@@ -134,11 +155,65 @@ define([
                                         </div>
                                     </div>
                                 </div>
+                                <div className={cn('tab_cont')} aria-hidden={!(tab == 'stock')}>
+                                    {this._getStockInfo()}
+                                </div>
                             </div>
                         </div>
                     </div>
                 </li>
             );
+        },
+
+        _updateStatus: function() {
+            if (this.state.fullStock.length == 0) {
+                this.setState({
+                    'fullStock': stockStore.getFullStock(this.props.tire.id)
+                });
+            }
+            if (this.state.stockFor) {
+                this.setState({
+                    'stock': stockStore.getBranches(this.state.stockFor.tire_id)
+                });
+            }
+        },
+
+        _getStockInfo: function() {
+            event.preventDefault();
+
+            var info = [];
+            if (!this.state.stock.length) {
+                var info = [];
+                this.state.fullStock.map(function(supplierInfo, i) {
+                    info.push( 
+                        <li key={i}>
+                            <a href={'#' + i} onClick={this._handleStockClick}>{supplierInfo.supplier.nice_name + ': ' + supplierInfo.quantity}</a>
+                        </li> 
+                    );
+                }.bind(this));
+
+                return <div>
+                    <h5 className={cn('result_reviews_heading')}>Item: {this.props.tire.part_number}</h5>
+                    <ul>{info}</ul>
+                </div>
+            } else if (this.state.stock.length > 0) {
+                this.state.stock.map(function(branch, i) {
+                    info.push(<li key={i}>{branch.branch + ': ' + branch.quantity}</li>);
+                });
+
+                return <div>
+                    <h5 className={cn('result_reviews_heading')}>{this.state.stockFor.supplier.nice_name}</h5>
+                    <ul>{info}</ul>
+                    <a href="#stock_back" onClick={this._hangleStockBackClick}>Back</a>
+                </div>;
+            }
+        },
+
+        _hangleStockBackClick: function() {
+            event.preventDefault();
+            this.setState({
+                stock: []
+            });
         },
 
         _getRatingBlock: function(rating, withLink) {
@@ -242,6 +317,20 @@ define([
         _handleTabClick: function(tab, event) {
             this.setState({
                 activeTab: tab
+            });
+            if (tab == 'stock' && this.state.fullStock.length <= 0) {
+                Act.Tire.loadFullStock(this.props.tire.id);
+            }
+        },
+        _handleStockClick: function(event) {
+            event.preventDefault();
+            var index = event.target.href.replace(/^[^#]+#/, '');
+            var supplier = this.state.fullStock[index];
+            
+            Act.Tire.loadStock(supplier.tire_id);
+
+            this.setState({
+                stockFor: supplier
             });
         },
         _handleQuantityChange: function() {

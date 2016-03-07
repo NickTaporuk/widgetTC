@@ -14,6 +14,9 @@ define([
 
     var showTCLogo = true;
 
+    var companyName;
+    var logo;
+
     var style = null; //color scheme style element
     function changeColorScheme(color1, color2) {
         if (style !== null) {
@@ -120,6 +123,12 @@ define([
         getShowTCLogo: function() {
             return showTCLogo;
         },
+        getCompanyName: function() {
+            return companyName;
+        },
+        getLogo: function() {
+            return logo;
+        },
 
         dispatchToken: dispatcher.register(function(payload) {
             change = false;
@@ -132,6 +141,12 @@ define([
                     }
                     showTCLogo = c.show_tireconnect_logo;
                     changeColorScheme('#' + c.colors.color1, '#' + c.colors.color2);
+                    break;
+
+                case 'dealer.info.success':
+                    companyName = payload.info.company_name;
+                    logo = payload.info.logo;
+                    change = true;
                     break;
             }
             

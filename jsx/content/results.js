@@ -43,10 +43,11 @@ define([
         },
 
         render: function() {
+            console.log(this.props.isInMile);
             var tires = [];
             this.state.tires.map(function(tire, i) {
                 tires.push((
-                    <Tire key={i + tire.part_number} tire={tire} isTop={(i < 3 && this.state.page == 1)} />
+                    <Tire key={i + tire.part_number} tire={tire} isInMile={this.props.isInMile} isTop={(i < 3 && this.state.page == 1)} />
                 ));
             }.bind(this));
 

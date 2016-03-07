@@ -17,7 +17,6 @@ define([
             var locations = locationsStore.getLocations();
 
             locations.forEach(function(location, i) {
-                // var location = locations[id];
                 locationEls.push((
                     <li key={i}>
                         <h5>{location.name}</h5>

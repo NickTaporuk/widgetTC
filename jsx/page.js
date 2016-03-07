@@ -104,7 +104,8 @@ define([
                             run_flat: searchStore.getValue('common', 'run_flat'),
                             light_truck: searchStore.getValue('common', 'light_truck')
                         },
-                        queryParams: queryParams
+                        queryParams: queryParams,
+                        isInMile: locationsStore.getCurrentLocation().country !== 'Canada'
                     };
                     content = <Results {...props} />
                     break;

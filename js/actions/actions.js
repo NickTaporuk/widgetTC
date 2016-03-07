@@ -1,6 +1,7 @@
 define([
     'dispatcher',
     'load!stores/resultsStore',
+    'load!stores/dealerStore',
     'load!stores/searchStore',
     'load!stores/locationsStore',
     'load!stores/customerStore',
@@ -9,6 +10,7 @@ define([
 ], function(
     dispatcher,
     resultsStore,
+    dealerStore,
     searchStore,
     locationsStore,
     customerStore,
@@ -45,6 +47,13 @@ define([
                 dispatcher.dispatch({
                     actionType: 'dealer.config.set',
                     config: config
+                });
+            });
+
+            Api.getDealerList().then(function(info) {
+                dispatcher.dispatch({
+                    actionType: 'dealer.info.success',
+                    info: info
                 });
             });
         },
@@ -95,19 +104,23 @@ define([
                 }); 
             }
         },
-        Customer: {
-            updateParam: function(param, value) {
-                dispatcher.dispatch({
-                    actionType: 'customer.update_param',
-                    param: param,
-                    value: value
-                });                
+        Tire: {
+            loadFullStock: function(tireId) {
+                Api.getFullStock(tireId).then(function(stock) {
+                    dispatcher.dispatch({
+                        actionType: 'tire.full_stock.success',
+                        stock: stock,
+                        tireId: tireId
+                    }); 
+                });
             },
-            updateVehicle: function(param, value) {
-                dispatcher.dispatch({
-                    actionType: 'customer.update_vehicle',
-                    param: param,
-                    value: value
+            loadStock: function(tireId) {
+                Api.getStock(tireId).then(function(branches) {
+                    dispatcher.dispatch({
+                        actionType: 'tire.stock.success',
+                        branches: branches,
+                        tireId: tireId
+                    }); 
                 });
             }
         },

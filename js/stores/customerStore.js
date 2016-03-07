@@ -20,9 +20,9 @@ define([
         quote = {};
 
     var customer = {
-        name: 'Roamn',
-        email: 'mromanp@ukr.net',
-        phone: '2342343245',
+        name: '',
+        email: '',
+        phone: '',
         preferred_time: '',
         way_to_contact: '',
         vehicle_info: '',
