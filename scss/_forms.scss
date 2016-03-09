@@ -119,6 +119,25 @@
         @include padding($baseSpacing/4, $baseSpacing/3);
     }
 
+    table textarea,
+    table input[type="text"],
+    table input[type="password"],
+    table input[type="datetime"],
+    table input[type="datetime-local"],
+    table input[type="date"],
+    table input[type="month"],
+    table input[type="time"],
+    table input[type="week"],
+    table input[type="number"],
+    table input[type="email"],
+    table input[type="url"],
+    table input[type="search"],
+    table input[type="tel"],
+    table input[type="color"] {
+        @include font-size(1);
+        width: auto;
+    }
+
     select {
         line-height: normal !important;
         @include padding(0.2);
@@ -218,6 +237,29 @@
         }
 
         label {
+            margin: 0;
+        }
+    }
+
+    .tcwlw_dollar_field {
+        position: relative;
+        @include padding-left($baseSpacing/2);
+        display: block;
+    }
+
+    .tcwlw_dollar_label {
+        font-weight: bold;
+        line-height: 1.2;
+        position: absolute;
+        @include top($baseLineHeight/2);
+        left: 2px;
+    }
+
+    table .tcwlw_dollar_field {
+        max-width: 150px;
+
+        input {
+            width: 100%;
             margin: 0;
         }
     }

@@ -1,12 +1,14 @@
 define([
     'react',
     'classnames',
+    'config',
     'load!actions/actions',
     'lib/helper',
     'load!stores/customerStore',
 ], function(
     React,
     cn,
+    config,
     Act,
     h,
     customerStore
@@ -88,7 +90,6 @@ define([
 
                         {this._getServicesBlock(quote.services)}
                         {this._getServicesBlock(quote.optional_services, true)}
-                        {this._getDiscountBlock()}
 
                         <div className={cn('table_wrapper')}>
                             <table className={cn('table')}>
@@ -103,6 +104,8 @@ define([
                                         <td>Sub-total</td>
                                         <td>${h.priceFormat(quote.total.sub_total)}</td>
                                     </tr>
+                                    {this._getDiscountBlock()}
+
                                     { recyclingFee && quote.recycling_fee.is_taxable ? recyclingFee : null }
                                     <tr>
                                         <td>{quote.tax.name}</td>
@@ -196,33 +199,122 @@ define([
             </div>
         },
         _getDiscountBlock: function() {
-            var discount = this.state.quote.discount;
-            if (!discount) {
+            var offer = this.state.quote.discount;
+            if (!offer) {
                 return null;
             }
 
+            var type = 'discount';
+
+            var whiteBlock = null;
+
+            if (offer.is_active) {
+                // generate coupon link and offer amount if offer is active:
+
+                var showValue = (type == 'discount' || offer.effective);  //if rebate has no effective price value should not be displayed.
+
+                var valueBlock = null,
+                    valueHeader = null;
+                if (showValue) {
+
+                    var valueHeader = type == 'discount' ? 'Discount' : (showValue ? 'Effective Price' : null);
+                    if (valueHeader) {
+                        valueHeader = <strong>{valueHeader}</strong>;
+                    }
+
+                    if (type == 'rebate' || !config.sa || !offer.editable) {
+                        var valueToShow = h.priceFormat( offer.effective ? offer.effective : offer.total_value ); // discount has no effective price
+                        valueBlock = <span className={cn('dollar_field')}>
+                            <strong>{ '$'  + valueToShow }</strong>
+                        </span>;
+                    } else {
+                        valueBlock = <span className={cn('dollar_field')}>
+                            <span className={cn('dollar_label')}>$</span><input key={Date.now()} type="number" type="number" onBlur={this.handleChangeDiscount} defaultValue={ (this.state.custom_discount || offer.total_value) } />
+                        </span>;
+                    }
+                }
+
+                var couponLink = null;
+                if (offer.coupon_link && offer.coupon_line) {
+                    couponLink = <a href={offer.coupon_link} rel="nofollow" target="_blank">{offer.coupon_line}</a>;
+                }
+
+                whiteBlock = <div className={cn({'no_value': !showValue, 'discount_wrapper': true})}>
+                    {valueHeader}
+                    {valueBlock}
+                    {couponLink}
+                </div>;
+
+            } else {
+                // generate message if offer is not active:
+                
+                var msgOfferSpend = '', msgOfferVal = '';
+                if (offer.minimum_qualifiers.amount) {
+                    msgOfferSpend = 'Spend $' + offer.minimum_qualifiers.amount + (offer.minimum_qualifiers.pre_tax ? ' before' : ' after') + ' taxes ';
+                } else {
+                    msgOfferSpend = 'Purchase ' + offer.minimum_qualifiers.quantity + ' tires ';
+                }
+                if (offer.rate) {
+                    msgOfferVal = 'to receive ' + offer.rate + '% ' + type + '.';
+                } else {
+                    var value = offer.per_tire ? offer.value : offer.total_value; // rebate need only total value and rebate have no per_tire option
+                    msgOfferVal = 'to receive $' + value + ' ' + type + (offer.per_tire ? ' per tire.' : '.');
+                }
+                whiteBlock = <div className={cn('discount_wrapper')}><strong>{msgOfferSpend}<br />{msgOfferVal}</strong></div>;
+
+            }
+
+            var minQualifuerText = null;
+            if (!(offer.minimum_qualifiers.amount === 0 || offer.minimum_qualifiers.quantity <= 1)) {
+                minQualifuerText = <span>{'Minimum of ' + (offer.minimum_qualifiers.amount ? '$' + offer.minimum_qualifiers.amount : offer.minimum_qualifiers.quantity + ' tire') + ' purchase required.'}<br /></span>;
+            }
+
+            var legalLine = null;
+            if (offer.legal_link && offer.legal_line) {
+                legalLine = <small>{ offer.valid_range.is_ongoing ? '' : '*' }<a target="_blank" rel="nofollow" href={offer.legal_link}  dangerouslySetInnerHTML={ {__html: offer.legal_line} } /></small>;
+            }
+
+            var validRange = null;
+            if (!offer.valid_range.is_ongoing) {
+                validRange = <span>{'Offer valid from ' + moment(offer.valid_range.start_date).format('MMM. DD') + ' - ' + moment(offer.valid_range.end_date).format('MMM. DD, YYYY') +  '.' + (legalLine ? '*' : '') }<br /></span>
+            }
+
+/*
+                                    <div className={cn('discount_wrapper')}>
+                                        <strong>Discount</strong>
+                                        <span className={cn('dollar_field')}>
+                                            <span className={cn('dollar_label')}>$</span>
+                                            <input type="number" value={h.priceFormat(offer.total_value)} />
+                                        </span>
+                                    </div>
+
+ */
+
             return (
-                <div className={cn('table_wrapper')}>
-                    <table className={cn('table')}>
-                        <thead>
+                <tr className={cn('discount_row')}>
+                    <td colSpan="3" className={cn('nested_wrapper')}>
+                        <table className={cn('toggle_table')}>
                             <tr>
-                                <th colSpan="2">Discount</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>
-                                    <button onClick={this._handleDiscountClick} className={cn({toggle_cell_btn: true, toggle_remove: discount.applied, toggle_add: !discount.applied})}>
-                                        <i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: (discount.applied ? '&#xE15C;' : '&#xE147;') }} /><span>{ discount.applied ? 'Remove' : 'Add' }</span>
+                                <td className={cn('toggle_cell')}>
+                                    <button onClick={this._handleDiscountClick} className={cn({toggle_cell_btn: true, toggle_remove: offer.applied, toggle_add: !offer.applied})}>
+                                        <i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: (offer.applied ? '&#xE15C;' : '&#xE147;') }} /><span>{ offer.applied ? 'Remove' : 'Add' }</span>
                                     </button>
                                 </td>
-                                <td>Discount</td>
-                                <td>${h.priceFormat(discount.total_value)}</td>
+                                <td>
+                                    {whiteBlock}
+                                    <strong>{offer.name}</strong><br />
+                                    <span dangerouslySetInnerHTML={{ __html: offer.description.replace(/(?:\r\n|\r|\n)/g, "<br />") }} /><br />
+
+                                    {validRange}
+
+                                    {minQualifuerText}
+
+                                    {legalLine}
+                                </td>
                             </tr>
-                        </tbody>
-                    </table>
-                </div>
+                        </table>
+                    </td>
+                </tr>
             );
         },
 

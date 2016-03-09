@@ -147,6 +147,7 @@
 
 	.tcwlw_toggle_table {
 		.tcwlw_toggle_cell {
+			width: 82px;
 			text-align: center;
 		}
 
@@ -279,6 +280,10 @@
 		}
 
 		.tcwlw_toggle_table {
+			.tcwlw_toggle_cell {
+				width: 45px;
+			}
+
 			.tcwlw_toggle_cell_btn {
 				span {
 					display: none;

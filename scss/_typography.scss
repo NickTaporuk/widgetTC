@@ -162,6 +162,10 @@
 			&:last-child {
 				text-align: right;
 			}
+
+			a {
+				@include font-size(1);
+			}
 		}
 
 		th {
@@ -209,7 +213,19 @@
 			td {
 				font-weight: bold;
 				color: white;
+
+				a {
+					color: white;
+				}
 			}
+		}
+	}
+
+	.tcwlw_nested_wrapper {
+		padding: 0;
+
+		table {
+			@include font-size(1);
 		}
 	}
 
