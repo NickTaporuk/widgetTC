@@ -4,23 +4,19 @@ define([
     dispatcher
 ) {
 
-    var settingsStore = {
+    var store = {
         isInProcess: function() {
             return ajaxCount > 0;
         },
 
         dispatchToken: dispatcher.register(function(payload) {
             change = false;
-            switch (payload.actionType) {
-                case 'ajax.beforeSend':
-                    break;
-            }
             
             if (change) {
-                settingsStore.trigger('change');
+                store.trigger('change');
             }
         })
     };
 
-    return settingsStore;
+    return store;
 });

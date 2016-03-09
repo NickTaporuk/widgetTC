@@ -13,7 +13,7 @@ define([
     var defaultSelectedQuantity = 4;
 
     var tires = [];
-    var tiresIndexes = []
+    var tiresIndexes = [];
     var totalCount;
     var filters = [];
     var page;

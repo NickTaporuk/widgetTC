@@ -10,17 +10,19 @@ define([
 
     ajax.beforeSend = function() {
         dispatcher.dispatch({
-            actionType: 'ajax.beforeSend'
+            actionType: constants.BEFORE_REQUEST
         });
     };
+
     ajax.complete = function() {
         dispatcher.dispatch({
-            actionType: 'ajax.complete'
+            actionType: constants.RESPONSE_RECEIVED
         });
     };
     ajax.error = function(error) {
+        console.log(error);
         dispatcher.dispatch({
-            actionType: 'ajax.error',
+            actionType: constants.ERROR_RESPONSE,
             error: error
         });
     };
@@ -324,6 +326,8 @@ define([
                             actionType: constants.ORDER_CHECKOUT_ERROR,
                             errors: response.errors
                         });
+                    } else {
+                        ajax.error(response);
                     }
                 }
             });
@@ -336,7 +340,7 @@ define([
                 success: function(response) {
                     var info = response.data;
                     info.notice = response.notice;
-                    info.actionType = constants.ORDER_PAYMENT_SUCCESS,
+                    info.actionType = constants.ORDER_PAYMENT_SUCCESS;
                     dispatcher.dispatch(info);
                 },
                 error: function(response) {
@@ -345,6 +349,8 @@ define([
                             actionType: constants.ORDER_PAYMENT_ERROR,
                             errors: {number: response.errors.token}
                         });
+                    } else {
+                        ajax.error(response);
                     }
                 }
             });
@@ -373,7 +379,7 @@ define([
                         tireId: tireId
                     }); 
                 }
-            })
+            });
         }
     };
 

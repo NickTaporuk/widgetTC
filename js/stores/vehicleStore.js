@@ -39,7 +39,7 @@ define([
             return tireSizes[key] ? tireSizes[key] : [];
         },
         getAll: function(year, make, model, trim) {
-            var key = getKey(year, make, model, trim)
+            var key = getKey(year, make, model, trim);
             var all = {
                 years: store.getYears(),
                 makes: year ? store.getMakes(year) : [],
@@ -50,7 +50,7 @@ define([
             return all;
         },
         dispatchToken:  dispatcher.register(function(payload) {
-            var values = payload.values || {}
+            var values = payload.values || {};
             var key = getKey(values.year, values.make, values.model, values.trim);
             switch (payload.actionType) {
                 case constants.GET_VEHICLE_YEARS_SUCCESS:
@@ -73,7 +73,7 @@ define([
             store.trigger('change');
         })
     };
-
+    
     return store;
 
 });

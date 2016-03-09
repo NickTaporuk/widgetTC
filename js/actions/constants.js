@@ -2,8 +2,9 @@ define([], function() {
 
     return {
         // ----- API events -----
-        BEFORE_SEND:     'BEFORE_SEND',
-        API_ERROR:       'API_ERROR',
+        BEFORE_REQUEST:    'BEFORE_REQUEST',
+        RESPONSE_RECEIVED: 'RESPONSE_RECEIVED',
+        ERROR_RESPONSE:    'ERROR_RESPONSE',
 
         LOAD_DEALER_CONFIG_SUCCESS:         'LOAD_DEALER_CONFIG_SUCCESS',
         LOAD_LOCATIONS_SUCCESS:             'LOAD_LOCATIONS_SUCCESS',
@@ -39,7 +40,6 @@ define([], function() {
         LOAD_FULL_STOCK_SUCCESS:     'LOAD_FULL_STOCK_SUCCESS',
         LOAD_STOCK_SUCCESS:          'LOAD_STOCK_SUCCESS',
 
-
         // ----- User actions events -----
         CHANGE_LOCATION:             'CHANGE_LOCATION',
         CHANGE_SEARCH_TIRE_PARAM:    'CHANGE_SEARCH_TIRE_PARAM',
@@ -48,8 +48,8 @@ define([], function() {
 
         SEARCH_TIRES:                'SEARCH_TIRES',
                 
-        SELECT_TIRE:  'SELECT_TIRE',
-        UPDATE_QUOTE: 'UPDATE_QUOTE',
+        SELECT_TIRE:     'SELECT_TIRE',
+        UPDATE_QUOTE:    'UPDATE_QUOTE',
 
         SHOW_QUOTE_REQUEST_FORM: 'SHOW_QUOTE_REQUEST_FORM',
         SHOW_APPOINTMENT_FORM:   'SHOW_APPOINTMENT_FORM',
@@ -64,6 +64,5 @@ define([], function() {
         SEND_QUOTE_REQUEST: 'SEND_QUOTE_REQUEST',
         SEND_EMAIL:         'SEND_EMAIL',
         PRINT_QUOTE:        'PRINT_QUOTE'
-    }
-
+    };
 });

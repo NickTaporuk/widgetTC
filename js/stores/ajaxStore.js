@@ -1,7 +1,9 @@
 define([
-    'dispatcher'
+    'dispatcher',
+    'load!actions/constants'
 ], function(
-    dispatcher
+    dispatcher,
+    constants
 ) {
 
     var ajaxCount = 0;
@@ -14,16 +16,14 @@ define([
         dispatchToken: dispatcher.register(function(payload) {
             change = false;
             switch (payload.actionType) {
-                case 'ajax.beforeSend':
+                case constants.BEFORE_REQUEST:
                     ajaxCount++;
-                    // setLocations(payload.locations);
                     change = true;
                     break;
                     
-                case 'ajax.complete': 
+                case constants.RESPONSE_RECEIVED: 
                     ajaxCount--;
-                    // currectLocation = payload.id;
-                    if (ajaxCount == 0) {
+                    if (ajaxCount === 0) {
                         change = true;
                     }
                     break;

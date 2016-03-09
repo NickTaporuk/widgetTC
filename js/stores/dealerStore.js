@@ -116,7 +116,7 @@ define([
                 'background-color: ' + color2 +'; ' +
                 'border-color: ' + color2 +';'
         );
-    };
+    }
 
     var store = {
         getStripeKey: function(id) {

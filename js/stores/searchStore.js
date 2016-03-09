@@ -70,14 +70,15 @@ define([
     var sections = ['size', 'vehicle', 'part_number', 'common'];
 
     function setDefaultValue(field) {
+        var options;
         if (field == 'car_tire_id') {
-            var options = fieldOptions['car_tire_id'];
+            options = fieldOptions.car_tire_id;
             setValue('vehicle', 'car_tire_id', options[0].value);
         } else if (field == 'display') {
-            var options = fieldOptions['display'];
+            options = fieldOptions.display;
             setValue('common', 'display', options[0].value);
         } else if (field == 'brand' || field == 'run_flat' || field == 'light_truck') {
-            var options = fieldOptions[field];
+            options = fieldOptions[field];
             var value = [];
             options.forEach(function(option, i, options) {
                 value.push(option.value);
