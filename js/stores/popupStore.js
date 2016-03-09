@@ -1,7 +1,9 @@
 define([
-    'dispatcher'
+    'dispatcher',
+    'load!actions/constants'
 ], function(
-    dispatcher
+    dispatcher,
+    constants
 ) {
 
     // private section
@@ -36,9 +38,9 @@ define([
                     change = true;
                     break;
 
-                case 'quote.appointment.success':
-                case 'quote.email.success':
-                case 'quote.request.success':
+                case constants.SEND_APPOINTMENT_SUCCESS:
+                case constants.EMAIL_QUOTE_SUCCESS:
+                case constants.REQUEST_QUOTE_SUCCESS:
                     name = 'alert';
                     props = {
                         title: payload.title,

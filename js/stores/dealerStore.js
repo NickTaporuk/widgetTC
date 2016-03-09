@@ -1,9 +1,11 @@
 define([
     'dispatcher',
-    'lodash'
+    'lodash',
+    'load!actions/constants'
 ], function(
     dispatcher,
-    _
+    _,
+    constants
 ) {
 
     var ecommerce = {
@@ -133,7 +135,7 @@ define([
         dispatchToken: dispatcher.register(function(payload) {
             change = false;
             switch (payload.actionType) {
-                case 'dealer.config.set':
+                case constants.LOAD_DEALER_CONFIG_SUCCESS:
                     var c = payload.config;
                     if (c.ecommerce.enabled && c.ecommerce.services && c.ecommerce.services.stripe) {
                         ecommerce.stripe.key = c.ecommerce.services.stripe.publishable_key;
@@ -143,7 +145,7 @@ define([
                     changeColorScheme('#' + c.colors.color1, '#' + c.colors.color2);
                     break;
 
-                case 'dealer.info.success':
+                case constants.LOAD_DEALER_INFO_SUCCESS:
                     companyName = payload.info.company_name;
                     logo = payload.info.logo;
                     change = true;

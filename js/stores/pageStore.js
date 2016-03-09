@@ -1,11 +1,13 @@
 define([
     'dispatcher',
     'load!stores/resultsStore',
-    'load!stores/customerStore'
+    'load!stores/customerStore',
+    'load!actions/constants'
 ], function(
     dispatcher,
     resultsStore,
-    customerStore
+    customerStore,
+    constants
 ) {
 
     // private section
@@ -24,14 +26,14 @@ define([
         dispatchToken:  dispatcher.register(function(payload) {
             var change = false;
             switch (payload.actionType) {
-                case 'tire.parameters.set':
+                case constants.LOAD_TIRE_PARAMETERS_SUCCESS:
                 case 'page.update':
                     name = payload.name || 'search';
                     props = payload.props || {};
                     change = true;
                     break;
 
-                case 'results.fill':
+                case constants.SEARCH_TIRES_SUCCESS:
                     dispatcher.waitFor([resultsStore.dispatchToken]);
                     if (name !== 'results') {
                         name = 'results';
@@ -50,19 +52,19 @@ define([
                     change = true;
                     break;
 
-                case 'quote.print.success':
-                case 'quote.email.success':
-                case 'quote.appointment.success':
+                case constants.SEND_APPOINTMENT_SUCCESS:
+                case constants.PRINT_QUOTE_SUCCESS:
+                case constants.EMAIL_QUOTE_SUCCESS:
                     name = 'summary';
                     change = true;
                     break;
                     
-                case 'quote.request.success':
+                case constants.REQUEST_QUOTE_SUCCESS:
                     name = 'results';
                     change = true;
                     break;
 
-                case 'order.create.success':
+                case constants.ORDER_CREATE_SUCCESS:
                     if (payload.tires && payload.tires[0]) {
                         dispatcher.waitFor([customerStore.dispatchToken]);
                         name = 'order';
@@ -70,7 +72,7 @@ define([
                     }
                     break;
 
-                case 'quote.display.update':
+                case constants.LOAD_QUOTE_SUCCESS:
                     dispatcher.waitFor([customerStore.dispatchToken, resultsStore.dispatchToken]);
                     if (name !== 'summary') {
                         name = 'summary';
@@ -78,7 +80,7 @@ define([
                     }
                     break;
 
-                case 'order.payment.success':
+                case constants.ORDER_PAYMENT_SUCCESS:
                     dispatcher.waitFor([customerStore.dispatchToken]);
                     name = 'confirmation';
                     props.notice = payload.notice;

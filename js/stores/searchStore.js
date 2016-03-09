@@ -1,11 +1,13 @@
 define([
     'dispatcher',
     'lodash',
-    'load!stores/vehicleStore'
+    'load!stores/vehicleStore',
+    'load!actions/constants'
 ], function(
     dispatcher,
     _,
-    vehicleStore
+    vehicleStore,
+    constants
 ) {
     var activeSection = 'size';
 
@@ -148,7 +150,7 @@ define([
         dispatchToken: dispatcher.register(function(payload) {
             var change = false;
             switch (payload.actionType) {
-                case 'tire.parameters.set':
+                case constants.LOAD_TIRE_PARAMETERS_SUCCESS:
                 case 'search.options.update':
                     Object.keys(payload.options).map(function(fieldName) {
                         setOptions(fieldName, payload.options[fieldName]);
@@ -165,7 +167,7 @@ define([
                     });
                     change = true;
                     break;
-                case 'dealer.config.set':
+                case constants.LOAD_DEALER_CONFIG_SUCCESS:
                     var c = payload.config;
                     setValue('common', 'order_by', c.default_order.iframe);
                     setValue('size', 'base_category', c.default_base_category);
@@ -188,11 +190,11 @@ define([
                         change = true;
                     }
                     break;
-                case 'vehicle.years.success':
-                case 'vehicle.makes.success':
-                case 'vehicle.models.success':
-                case 'vehicle.trims.success':
-                case 'vehicle.tireSizes.success':
+                case constants.GET_VEHICLE_YEARS_SUCCESS:
+                case constants.GET_VEHICLE_MAKES_SUCCESS:
+                case constants.GET_VEHICLE_MODELS_SUCCESS:
+                case constants.GET_VEHICLE_TRIMS_SUCCESS:
+                case constants.GET_VEHICLE_TIRES_SUCCESS:
                     dispatcher.waitFor([vehicleStore.dispatchToken]);
                     
                     setOptions('year', vehicleStore.getYears());

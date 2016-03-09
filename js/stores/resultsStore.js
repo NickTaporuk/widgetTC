@@ -1,9 +1,11 @@
 define([
     'dispatcher',
-    'lodash'
+    'lodash',
+    'load!actions/constants'
 ], function(
     dispatcher,
-    _
+    _,
+    constants
 ) {
 
     var itemsPerPage = 6;
@@ -56,21 +58,21 @@ define([
         dispatchToken: dispatcher.register(function(payload) {
             var change = false;
             switch (payload.actionType) {
-                case 'results.fill':
+                case constants.SEARCH_TIRES_SUCCESS:
                     fillTires(payload.tires);
                     totalCount = payload.totalCount;
                     filters = payload.filters;
                     page = payload.page;                
                     change = true;
                     break;
-                case 'dealer.config.set':
+                case constants.LOAD_DEALER_CONFIG_SUCCESS:
                     var c = payload.config;
                     itemsPerPage = c.items_per_page;
                     defaultSelectedQuantity = c.default_selected_quantity;
                     // showInStock = c.show_in_stock;
                     change = true;
                     break;
-                case 'quote.display.update':
+                case constants.LOAD_QUOTE_SUCCESS:
                     changeSelectedQuantity(payload.tireId, payload.quantity);
                     change = true;
                     break;

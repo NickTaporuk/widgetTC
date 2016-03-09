@@ -1,9 +1,11 @@
 define([
     'dispatcher',
     'lodash',
+    'load!actions/constants'
 ], function(
     dispatcher,
-    _
+    _,
+    constants
 ) {
 
     var years = [],
@@ -51,19 +53,19 @@ define([
             var values = payload.values || {}
             var key = getKey(values.year, values.make, values.model, values.trim);
             switch (payload.actionType) {
-                case 'vehicle.years.success':
+                case constants.GET_VEHICLE_YEARS_SUCCESS:
                     years = payload.options;
                     break;
-                case 'vehicle.makes.success':
+                case constants.GET_VEHICLE_MAKES_SUCCESS:
                     makes[key] = payload.options;
                     break;
-                case 'vehicle.models.success':
+                case constants.GET_VEHICLE_MODELS_SUCCESS:
                     models[key] = payload.options;
                     break;
-                case 'vehicle.trims.success':
+                case constants.GET_VEHICLE_TRIMS_SUCCESS:
                     trims[key] = payload.options;
                     break;
-                case 'vehicle.tireSizes.success':
+                case constants.GET_VEHICLE_TIRES_SUCCESS:
                     tireSizes[key] = payload.options;
                     break;
             }

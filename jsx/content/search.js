@@ -3,7 +3,6 @@ define([
     'classnames',
     'config',
     'load!actions/actions',
-    'load!actions/apiActions',
     'load!stores/searchStore',
     'load!stores/vehicleStore',
     'load!components/elements/select'
@@ -12,7 +11,6 @@ define([
     cn,
     config,
     Act,
-    ApiAct,
     searchStore,
     vehicleStore,
     SelectField
@@ -222,11 +220,10 @@ define([
         },
         _handleSubmit: function(event) {
             event.preventDefault();
-            ApiAct.searсhTires();
+            Act.Tire.search();
         },
         _handleFieldChange: function(event) {
             var fieldName = event.target.name.replace( (this.state.activeTab + '_'), '');
-            console.log(this.state.activeTab, fieldName, event.target.value);
             Act.Search.updateField(this.state.activeTab, fieldName, event.target.value);
         },
         _handleVehicleChange: function(event) {

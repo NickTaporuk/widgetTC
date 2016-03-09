@@ -4,14 +4,16 @@ define([
     'load!stores/searchStore',
     'lodash',
     'validate',
-    'moment'
+    'moment',
+    'load!actions/constants'
 ], function(
     dispatcher,
     resultsStore,
     searchStore,
     _,
     validate,
-    moment
+    moment,
+    constants
 ) {
 
     // private section
@@ -138,7 +140,7 @@ define([
         dispatchToken:  dispatcher.register(function(payload) {
             var change = false;
             switch (payload.actionType) {
-                case 'quote.display.update':
+                case constants.LOAD_QUOTE_SUCCESS:
                 case 'quote.request.form.show':
                     selectedTire = payload.tireId;
                     selectedQuantity = payload.quantity;
@@ -148,7 +150,7 @@ define([
                     change = true;
                     break;
 
-                case 'order.create.success':
+                case constants.ORDER_CREATE_SUCCESS:
                     if (payload.tires && payload.tires[0]) {
                         order.order_id = payload.order_id;
                         order.order_number = payload.order_number;
@@ -186,14 +188,14 @@ define([
                     change = true;
                     break;
 
-                case 'order.checkout.success':
-                case 'order.payment.success':
+                case constants.ORDER_CHECKOUT_SUCCESS:
+                case constants.ORDER_PAYMENT_SUCCESS:
                     order.status = payload.status;
                     change = true;
                     break;
 
-                case 'order.checkout.error':
-                case 'order.payment.error':
+                case constants.ORDER_CHECKOUT_ERROR:
+                case constants.ORDER_PAYMENT_ERROR:
                     validationErrors = payload.errors;
                     if (validationErrors.prefered_time) {
                         validationErrors.preferred_time = validationErrors.prefered_time; //temporary for compatibility

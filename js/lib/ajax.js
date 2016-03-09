@@ -52,6 +52,7 @@ define(['config', 'isMobile'], function(config, isMobile) {
 		        .apply( $private.methods, $private.parseResponse( xhr ) );
 		    };
 		    xhr.onerror = function() {
+		    	console.log(xhr.responseText);
 		      $private.methods.always
 		        .apply( $private.methods, $private.parseResponse( xhr ) );
 		      $private.methods.error
@@ -132,60 +133,6 @@ define(['config', 'isMobile'], function(config, isMobile) {
 	  return (myNav.indexOf('msie') != -1) ? parseInt(myNav.split('msie')[1]) : false;
 	}
 
-
-	// var promise = function() {
- //        var response = null;
-
- //        var methods = {
- //            success: [],
- //            error: []
- //        };
-
- //        this.resolve = function(resp) {
- //            response = resp;
- //            success();
- //        };
-
- //        this.reject = function(resp) {
- //        	response = resp;
- //        	error();
- //        }
-
- //        var processResponse = function(type) {
- //            if (response) {
- //            	var count = methods[type].length;
- //                for (var i = 0; i < count; i++) {
- //                    response = methods[type][i](response);    
- //                }
- //                response = null;
- //                methods.success = [];
- //                methods.error = [];
- //            }
- //        } 
-
- //        var success = function() {
- //            processResponse('success');
- //        }
-
- //        var error = function() {
- //        	processResponse('error');
- //        }
-
- //        this.then = function(onFulfilled, onRejected) {
- //        	if (onFulfilled && typeof onFulfilled == 'function') {
- //            	methods.success.push(onFulfilled);
- //            	success();
- //        	}
- //        	if (onRejected && typeof onRejected == 'function') {
- //            	methods.error.push(onRejected);
- //            	error();
- //        	}
-            
- //            return this;
- //        }
- //    };
-
-
 	var ajax2 = function() {
 		var self = this;
 
@@ -193,17 +140,17 @@ define(['config', 'isMobile'], function(config, isMobile) {
 		this.error = function(e){};
 		this.complete = function(){};
 
-		// var ajaxCounter = 0;
-		// this.isBusy = function() {
-		// 	return ajaxCounter > 0;
-		// };
+		var ajaxCounter = 0;
+		this.isBusy = function() {
+			return ajaxCounter > 0;
+		};
 
 		this.make = function(params) {
 			var url = config.apiBaseUrl + params.url + (/\?/.test(params.url) ? '&' : '?') + 'key=' + config.apikey + (config.sessionId ? '&session_id=' + config.sessionId : '')
 			var a;
 
 			self.beforeSend();
-			// ajaxCounter++;
+			ajaxCounter++;
 
 			var ajax_a = new Ajax();
 			var data = params.data || {}
@@ -212,26 +159,19 @@ define(['config', 'isMobile'], function(config, isMobile) {
 					a = ajax_a.get( url, data );
 					break;
 				case 'post':
-					a = ajax_a.post( url, data );
+					a =ajax_a.post( url, data );
 					break;
 			}
-
-			var p = new Promise(function(resolve, reject) {
-				a.done(function(response, xhr) {
-					resolve(response);
-				});
-				a.error(function(response, xhrObject) {
-					reject(response);
-					params.error ? params.error(response, xhrObject) : self.error(response, xhrObject);
-				});
-				a.always(function(response, xhrObject) {
-					// ajaxCounter--;
-					params.complete ? params.complete(response, xhrObject) : self.complete(response, xhrObject);
-				});
+			a.done(function(response, xhr) {
+				params.success(response);
 			});
-
-
-			return p;
+			a.error(function(response, xhrObject) {
+				params.error ? params.error(response, xhrObject) : self.error(response, xhrObject);
+			});
+			a.always(function(response, xhrObject) {
+				ajaxCounter--;
+				params.complete ? params.complete(response, xhrObject) : self.complete(response, xhrObject);
+			});
 		}
 	}
 

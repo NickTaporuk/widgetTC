@@ -1,9 +1,11 @@
 define([
     'dispatcher',
-    'lodash'
+    'lodash',
+    'load!actions/constants'
 ], function(
     dispatcher,
-    _
+    _,
+    constants
 ) {
     var fullStock = {};
     var branches ={};
@@ -24,13 +26,12 @@ define([
         dispatchToken: dispatcher.register(function(payload) {
             change = false;
             switch (payload.actionType) {
-                case 'tire.full_stock.success':
+                case constants.LOAD_FULL_STOCK_SUCCESS:
                     fullStock[payload.tireId] = payload.stock;
-                    // console.log(fullStock);
                     change = true;
                     break;
                     
-                case 'tire.stock.success': 
+                case constants.LOAD_STOCK_SUCCESS: 
                     branches[payload.tireId] = payload.branches;
                     change = true;
                     break;

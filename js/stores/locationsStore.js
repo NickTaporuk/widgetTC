@@ -2,10 +2,12 @@ define([
     'dispatcher',
     'lodash',
     'lockr',
+    'load!actions/constants'
 ], function(
     dispatcher,
     _,
-    lockr
+    lockr,
+    constants
 ) {
     var locations = [];
     var currectLocation;
@@ -40,7 +42,7 @@ define([
         dispatchToken: dispatcher.register(function(payload) {
             change = false;
             switch (payload.actionType) {
-                case 'locations.init':
+                case constants.LOAD_LOCATIONS_SUCCESS:
                     setLocations(payload.locations);
                     change = true;
                     break;

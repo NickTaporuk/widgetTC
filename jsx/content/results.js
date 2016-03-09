@@ -3,7 +3,6 @@ define([
     'classnames',
     'lodash',
     'load!actions/actions',
-    'load!actions/apiActions',
     'load!stores/resultsStore',
     'load!components/elements/select',
     'load!components/content/results/tire',
@@ -14,7 +13,6 @@ define([
     cn,
     _,
     Act,
-    ApiAct,
     resultsStore,
     SelectField,
     Tire,
@@ -43,7 +41,6 @@ define([
         },
 
         render: function() {
-            console.log(this.props.isInMile);
             var tires = [];
             this.state.tires.map(function(tire, i) {
                 tires.push((
@@ -137,15 +134,15 @@ define([
         _handleFieldChange: function(event) {
             var fieldName = event.target.name.replace('filter_', '');
             Act.Search.updateField('common', fieldName, event.target.value);
-            ApiAct.searсhTires();
+            Act.Tire.search();
         },
         _handleFilterChange: function(name, values, event) {
             Act.Search.updateField('common', name, values);
-            ApiAct.searсhTires();
+            Act.Tire.search();
         },
         _handlePageClick: function(page, event) {
             event.preventDefault();
-            ApiAct.searсhTires({page: page});
+            Act.Tire.search({page: page});
         }
     }
 
