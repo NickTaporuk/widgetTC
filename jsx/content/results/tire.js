@@ -5,7 +5,8 @@ define([
     'load!actions/actions',
     'lib/helper',
     'moment',
-    'load!stores/stockStore'
+    'load!stores/stockStore',
+    'load!stores/reviewsStore'
 ], function(
     React,
     config,
@@ -13,7 +14,8 @@ define([
     Act,
     h,
     moment,
-    stockStore
+    stockStore,
+    reviewsStore
 ) {
 
     return {
@@ -24,7 +26,8 @@ define([
                 showRebate: false,
                 fullStock: [],
                 stock: [],
-                stockFor: null
+                stockFor: null,
+                reviews: []
             }
         },
 
@@ -34,10 +37,12 @@ define([
             });
         },
         componentDidMount: function() {
-            stockStore.bind('change', this._updateStatus);
+            stockStore.bind('change', this._updateState);
+            reviewsStore.bind('change', this._updateState);
         },
         componentWillUnmount: function() {
-            stockStore.unbind('change', this._updateStatus);    
+            stockStore.unbind('change', this._updateState);    
+            reviewsStore.unbind('change', this._updateState);    
         },
 
         render: function() {
@@ -58,6 +63,8 @@ define([
             for(var q = 1; q <= tire.quantity && q <= 8; q++) {
                 quantityItems.push(<option key={q} value={q}>{q}</option>);
             }
+
+            var totalRewiews = this.props.tire.external_info.rating && this.props.tire.external_info.rating.total_reviews ? this.props.tire.external_info.rating.total_reviews : 0;
 
             return (
                 <li className={cn({result: true, result_featured: this.props.isTop, border_color: this.props.isTop})}>
@@ -83,7 +90,7 @@ define([
                             </div>
                             {this._getRebateBlock()}
                             {this._getOemBlock()}
-                            {this._getRatingBlock(3, true)}
+                            {this._getRatingBlock()}
                         </div>
                         <div className={cn('result_right')}>
                             <div className={cn('result_select_actions')}>
@@ -115,7 +122,11 @@ define([
                                         ? <li className={cn('tab')}><a href="#features_result_1" onClick={this._handleTabClick.bind(this, 'features')} className={cn('font_color')} aria-selected={(tab == 'features')}>Features</a></li>
                                         : null
                                     }
-                                    <li className={cn('tab')}><a href="#reviews_result_1" onClick={this._handleTabClick.bind(this, 'reviews')} className={cn('font_color')}  aria-selected={(tab == 'reviews')}>Reviews</a></li>
+                                    {   
+                                        totalRewiews
+                                        ? <li className={cn('tab')}><a href="#reviews_result_1" onClick={this._handleTabClick.bind(this, 'reviews')} className={cn('font_color')}  aria-selected={(tab == 'reviews')}>Reviews</a></li>
+                                        : null
+                                    }
                                     {
                                         config.sa
                                         ? <li className={cn(['tab', 'stock_tab'])} role="presentation">
@@ -135,25 +146,8 @@ define([
                                 </div>
                                 {features}
                                 <div className={cn('tab_cont')} aria-hidden={!(tab == 'reviews')}>
-                                    <h4 className={cn('result_reviews_heading')}><strong>10</strong> reviews:</h4>
-
-                                    <div className={cn('result_review')}>
-                                        <h5 className={cn('result_review_title')}>A great tire!</h5>
-                                        {this._getRatingBlock()}
-                                        <span className={cn('result_review_date')}>November 15, 2015</span>
-                                        <div className={cn('result_review_content')}>
-                                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque dui leo, mollis ac condimentum nec, iaculis non mi. Duis dictum dui a velit aliquet, ac consequat risus accumsan. </p>
-                                        </div>
-                                    </div>
-
-                                    <div className={cn('result_review')}>
-                                        <h5 className={cn('result_review_title')}>A much longer review title for testing layout adjustments</h5>
-                                        {this._getRatingBlock()}
-                                        <span className={cn('result_review_date')}>November 6, 2015</span>
-                                        <div className={cn('result_review_content')}>
-                                            <p>Suspendisse congue laoreet nulla ut mattis. Duis at sem rutrum, varius orci at, suscipit lectus. Phasellus ac magna semper, luctus sapien non, tempus sapien. </p>
-                                        </div>
-                                    </div>
+                                    <h4 className={cn('result_reviews_heading')}><strong>{totalRewiews}</strong> reviews:</h4>
+                                    {this._getReviewsBlock()}
                                 </div>
                                 <div className={cn('tab_cont')} aria-hidden={!(tab == 'stock')}>
                                     {this._getStockInfo()}
@@ -165,17 +159,41 @@ define([
             );
         },
 
-        _updateStatus: function() {
+        _updateState: function() {
+            var state = this.state;
             if (this.state.fullStock.length == 0) {
-                this.setState({
-                    'fullStock': stockStore.getFullStock(this.props.tire.id)
-                });
+                state.fullStock = stockStore.getFullStock(this.props.tire.id);
             }
             if (this.state.stockFor) {
-                this.setState({
-                    'stock': stockStore.getBranches(this.state.stockFor.tire_id)
-                });
+                state.stock = stockStore.getBranches(this.state.stockFor.tire_id);
             }
+            if (this.state.activeTab == 'reviews') {
+                state.reviews = reviewsStore.getReviews(this.props.tire.id);
+                state.totalReviews = reviewsStore.getTotalReviews(this.props.tire.id);
+            }
+            this.setState(state);
+        },
+
+        _getReviewsBlock: function() {
+            var items = [];
+
+            this.state.reviews.map(function(review, i) {
+                items.push((
+                    <div key={i} className={cn('result_review')}>
+                        <h5 className={cn('result_review_title')}>{review.title}</h5>
+                        {this._getStars(review.rating)}
+                        <span className={cn('result_review_date')}>{moment(review.submitted_at).format('MMMM DD, YYYY')}</span>
+                        <div className={cn('result_review_content')}>
+                            <p dangerouslySetInnerHTML={{ __html: review.text }} />
+                        </div>
+                    </div>
+                ));
+            }.bind(this));
+
+            if (this.state.reviews.length < this.state.totalReviews) {
+                items.push(<a key="more" onClick={this._handleMoreReviews} href="#more">Show more reviews</a>);
+            }
+            return items;
         },
 
         _getStockInfo: function() {
@@ -216,11 +234,24 @@ define([
             });
         },
 
-        _getRatingBlock: function(rating, withLink) {
-            var rating = this.props.tire.external_info.rating;
+        _getRatingBlock: function(rating, totalRevuew) {
+            var info = this.props.tire.external_info;
+            var rating = info.rating ? info.rating.average_rating : null;
             if (!rating) {
                 return null;
             }
+
+            var stars = this._getStars(rating);
+
+            var totalReviews = null
+            if (info.rating && info.rating.total_reviews) {
+                totalReviews = info.rating.total_reviews;
+            }
+
+            return this._getStars(rating, totalReviews);
+        },
+
+        _getStars: function(rating, totalReviews) {
             var fullStars = parseInt(rating);
             var halfStars = rating - fullStars > 0 ? 1 : 0;
             var emptyStars = 5 - fullStars - halfStars;
@@ -239,11 +270,15 @@ define([
                 stars.push(<i key={i} className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: star }} />);
             }
 
-            var withLink = withLink || false;
+            var rewiewsLink = null
+            if (totalReviews) {
+                rewiewsLink = <a href="#reviews_result_1" className={cn('result_rating_link')}>{totalReviews + ' Reviews'}</a>
+            }
+
             return (
-                <div className={cn('result_rating')} aria-label="Tire rating: 3.5 stars">
+                <div className={cn('result_rating')} aria-label="Tire rating:  stars">
                     {stars}
-                    {withLink ? <a href="#reviews_result_1" className={cn('result_rating_link')}>10 Reviews</a> : null}
+                    {rewiewsLink}
                 </div>
             );
         },
@@ -315,12 +350,21 @@ define([
         },
 
         _handleTabClick: function(tab, event) {
+            event.preventDefault();
+
             this.setState({
                 activeTab: tab
             });
             if (tab == 'stock' && this.state.fullStock.length <= 0) {
                 Act.Tire.loadFullStock(this.props.tire.id);
             }
+            if (tab == 'reviews' && this.state.reviews.length <= 0) {
+                Act.Tire.loadRewiews(this.props.tire.id);   
+            }
+        },
+        _handleMoreReviews: function(event) {
+            event.preventDefault();
+            Act.Tire.loadRewiews(this.props.tire.id, this.state.reviews.length);
         },
         _handleStockClick: function(event) {
             event.preventDefault();

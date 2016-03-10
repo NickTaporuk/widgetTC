@@ -75,7 +75,7 @@ define([
         },
         Tire: {
             search: function(addParams) {
-            var location = locationsStore.getCurrentLocation();
+                var location = locationsStore.getCurrentLocation();
                 if (location) {
                     var section = searchStore.getActiveSection();
                     var searchParams = searchStore.getSectionValues(section);
@@ -109,6 +109,9 @@ define([
             },
             loadStock: function(tireId) {
                 Api.loadStock(tireId);
+            },
+            loadRewiews: function(tireId, offset) {
+                Api.loadReviews(tireId, offset);
             }
         },
         Quote: {

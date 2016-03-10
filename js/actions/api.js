@@ -381,6 +381,20 @@ define([
                     }); 
                 }
             });
+        },
+
+        loadReviews: function(tireId, offset) {
+            ajax.make({
+                url: 'tire/' + tireId + '/reviews',
+                data: { offset: offset || 0, limit: 5 },
+                success: function(response) {
+                    dispatcher.dispatch({
+                        actionType: constants.LOAD_REVIEWS_SUCCESS,
+                        data: response.data,
+                        tireId: tireId
+                    }); 
+                }
+            })
         }
     };
 

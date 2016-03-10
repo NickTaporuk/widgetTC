@@ -40,6 +40,8 @@ define([], function() {
         LOAD_FULL_STOCK_SUCCESS:     'LOAD_FULL_STOCK_SUCCESS',
         LOAD_STOCK_SUCCESS:          'LOAD_STOCK_SUCCESS',
 
+        LOAD_REVIEWS_SUCCESS:   'LOAD_REVIEWS_SUCCESS',
+
         // ----- User actions events -----
         CHANGE_LOCATION:             'CHANGE_LOCATION',
         CHANGE_SEARCH_TIRE_PARAM:    'CHANGE_SEARCH_TIRE_PARAM',
