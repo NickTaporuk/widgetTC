@@ -13,7 +13,8 @@ define([
     'load!stores/locationsStore',
     'load!stores/customerStore',
     'load!stores/dealerStore',
-    'classnames'
+    'classnames',
+    'config'
 ], function(
     Search,
     Results,
@@ -29,7 +30,8 @@ define([
     locationsStore,
     customerStore,
     dealerStore,
-    cn
+    cn,
+    config
 ) {
 
     return {
@@ -112,7 +114,7 @@ define([
                 case 'summary':
                     var props = {
                         tire: customerStore.getSelectedTire(),
-                        withOrderBtn: dealerStore.getStripeKey() !== null
+                        withOrderBtn: dealerStore.getStripeKey() !== null && !config.sa
                     };
                     content = <Summary {...props} />
                     break;
