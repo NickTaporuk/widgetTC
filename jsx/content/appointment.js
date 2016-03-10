@@ -5,7 +5,9 @@ define([
     'lib/helper',
     'load!stores/customerStore',
     'load!stores/vehicleStore',
-    'load!components/elements/select'
+    'load!components/elements/select',
+    'components/datetime/DateTime',
+    'moment'
 ], function(
     React,
     cn,
@@ -13,7 +15,9 @@ define([
     h,
     customerStore,
     vehicleStore,
-    SelectField
+    SelectField,
+    DateTime,
+    moment
 ) {
 
     return {
@@ -138,8 +142,19 @@ define([
                                 </div>
                                 { this.props.type === 'appointment'
                                     ?   <div className={cn('control_wrapper')}>
+                                            <label htmlFor={cn('way_to_contact')}>Best way to contact</label>
+                                            <select id={cn('way_to_contact')} ref="way_to_contact" defaultValue={this.state.values.way_to_contact}>
+                                                <option value="phone">Phone</option>
+                                                <option value="email">Email</option>
+                                            </select>
+                                        </div>
+                                    :   null
+                                }
+                                { this.props.type === 'appointment'
+                                    ?   <div className={cn('control_wrapper')}>
                                             <label htmlFor={cn('order_date_time')}>Preferred Date and Time</label>
-                                            <input type="text" id={cn('order_date_time')} className={cn('datepicker')} ref="time" defaultValue={this.state.values.preferred_time} />
+                                            {/*<input type="text" id={cn('order_date_time')} className={cn('datepicker')} ref="time" defaultValue={this.state.values.preferred_time} />*/}
+                                            <DateTime isValidDate={this._isValidDate} inputProps={ {'name': "preferred_time", 'readOnly': true} } onChange={this._handleTimeChange} defaultValue={this.state.values.preferred_time} dateFormat="YYYY-MM-DD" timeFormat="HH:mm"/>
                                             {this._getError('preferred_time')}
                                         </div>
                                     :   null
@@ -155,6 +170,10 @@ define([
 
                 </div>
             );
+        },
+
+        _isValidDate: function( current ) {
+            return current.isAfter( moment().add(1, 'd').subtract(1,'day') );
         },
 
         _getBackLink: function() {
@@ -204,6 +223,9 @@ define([
                 Act.Page.show('results');
             }
         },
+        _handleTimeChange: function(event) {
+            this.preferred_time = event.target.value;
+        },
         _handleFormSubmit: function(event) {
             event.preventDefault();
             var values = {
@@ -213,8 +235,11 @@ define([
                 notes: this.refs.notes.value,
                 vehicle_info: this._getVehicleInfo()
             };
-            if (this.refs.time) {
-                values.preferred_time = this.refs.time.value;
+            if (this.preferred_time) {
+                values.preferred_time = this.preferred_time;
+            }
+            if (this.refs.way_to_contact) {
+                values.way_to_contact = this.refs.way_to_contact.value;
             }
 
             switch (this.props.type) {

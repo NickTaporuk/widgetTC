@@ -245,6 +245,7 @@
         position: relative;
         @include padding-left($baseSpacing/2);
         display: block;
+        padding-bottom: 0.4em;
     }
 
     .tcwlw_dollar_label {

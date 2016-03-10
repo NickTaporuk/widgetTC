@@ -19,6 +19,7 @@ define([
     // private section
     var selectedTire,
         selectedQuantity,
+        customDiscount,
         quote = {};
 
     var customer = {
@@ -26,7 +27,7 @@ define([
         email: '',
         phone: '',
         preferred_time: '',
-        way_to_contact: '',
+        way_to_contact: 'phone',
         vehicle_info: '',
         vehicle: {
             year: null,
@@ -120,6 +121,9 @@ define([
         getQuote: function() {
             return _.cloneDeep(quote);
         },
+        getCustomDiscount: function() {
+            return customDiscount;
+        },
         getValidationErrors: function() {
             return validationErrors;
         },
@@ -133,6 +137,24 @@ define([
             }
             return _customer;
         },
+        getParamsForQuote: function(withCustomer) {
+            var values = withCustomer ? store.getCustomer() : {};
+            delete values.vehicle;
+            values.tire_id = selectedTire;
+            values.quantity = selectedQuantity;
+            values.custom_discount = customDiscount;
+            var quote = store.getQuote();
+            values.with_discount = quote.discount ? quote.discount.applied : false;
+            var optionalServices = [];
+            quote.optional_services.map(function(service) {
+                if (service.applied) {
+                    optionalServices.push(service.key);
+                }
+            });
+            values.optional_services = optionalServices;
+
+            return values;
+        },
         getOrder: function() {
             return _.cloneDeep(order);
         },
@@ -141,6 +163,7 @@ define([
             var change = false;
             switch (payload.actionType) {
                 case constants.LOAD_QUOTE_SUCCESS:
+                    customDiscount = payload.customDiscount;
                 case 'quote.request.form.show':
                     selectedTire = payload.tireId;
                     selectedQuantity = payload.quantity;

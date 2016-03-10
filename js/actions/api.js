@@ -227,6 +227,7 @@ define([
                         actionType: constants.LOAD_QUOTE_SUCCESS,
                         tireId: tireId,
                         quantity: quantity,
+                        customDiscount: customDiscount,
                         quote: response.data
                     });
                 }

@@ -143,20 +143,7 @@ define([
                 });
 
                 if (Object.keys(customerStore.getValidationErrors()).length === 0) {
-                    values.tire_id = customerStore.getSelectedTireId();
-                    values.quantity = customerStore.getSelectedQuantity();
-                    values.way_to_contact = 'phone';
-
-                    var quote = customerStore.getQuote();
-                    values.with_discount = quote.discount ? quote.discount.applied : false;
-                    var optionalServices = [];
-                    quote.optional_services.map(function(service) {
-                        if (service.applied) {
-                            optionalServices.push(service.key);
-                        }
-                    });
-                    values.optional_services = optionalServices;
-
+                    values = customerStore.getParamsForQuote(true);
                     Api.sendAppointment(values);
                 }
             },
@@ -168,22 +155,8 @@ define([
                 });
 
                 if (Object.keys(customerStore.getValidationErrors()).length === 0) {
-                    followUp = followUp || false;
-                    if (followUp) {
-                        values = customerStore.getCustomer();
-                    }
-                    values.tire_id = customerStore.getSelectedTireId();
-                    values.quantity = customerStore.getSelectedQuantity();
-                    var quote = customerStore.getQuote();
-                    values.with_discount = quote.discount ? quote.discount.applied : false;
-                    var optionalServices = [];
-                    quote.optional_services.map(function(service) {
-                        if (service.applied) {
-                            optionalServices.push(service.key);
-                        }
-                    });
-                    values.optional_services = optionalServices;
-
+                    var followUp = followUp || false;
+                    values = customerStore.getParamsForQuote( followUp );
                     Api.emailQuote(values);
                 }
             },
@@ -195,23 +168,8 @@ define([
                 });
 
                 if (Object.keys(customerStore.getValidationErrors()).length === 0) {
-                    followUp = followUp || false;
-                    values = {};
-                    if (followUp) {
-                        values = customerStore.getCustomer();
-                    }
-                    values.tire_id = customerStore.getSelectedTireId();
-                    values.quantity = customerStore.getSelectedQuantity();
-                    var quote = customerStore.getQuote();
-                    values.with_discount = quote.discount ? quote.discount.applied : false;
-                    var optionalServices = [];
-                    quote.optional_services.map(function(service) {
-                        if (service.applied) {
-                            optionalServices.push(service.key);
-                        }
-                    });
-                    values.optional_services = optionalServices;
-
+                    var followUp = followUp || false;
+                    values = customerStore.getParamsForQuote( followUp );
                     Api.printQuote(values);
                 }
             },

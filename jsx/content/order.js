@@ -6,7 +6,9 @@ define([
     'load!stores/customerStore',
     'load!stores/vehicleStore',
     'load!components/elements/select',
-    'validate'
+    'validate',
+    'moment',
+    'components/datetime/DateTime',
 ], function(
     React,
     cn,
@@ -15,7 +17,9 @@ define([
     customerStore,
     vehicleStore,
     SelectField,
-    validate
+    validate,
+    moment,
+    DateTime
 ) {
 
     return {
@@ -95,7 +99,8 @@ define([
                                 </div>
                                 <div className={cn('control_wrapper')}>
                                     <label htmlFor={cn('order_date_time')}>Preferred Date and Time</label>
-                                    <input type="text" id={cn('order_date_time')} className={cn('datepicker')} ref="preferred_time" defaultValue={this.state.values.preferred_time} disabled={this.state.status == 'incomplete'} />
+                                    {/* <input type="text" id={cn('order_date_time')} className={cn('datepicker')} ref="preferred_time" defaultValue={this.state.values.preferred_time} disabled={this.state.status == 'incomplete'} /> */}
+                                    <DateTime isValidDate={this._isValidDate} inputProps={ {'name': "preferred_time", 'readOnly': true} } onChange={this._handleTimeChange} defaultValue={this.state.values.preferred_time} dateFormat="YYYY-MM-DD" timeFormat="HH:mm"/>
                                     {this._getError('preferred_time')}
                                 </div>
                                 <div className={cn('control_wrapper')}>
@@ -197,6 +202,10 @@ define([
             );
         },
 
+        _isValidDate: function( current ) {
+            return current.isAfter( moment().add(1, 'd').subtract(1,'day') );
+        },
+
         _getVehicleSelector: function(fieldName) {
             var options = [];
             this.state.vehicle[fieldName]
@@ -276,6 +285,9 @@ define([
             return (errors === undefined);
         },
 
+        _handleTimeChange: function(event) {
+            this.preferred_time = event.target.value;
+        },
         _handleFormSubmit: function(event) {
             event.preventDefault();
             this.setState({'disabled': true});
@@ -300,15 +312,18 @@ define([
                             self.setState({'errors': {'global': [response.error.message]}, 'disabled': false});    
                         }
                     } else {
-                         var values = {
+                        var values = {
                             token: response.id,
                             name: self.refs.name.value,
                             email: self.refs.email.value,
                             phone: self.refs.phone.value,
-                            preferred_time: self.refs.preferred_time.value,
+                            // preferred_time: self.refs.preferred_time.value,
                             notes: self.refs.notes.value,
                             vehicle_info: self._getVehicleInfo()
                         };
+                        if (self.preferred_time) {
+                            values.preferred_time = self.preferred_time;
+                        }
 
                         Act.Order.payment(values); 
                     }
