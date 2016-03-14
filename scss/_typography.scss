@@ -25,8 +25,8 @@
 		color: $linkColor;
 		@include transition();
 
-		&:hover, 
-		&:focus {
+		//&:focus,
+		&:hover {
 			color: lighten($linkColor, 10%);
 			text-decoration: none;
 		}

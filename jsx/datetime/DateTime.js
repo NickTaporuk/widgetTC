@@ -1,5 +1,5 @@
-define(['react', './src/DaysView', 'moment', 'lodash', 'comp!elements/Button', 'config'], //'./src/onClickOutside', './src/MonthsView', './src/YearsView', './src/TimeView'
-	function(React, DaysView, moment, _, Button, config) { // onClickOutside, MonthsView, YearsView, TimeView, 
+define(['react', './src/DaysView', 'moment', 'lodash', 'config'], //'./src/onClickOutside', './src/MonthsView', './src/YearsView', './src/TimeView'
+	function(React, DaysView, moment, _, config) { // onClickOutside, MonthsView, YearsView, TimeView, 
 
 	var TYPES = React.PropTypes;
 	var Datetime = React.createClass({
@@ -385,7 +385,7 @@ define(['react', './src/DaysView', 'moment', 'lodash', 'comp!elements/Button', '
 					React.createElement( Component, this.getComponentProps()),
 					React.createElement("div", {className: this.props.prefix + 'rdtFooter' }, 
 						// React.createElement(Button, {onClick: self.closeCalendar, text: 'Done', tag: 'button'})
-						React.createElement("button", {onClick: self.closeCalendar, type: 'button'}, "Done")
+						React.createElement("button", {onClick: self.closeCalendar, type: 'button', 'className': this.props.prefix + 'btn'}, "Done")
 					)
 				)
 			));

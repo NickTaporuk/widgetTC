@@ -1,20 +1,16 @@
 define([
     'dispatcher',
     'load!stores/resultsStore',
-    'load!stores/dealerStore',
     'load!stores/searchStore',
     'load!stores/locationsStore',
     'load!stores/customerStore',
-    'load!stores/vehicleStore',
     'actions/api'
 ], function(
     dispatcher,
     resultsStore,
-    dealerStore,
     searchStore,
     locationsStore,
     customerStore,
-    vehicleStore,
     Api
 ) {
 
@@ -24,7 +20,7 @@ define([
             Api.loadTireParameters();
             Api.getVehicleYears();
             Api.loadDealerConfig();
-            Api.loadDealerInfo();
+            Api.loadDealerInfo();    
         },
         Page: {
             show: function(name, props) {
@@ -91,7 +87,6 @@ define([
                     };
                     searchParams.needed_filters = ['brand', 'run_flat', 'light_truck'];
 
-
                     if (addParams) {
                         searchParams = _.assign(searchParams, addParams);
                     }
@@ -112,6 +107,23 @@ define([
             },
             loadRewiews: function(tireId, offset) {
                 Api.loadReviews(tireId, offset);
+            },
+            select: function(tireId, selQuantity, supplier) {
+                dispatcher.dispatch({
+                    actionType: 'tire.select',
+                    tireId: tireId,
+                    selQuantity: selQuantity,
+                    supplier: supplier
+                });
+
+                Api.loadQuote((supplier ? supplier.tire_id : tireId), selQuantity);
+            },
+            enlargeImage: function(image, model) {
+                dispatcher.dispatch({
+                    actionType: 'tire.enlarge',
+                    image: image,
+                    model: model
+                });
             }
         },
         Quote: {
@@ -146,7 +158,7 @@ define([
                 });
 
                 if (Object.keys(customerStore.getValidationErrors()).length === 0) {
-                    values = customerStore.getParamsForQuote(true);
+                    values = customerStore.getParamsForQuote(true, 'appointment');
                     Api.sendAppointment(values);
                 }
             },
@@ -159,8 +171,8 @@ define([
 
                 if (Object.keys(customerStore.getValidationErrors()).length === 0) {
                     var followUp = followUp || false;
-                    values = customerStore.getParamsForQuote( followUp );
-                    Api.emailQuote(values);
+                    var data = customerStore.getParamsForQuote( followUp, 'email' );
+                    Api.emailQuote(data);
                 }
             },
             print: function(followUp, values) {
@@ -172,7 +184,7 @@ define([
 
                 if (Object.keys(customerStore.getValidationErrors()).length === 0) {
                     var followUp = followUp || false;
-                    values = customerStore.getParamsForQuote( followUp );
+                    values = customerStore.getParamsForQuote( followUp, 'print' );
                     Api.printQuote(values);
                 }
             },
@@ -201,16 +213,14 @@ define([
                     }
                 });
 
-                data = {
+                Api.orderCreate({
                     tires: [{
                         id: customerStore.getSelectedTireId(),
                         quantity: customerStore.getSelectedQuantity(),
                         with_discount: quote.discount ? quote.discount.applied : false,
                         optional_services: optionalServices
                     }]
-                };
-
-                Api.orderCreate(data);
+                });
             },
 
             payment: function(values) {

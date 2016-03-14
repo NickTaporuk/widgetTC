@@ -21,15 +21,46 @@ define([
     function changeSelectedQuantity(tireId, quantity) {
         var tire = tires[tiresIndexes[tireId]];
         tire.selected_quantity = quantity <= tire.quantity ? quantity : tire.quantity;
-        tire.calculated_price = tire.selected_quantity * tire.price;
+        // tire.calculated_price = tire.selected_quantity * tire.price;
     }
 
-    function fillTires(_tires) {
+    function addTires(_tires) {
         tires = _tires;
         _tires.map(function(tire, i) {
             tiresIndexes[tire.id] = i;
             changeSelectedQuantity(tire.id, defaultSelectedQuantity);
+
+            if (!tire.external_info) {
+                tire.external_info = {
+                    marketing: {},
+                    rating: {}
+                };
+            }
+
+            if (!tire.external_info.marketing) {
+                tire.external_info.marketing = {
+                    images: []
+                };
+            }
+
+            if (!tire.external_info.rating) {
+                tire.external_info.rating = {
+                    total_reviews: null,
+                    average_rating: null
+                };
+            }
         });
+    }
+
+    function changeSupplier(tireId, supplier) {
+        var tire = tires[tiresIndexes[tireId]];
+        tire.id = supplier.tire_id;
+        tire.quantity = supplier.quantity;
+        tire.price = supplier.price;
+        tire.supplier = supplier.supplier.name;
+        // tire.selected_quantity = supplier.quantity < tire.selected_quantity ? 1 : tire.selected_quantity;
+
+        tiresIndexes[supplier.tire_id] = tiresIndexes[tireId];
     }
 
     var resultsStore = {
@@ -59,7 +90,7 @@ define([
             var change = false;
             switch (payload.actionType) {
                 case constants.SEARCH_TIRES_SUCCESS:
-                    fillTires(payload.tires);
+                    addTires(payload.tires);
                     totalCount = payload.totalCount;
                     filters = payload.filters;
                     page = payload.page;                
@@ -72,8 +103,11 @@ define([
                     // showInStock = c.show_in_stock;
                     change = true;
                     break;
-                case constants.LOAD_QUOTE_SUCCESS:
-                    changeSelectedQuantity(payload.tireId, payload.quantity);
+                case 'tire.select':
+                    if (payload.supplier) {
+                        changeSupplier(payload.tireId, payload.supplier);
+                    }
+                    changeSelectedQuantity(payload.tireId, payload.selQuantity);
                     change = true;
                     break;
             }

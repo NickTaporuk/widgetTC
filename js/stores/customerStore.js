@@ -84,13 +84,17 @@ define([
         var objToArr = ['services', 'optional_services'];
         for (var i = 0; i < 2; i++) {
             var objName = objToArr[i];
-            if (!_.isArray(q[objName])) {
-                var services = [];
-                Object.keys(q[objName]).map(function(service) {
-                    q[objName][service].key = service;
-                    services.push(q[objName][service]);
-                });
-                q[objName] = services;
+            if (q[objName]) {
+                if (!_.isArray(q[objName])) {
+                    var services = [];
+                    Object.keys(q[objName]).map(function(service) {
+                        q[objName][service].key = service;
+                        services.push(q[objName][service]);
+                    });
+                    q[objName] = services;
+                }
+            } else {
+                q[objName] = [];
             }
         }
         //make shop supply fee as service
@@ -137,12 +141,20 @@ define([
             }
             return _customer;
         },
-        getParamsForQuote: function(withCustomer) {
-            var values = withCustomer ? store.getCustomer() : {};
-            delete values.vehicle;
+        getParamsForQuote: function(withCustomer, type) {
+            var values = {};
+            if (withCustomer) {
+                values = store.getCustomer();
+                delete values.vehicle;
+                if (type == 'appointment' && customDiscount) {
+                    values.custom_discount = customDiscount;
+                }
+            } else if (type == 'email') {
+                values.email = customer.email;
+            }
             values.tire_id = selectedTire;
             values.quantity = selectedQuantity;
-            values.custom_discount = customDiscount;
+            
             var quote = store.getQuote();
             values.with_discount = quote.discount ? quote.discount.applied : false;
             var optionalServices = [];

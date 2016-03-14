@@ -1,4 +1,4 @@
-define(['config', 'isMobile'], function(config, isMobile) {
+define(['config'], function(config) {
 	var instance = null;
 
 	function Ajax() {

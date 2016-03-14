@@ -15,6 +15,8 @@ define([
 ) {
 
     return {
+        displayName: 'Popup',
+
         getInitialState: function() {
             return {
                 name: null,
@@ -41,7 +43,11 @@ define([
                     break;
                 case 'alert':
                     var title = this.state.props.title;
-                    content = this.state.props.content ? <p dangerouslySetInnerHTML={ {__html: this.state.props.content} } /> : null;
+                    if (this.state.props.image) {
+                        content = <img src={this.state.props.image} />
+                    } else {
+                        content = this.state.props.content ? <p dangerouslySetInnerHTML={ {__html: this.state.props.content} } /> : null;
+                    }
                     break;
 
                 default:

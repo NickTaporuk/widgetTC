@@ -5,13 +5,10 @@ define([
     dispatcher,
     constants
 ) {
-
-    // private section
     var name = '';
     var props = {};
     var hidden = true;
 
-    // public section
     var popupStore = {
         getPopupName: function() {
             return name;
@@ -50,6 +47,16 @@ define([
                     change = true;
                     break;
 
+                case 'tire.enlarge':
+                    name = 'alert';
+                    props = {
+                        title: payload.model,
+                        image: payload.image
+                    };
+                    hidden = false;
+                    change = true;
+                    break;
+
                 case constants.ERROR_RESPONSE:
                     name = 'alert';
                     var error = payload.error;
@@ -58,7 +65,7 @@ define([
                             403011: 'Sorry, rate limit has been exceeded',
                             403012: 'Sorry, widget is unavailable from your IP',
                             403013: 'Sorry, widget is unavailable from this Domain'
-                        }
+                        };
                         props = {
                             title: (errors[error.error_code] ? errors[error.error_code] : error.notice),
                             content: ''

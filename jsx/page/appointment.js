@@ -29,8 +29,8 @@ define([
             vehicleStore.bind('change', this._updateState);
         },
         componentWillUnmount: function() {
-            customerStore.unbind('change', this._updateState);    
-            vehicleStore.unbind('change', this._updateState);    
+            customerStore.unbind('change', this._updateState);
+            vehicleStore.unbind('change', this._updateState);
         },
 
         render: function() {

@@ -5,9 +5,9 @@ define([
     'load!actions/actions',
     'load!stores/resultsStore',
     'load!components/elements/select',
-    'load!components/content/results/tire',
-    'load!components/content/results/pagination',
-    'load!components/content/results/filterBlock'
+    'load!components/page/results/tire',
+    'load!components/page/results/pagination',
+    'load!components/page/results/filterBlock'
 ], function(
     React,
     cn,
@@ -21,6 +21,8 @@ define([
 ) {
 
     return {
+        displayName: 'Results',
+
         getInitialState: function() {
             return {
                 tires: [],
@@ -86,7 +88,7 @@ define([
                         </div>
                         <div className={cn('results')}>
                             <div className={cn('twelvecol')}>
-                                <Pagination activePage={this.state.page} itemsOnPage={6} totalItems={this.state.totalCount} onPageClick={this._handlePageClick} />
+                                <Pagination activePage={this.state.page} itemsOnPage={this.state.itemsOnPage} totalItems={this.state.totalCount} onPageClick={this._handlePageClick} />
                                 {/*<div className={cn('compare_btn_wrapper')}>
                                     <span className={cn(['font_color', 'compare_number'])}>2</span>
                                     <a href="#compare" className={cn(['brand_btn_light', 'btn_small', 'compare_btn'])}><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE915;' }} /> Compare Selected Tires</a>
@@ -104,7 +106,7 @@ define([
                                 }
                             </div>
                             <div className={cn('twelvecol')}>
-                                <Pagination activePage={this.state.page} itemsOnPage={6} totalItems={this.state.totalCount} onPageClick={this._handlePageClick} />
+                                <Pagination activePage={this.state.page} itemsOnPage={this.state.itemsOnPage} totalItems={this.state.totalCount} onPageClick={this._handlePageClick} />
                             </div>
                         </div>
                     </div>
@@ -113,12 +115,12 @@ define([
         },
 
         _updateStatus: function() {
-            // console.log(resultsStore.getFilters());
             this.setState({
                 tires: resultsStore.getTires(),
                 totalCount: resultsStore.getTotalCount(),
                 page: resultsStore.getPage(),
-                filters: resultsStore.getFilters()
+                filters: resultsStore.getFilters(),
+                itemsOnPage: resultsStore.getItemsPerPage()
             })
         },
         _handleBackClick: function(event) {

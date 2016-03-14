@@ -9,6 +9,7 @@ define([
     'validate',
     'moment',
     'components/datetime/DateTime',
+    'config'
 ], function(
     React,
     cn,
@@ -19,7 +20,8 @@ define([
     SelectField,
     validate,
     moment,
-    DateTime
+    DateTime,
+    config
 ) {
 
     return {
@@ -76,7 +78,7 @@ define([
                                         <input style={ {display: 'none'} } type="radio" name="order_options" id={cn('order_option_cc')} value="credit-card" defaultChecked={true} />
                                         <label htmlFor={cn('order_option_cc')}>
                                             Pay with credit card 
-                                            <img src="/img/credit-cards.png" alt="Visa, MasterCard, or American Express" />
+                                            <img src={config.imagesFolder + 'credit-cards.png'} alt="Visa, MasterCard, or American Express" />
                                         </label>
                                     </div>
                                 </div>
@@ -192,7 +194,7 @@ define([
                                 </div>
                                 <p className={cn('textcenter')}>
                                     <em>* Outstanding balance will be payable after installation.</em>
-                                    <img src="/img/verify-security.png" alt="GoDaddy.com verified and secured" className={cn('verified')} />
+                                    <img src={config.imagesFolder + 'verify-security.png'} alt="GoDaddy.com verified and secured" className={cn('verified')} />
                                 </p>
                                 <button disabled={this.state.disabled} type="submit" className={cn('brand_btn')}><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE5CA;' }} /> Place Your Order</button>
                             </div>

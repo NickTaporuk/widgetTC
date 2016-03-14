@@ -289,8 +289,8 @@
 		vertical-align: -5px;
 	}
 
-	&:hover, 
-	&:focus {
+	//&:focus,
+	&:hover {
 		background-color: $grayDarkest;
 		color: white;
 		outline: none;
@@ -305,9 +305,9 @@
 		background-color: $gray;
 		opacity: 0.75;
 		cursor: not-allowed;
-
-		&:hover,
-		&:focus {
+		
+		// &:focus,
+		&:hover {
 			background-color: $buttonColor;
 		}
 
@@ -351,8 +351,8 @@
 		vertical-align: -5px;
 	}
 
-	&:hover, 
-	&:focus {
+	//&:focus,
+	&:hover {
 		background: lighten($grayLightest, 5%);
 		color: $grayDarkest;
 		outline: none;
@@ -367,9 +367,9 @@
 		color: $gray;
 		opacity: 0.75;
 		cursor: not-allowed;
-
-		&:hover,
-		&:focus {
+		
+		// &:focus,
+		&:hover {
 			background-color: white;
 		}
 

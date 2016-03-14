@@ -39,7 +39,7 @@ define([
                     }
                     break;
                 case 'scriptPlace':
-                    config.imagesFolder = value + '/images/';
+                    config.imagesFolder = value + '/img/';
                     config.mainCss      = value + '/css/style.css';
                     break;
             }

@@ -22,6 +22,7 @@ define([
             var activePage;
             if (this.props.totalItems && this.props.itemsOnPage) {
                 // if totalItems > 0 and this.props.itemsOnPage > 0 
+                // console.log(this.props.totalItems, this.props.itemsOnPage);
                 countPages = Math.ceil(this.props.totalItems/this.props.itemsOnPage);
                 activePage = this.props.activePage;
             } else {

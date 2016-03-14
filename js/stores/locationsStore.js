@@ -9,7 +9,7 @@ define([
     lockr,
     constants
 ) {
-    var locations = [];
+    var locations = {};
     var currectLocation;
 
     function setLocations(locs) {

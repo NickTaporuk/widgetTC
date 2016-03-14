@@ -1,11 +1,11 @@
 define([
-    'load!components/content/search',
-    'load!components/content/results',
-    'load!components/content/summary',
-    'load!components/content/appointment',
-    'load!components/content/order',
-    'load!components/content/confirmation',
-    'load!components/content/quote',
+    'load!components/page/search',
+    'load!components/page/results',
+    'load!components/page/summary',
+    'load!components/page/appointment',
+    'load!components/page/order',
+    'load!components/page/confirmation',
+    'load!components/page/quote',
     'react',
     'load!stores/pageStore',
     'load!stores/searchStore',
@@ -35,10 +35,11 @@ define([
 ) {
 
     return {
+        displayName: 'Page',
 
         getInitialState: function() {
             return {
-                name: '',
+                name: 'search',
                 props: {}
             }
         },
@@ -61,7 +62,7 @@ define([
             switch (this.state.name) {
                 case 'search':
                     var props = {
-                        canChangeLocation: locationsStore.getLocations().length > 1
+                        canChangeLocation: Object.keys(locationsStore.getLocations()).length > 1
                     };
 
                     content = <Search {...props} />;

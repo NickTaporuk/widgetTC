@@ -5,7 +5,7 @@ define([
     'load!actions/actions',
     'lib/helper',
     'load!stores/customerStore',
-    'load!components/content/summary/offerLine'
+    'load!components/page/summary/offerLine'
 ], function(
     React,
     cn,
@@ -178,7 +178,7 @@ define([
                     <tr key={i} className={ cn({service_added: (isOptional && info.applied)}) }>
                         {toggleCell}
                         <td>
-                            {info.name}
+                            {info.name + ' '}
                             <small>{info.description}</small>
                         </td>
                         <td>${h.priceFormat(info.total_price)}</td>
@@ -224,19 +224,31 @@ define([
                   return key == serviceKey;
                 });
             }
-
-            Act.Quote.update(this.props.tire.id, this.state.quantity, optServices, this.state.quote.discount.applied);
+            var params = this._getParamsForQuote();
+            Act.Quote.update(params.tireId, params.quantity, optServices, params.isDiscountApplied, params.customDiscount);
+        },
+        _getParamsForQuote: function() {
+            return {
+                tireId: this.props.tire.id,
+                quantity: this.state.quantity,
+                optServices: this._getActiveOptServicesKeys(),
+                isDiscountApplied: this.state.quote.discount && this.state.quote.discount.applied,
+                customDiscount: this.state.customDiscount
+            }
         },
         _handleQuantityChange: function(event) {
-            Act.Quote.update(this.props.tire.id, event.target.value, this._getActiveOptServicesKeys(), this.state.quote.discount.applied, this.state.customDiscount);
+            var params = this._getParamsForQuote();
+            Act.Quote.update(params.tireId, event.target.value, params.optServices, params.isDiscountApplied, params.customDiscount);
         },
         _handleDiscountClick: function(event) {
             event.preventDefault();
-            Act.Quote.update(this.props.tire.id, this.state.quantity, this._getActiveOptServicesKeys(), !this.state.quote.discount.applied, this.state.customDiscount);
+            var params = this._getParamsForQuote();
+            Act.Quote.update(params.tireId, params.quantity, params.optServices, !params.isDiscountApplied, params.customDiscount);
         },
         _handleDiscountChange: function(event) {
             event.preventDefault();
-            Act.Quote.update(this.props.tire.id, this.state.quantity, this._getActiveOptServicesKeys(), this.state.quote.discount.applied, event.target.value);
+            var params = this._getParamsForQuote();
+            Act.Quote.update(params.tireId, params.quantity, params.optServices, params.isDiscountApplied, event.target.value);
         },
 
         _getActiveOptServicesKeys: function() {
@@ -251,7 +263,6 @@ define([
         },
         _handleAppointmentClick: function(event) {
             event.preventDefault();
-            // Act.Page.show('appointment');
             Act.Quote.appointmentForm()
         },
         _handleOrderClick: function(event) {

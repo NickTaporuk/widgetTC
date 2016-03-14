@@ -4,7 +4,7 @@ define([
     'config',
     'load!actions/actions',
     'load!stores/searchStore',
-    'load!stores/vehicleStore',
+    // 'load!stores/locationsStore',
     'load!components/elements/select'
 ], function(
     React,
@@ -12,30 +12,36 @@ define([
     config,
     Act,
     searchStore,
-    vehicleStore,
+    // locationsStore,
     SelectField
 ) {
 
     return {
+        displayName: 'Search',
+
         getInitialState: function() {
             return  {
                 activeTab: 'size',
                 fieldOptions: {},
                 fieldValues: {}
+                // currentLocId: null
             }
         },
 
         componentWillMount: function() {
             this._updateStatus();
         },
+
         componentDidMount: function() {
             searchStore.bind('change', this._updateStatus);
-            // vehicleStore.bind('change', this._updateStatus);
+            // locationsStore.bind('change', this._updateStatus);
         },
+
         componentWillUnmount: function() {
-            searchStore.unbind('change', this._updateStatus);    
-            // vehicleStore.unbind('change', this._updateStatus);    
+            searchStore.unbind('change', this._updateStatus);
+            // locationsStore.unbind('change', this._updateStatus);
         },
+
         shouldComponentUpdate: function(nextProps, nextState) {
             return true;
             // var isTabChanged = (nextState.activeTab !== this.state.activeTab);
@@ -54,14 +60,16 @@ define([
             // return should;
         },
 
-
         render: function() {
             return (
                 <div className={cn('search_wrapper')} id={cn('search_wrapper')}>
                     <div className={cn('search_inner')}>
                         <p className={cn('search_intro')}>Find your tires using the form below. You can search by vehicle or tire size. You can also narrow down your search by tire category and brand.</p>
                         <form id={cn('search_by')} className={cn('search_by')} role="search" onSubmit={this._handleSubmit}>
-                            <a href="#locations" onClick={this._handleLocationsClick} className={cn(['change_location', 'modal_open'])}><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE0C8;' }} />Change Location</a>
+                            { this.props.canChangeLocation 
+                                ? <a href="#locations" onClick={this._handleLocationsClick} className={cn(['change_location', 'modal_open'])}><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE0C8;' }} />Change Location</a>
+                                : null
+                            }
                             <div className={cn('tabs')}>
                                 <ul role="tablist">
                                     {this._tabs()}                                    
@@ -205,33 +213,47 @@ define([
 
             return isReady;
         },
+
         _updateStatus: function() {
-            var fieldValues = searchStore.getAllValues();
-            var options = searchStore.getAllOptions();
-            this.setState({
-                'activeTab': searchStore.getActiveSection(),
-                'fieldOptions': options,
-                'fieldValues': fieldValues
-            });
+            // var currentLocation = locationsStore.getCurrentLocation();
+            // var locId = currentLocation ? currentLocation.id : null;
+            // console.log(locId, this.state.currentLocId);
+            // if (locId !== this.state.currentLocId) {
+                // this._handleSubmit();
+            // } else {
+                var fieldValues = searchStore.getAllValues();
+                var options = searchStore.getAllOptions();
+                this.setState({
+                    'activeTab': searchStore.getActiveSection(),
+                    'fieldOptions': options,
+                    'fieldValues': fieldValues
+                    // 'currentLocId': locId
+                });
+            // }
         },
+
         _handleTabClick: function(tab, event) {
             event.preventDefault();
             Act.Search.changeTab(tab);
         },
+
         _handleSubmit: function(event) {
-            event.preventDefault();
+            if (event) {
+                event.preventDefault();
+            }
             Act.Tire.search();
         },
+
         _handleFieldChange: function(event) {
             var fieldName = event.target.name.replace( (this.state.activeTab + '_'), '');
             Act.Search.updateField(this.state.activeTab, fieldName, event.target.value);
         },
+
         _handleVehicleChange: function(event) {
             var fields = ['year', 'make', 'model', 'trim'];
             var fieldName = event.target.name.replace( (this.state.activeTab + '_'), '');
             var index = fields.indexOf(fieldName);
 
-            // var value = event.traget.value;
             var values = this.state.fieldValues.vehicle;
             values[fieldName] = event.target.value;
             
@@ -244,6 +266,7 @@ define([
 
             Act.Vehicle.change(values, 'search');
         },
+
         _handleLocationsClick: function(event) {
             event.preventDefault();
             Act.Popup.show('locations');

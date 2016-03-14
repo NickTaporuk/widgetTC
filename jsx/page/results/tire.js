@@ -24,17 +24,23 @@ define([
                 activeTab: 'specs',
                 quantity: 4,
                 showRebate: false,
+
                 fullStock: [],
                 stock: [],
                 stockFor: null,
+
                 reviews: []
             }
         },
 
         componentWillMount: function() {
             this.setState({
-                quantity: this.props.tire.selected_quantity
+                selQuantity: this.props.tire.selected_quantity,
+                quantity: this.props.tire.quantity,
+                price: this.props.tire.price,
+                supplier: this.props.tire.supplier
             });
+            this._updateState();
         },
         componentDidMount: function() {
             stockStore.bind('change', this._updateState);
@@ -60,11 +66,9 @@ define([
             }
 
             var quantityItems = [];
-            for(var q = 1; q <= tire.quantity && q <= 8; q++) {
+            for(var q = 1; q <= this.state.quantity && q <= 8; q++) {
                 quantityItems.push(<option key={q} value={q}>{q}</option>);
             }
-
-            var totalRewiews = this.props.tire.external_info.rating && this.props.tire.external_info.rating.total_reviews ? this.props.tire.external_info.rating.total_reviews : 0;
 
             return (
                 <li className={cn({result: true, result_featured: this.props.isTop, border_color: this.props.isTop})}>
@@ -84,9 +88,13 @@ define([
                             <img src={tire.brand_logo} alt={tire.brand + ' Tire'} className={cn('result_brand_logo')} />
                             <div className={cn('result_tire_wrapper')}>
                                 <img src={tire.image} alt="An image of the tire" className={cn('result_tire')} />
-                                {/*<a href="#tire_modal" className={cn(['modal_open', 'tire_enlarge', 'font_color'])}>
-                                    <i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE147;'}} /><span className={cn('hidden')}>Enlarge</span>
-                                </a>*/}
+                                {
+                                    this.props.tire.external_info.marketing.images.length > 0
+                                    ?   <a href="#tire_img" onClick={this._handleEnlargeClick} className={cn(['modal_open', 'tire_enlarge', 'font_color'])}>
+                                            <i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE147;'}} /><span className={cn('hidden')}>Enlarge</span>
+                                        </a>
+                                    :   null
+                                }
                             </div>
                             {this._getRebateBlock()}
                             {this._getOemBlock()}
@@ -103,12 +111,12 @@ define([
                                             </select>
                                         </label>
                                         <h5 className={cn('price')}>
-                                            <strong className={cn('price_value')}>{tire.price ? '$' + h.priceFormat(tire.price * this.state.quantity) : null}</strong>
+                                            <strong className={cn('price_value')}>{this.state.price ? '$' + h.priceFormat(this.state.price * this.state.selQuantity) : null}</strong>
                                         </h5>
                                     </div>
                                 </div>
                                 <div className={cn('select_btn_wrapper')}>
-                                    { tire.price
+                                    { this.state.price
                                         ? <a href="#summary" onClick={this._handleSelectClick} className={cn(['btn', 'brand_btn', 'select_btn'])}>Select Tire <i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE5C8;' }} /></a>
                                         : <a href="#summary" onClick={this._handleGetQuoteClick} className={cn(['btn', 'brand_btn', 'select_btn'])}>Get a quote</a>
                                     }
@@ -123,7 +131,7 @@ define([
                                         : null
                                     }
                                     {   
-                                        totalRewiews
+                                        this.props.tire.external_info.rating.total_reviews
                                         ? <li className={cn('tab')}><a href="#reviews_result_1" onClick={this._handleTabClick.bind(this, 'reviews')} className={cn('font_color')}  aria-selected={(tab == 'reviews')}>Reviews</a></li>
                                         : null
                                     }
@@ -146,7 +154,7 @@ define([
                                 </div>
                                 {features}
                                 <div className={cn('tab_cont')} aria-hidden={!(tab == 'reviews')}>
-                                    <h4 className={cn('result_reviews_heading')}><strong>{totalRewiews}</strong> reviews:</h4>
+                                    <h4 className={cn('result_reviews_heading')}><strong>{this.props.tire.external_info.rating.total_reviews}</strong> reviews:</h4>
                                     {this._getReviewsBlock()}
                                 </div>
                                 <div className={cn('tab_cont')} aria-hidden={!(tab == 'stock')}>
@@ -171,6 +179,7 @@ define([
                 state.reviews = reviewsStore.getReviews(this.props.tire.id);
                 state.totalReviews = reviewsStore.getTotalReviews(this.props.tire.id);
             }
+
             this.setState(state);
         },
 
@@ -197,15 +206,15 @@ define([
         },
 
         _getStockInfo: function() {
-            event.preventDefault();
-
             var info = [];
             if (!this.state.stock.length) {
                 var info = [];
                 this.state.fullStock.map(function(supplierInfo, i) {
                     info.push( 
                         <li key={i}>
-                            <a href={'#' + i} onClick={this._handleStockClick}>{supplierInfo.supplier.nice_name + ': ' + supplierInfo.quantity}</a>
+                            <a href={'#'+ i} onClick={this._handleStockClick}>{supplierInfo.supplier.nice_name + ': ' + supplierInfo.quantity}</a>
+                            <span> </span>
+                            <a href={'#'+ i} className={cn('btn_small')} dangerouslySetInnerHTML={{ __html: supplierInfo.supplier.name == this.state.supplier ? 'View &#x2714;' : 'View' }} onClick={this._handleSupplierViewClick} />
                         </li> 
                     );
                 }.bind(this));
@@ -227,7 +236,7 @@ define([
             }
         },
 
-        _hangleStockBackClick: function() {
+        _hangleStockBackClick: function(event) {
             event.preventDefault();
             this.setState({
                 stock: []
@@ -236,7 +245,7 @@ define([
 
         _getRatingBlock: function(rating, totalRevuew) {
             var info = this.props.tire.external_info;
-            var rating = info.rating ? info.rating.average_rating : null;
+            var rating = info.rating.average_rating;
             if (!rating) {
                 return null;
             }
@@ -244,7 +253,7 @@ define([
             var stars = this._getStars(rating);
 
             var totalReviews = null
-            if (info.rating && info.rating.total_reviews) {
+            if (info.rating.total_reviews) {
                 totalReviews = info.rating.total_reviews;
             }
 
@@ -272,7 +281,7 @@ define([
 
             var rewiewsLink = null
             if (totalReviews) {
-                rewiewsLink = <a href="#reviews_result_1" className={cn('result_rating_link')}>{totalReviews + ' Reviews'}</a>
+                rewiewsLink = <a href="#reviews" onClick={this._handleTabClick.bind(this, 'reviews')} className={cn('result_rating_link')}>{totalReviews + ' Reviews'}</a>
             }
 
             return (
@@ -377,18 +386,36 @@ define([
                 stockFor: supplier
             });
         },
+        _handleSupplierViewClick: function(event) {
+            event.preventDefault();
+            var index = event.target.href.replace(/^[^#]+#/, '');
+            var supplier = this.state.fullStock[index];
+
+            this.setState({
+                price:  supplier.price,
+                quantity: supplier.quantity,
+                selQuantity: supplier.quantity < this.state.selQuantity ? 1 : this.state.selQuantity,
+                supplierIndex: index,
+                supplier: supplier.supplier.name
+            });
+        },
         _handleQuantityChange: function() {
             this.setState({
-                quantity: parseInt(this.refs.quantity.value)
+                selQuantity: parseInt(this.refs.quantity.value)
             });
         },
         _handleSelectClick: function(event) {
             event.preventDefault();
-            Act.Quote.update(this.props.tire.id, this.state.quantity);
+            var supplier = this.state.supplierIndex ? this.state.fullStock[this.state.supplierIndex] : null;
+            Act.Tire.select(this.props.tire.id, this.state.selQuantity, supplier);
         },
         _handleGetQuoteClick: function(event) {
             event.preventDefault();
-            Act.Quote.requestForm(this.props.tire.id, this.state.quantity);
+            Act.Quote.requestForm(this.props.tire.id, this.state.selQuantity);
+        },
+        _handleEnlargeClick: function(event) {
+            event.preventDefault();
+            Act.Tire.enlargeImage(this.props.tire.external_info.marketing.images[0], this.props.tire.model);
         }
     }
 

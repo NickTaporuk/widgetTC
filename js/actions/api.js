@@ -1,11 +1,15 @@
 define([
     'dispatcher',
     'ajax',
-    'load!actions/constants'
+    'load!actions/constants',
+    'load!stores/vehicleStore',
+    'config'
 ], function(
     dispatcher,
     ajax,
-    constants
+    constants,
+    vehicleStore,
+    config
 ) {
 
     ajax.beforeSend = function() {
@@ -19,8 +23,8 @@ define([
             actionType: constants.RESPONSE_RECEIVED
         });
     };
+
     ajax.error = function(error) {
-        console.log(error);
         dispatcher.dispatch({
             actionType: constants.ERROR_RESPONSE,
             error: error
@@ -101,69 +105,108 @@ define([
 
         getVehicleYears: function() {
             var values = {year: '', make: '', model: '', trim: ''};
-            ajax.make({
-                url: 'vehicle/years',
-                success: function(response) {
-                    dispatcher.dispatch({
-                        actionType: constants.GET_VEHICLE_YEARS_SUCCESS,
-                        options: prepareVehicleResponse(response),
-                        values: values
-                    });
-                }
-            });
+            var options = vehicleStore.getYears();
+            var dispatch = function(response) {
+                dispatcher.dispatch({
+                    actionType: constants.GET_VEHICLE_YEARS_SUCCESS,
+                    options: response,
+                    values: values
+                });
+            }
+            if (options.length > 0) {
+                dispatch(options);
+            } else {
+                ajax.make({
+                    url: 'vehicle/years',
+                    success: function(response) {
+                        dispatch(prepareVehicleResponse(response));
+                    }
+                });
+            }
         },
 
         getVehicleMakes: function(year) {
             var values = {year: year, make: '', model: '', trim: ''};
-            if (year) {
+            var options = vehicleStore.getMakes(year);
+            var dispatch = function(response) {
+                dispatcher.dispatch({
+                    actionType: constants.GET_VEHICLE_MAKES_SUCCESS,
+                    options: response,
+                    values: values
+                });
+            }
+            if (options.length > 0) {
+                dispatch(options);
+            } else if (year) {
                 ajax.make({
                     url: 'vehicle/makes',
                     data: {year: year},
                     success: function(response) {
-                        dispatcher.dispatch({
-                            actionType: constants.GET_VEHICLE_MAKES_SUCCESS,
-                            options: prepareVehicleResponse(response),
-                            values: values
-                        });
+                        dispatch(prepareVehicleResponse(response));
                     }
                 });
             }
         },
+
         getVehicleModels: function(year, make) {
-            if (make) {
-                var values = {year: year, make: make, model: '', trim: ''};
+            var values = {year: year, make: make, model: '', trim: ''};
+            var options = vehicleStore.getModels(year, make);
+            var dispatch = function(response) {
+                dispatcher.dispatch({
+                    actionType: constants.GET_VEHICLE_MODELS_SUCCESS,
+                    options: response,
+                    values: values
+                });
+            }
+            if (options.length > 0) {
+                dispatch(options);
+            } else if (make) {
                 ajax.make({
                     url: 'vehicle/models',
                     data: {year: year, make: make},
                     success: function(response) {
-                        dispatcher.dispatch({
-                            actionType: constants.GET_VEHICLE_MODELS_SUCCESS,
-                            options: prepareVehicleResponse(response),
-                            values: values
-                        });
+                        dispatch(prepareVehicleResponse(response));
                     }
                 });
             }
         },
+
         getVehicleTrims: function(year, make, model) {
-            if (model) {
-                var values = {year: year, make: make, model: model, trim: ''};
+            var values = {year: year, make: make, model: model, trim: ''};
+            var options = vehicleStore.getTrims(year, make, model);
+            var dispatch = function(response) {
+                dispatcher.dispatch({
+                    actionType: constants.GET_VEHICLE_TRIMS_SUCCESS,
+                    options: response,
+                    values: values
+                });
+            }
+            if (options.length > 0) {
+                dispatch(options);
+            } else if (model) {
                 ajax.make({
                     url: 'vehicle/trims',
                     data: values,
                     success: function(response) {
-                        dispatcher.dispatch({
-                            actionType: constants.GET_VEHICLE_TRIMS_SUCCESS,
-                            options: prepareVehicleResponse(response),
-                            values: values
-                        });
+                        dispatch(prepareVehicleResponse(response));
                     }
                 });
             }
         },
+
         getVehicleTireSizes: function(year, make, model, trim) {
-            if (trim) {
-                var values = {year: year, make: make, model: model, trim: trim};
+            var values = {year: year, make: make, model: model, trim: trim};
+            var options = vehicleStore.getTireSizes(year, make, model, trim);
+            var dispatch = function(response) {
+                dispatcher.dispatch({
+                    actionType: constants.GET_VEHICLE_TIRES_SUCCESS,
+                    options: response,
+                    values: values
+                });
+            }
+            if (options.length > 0) {
+                dispatch(options);
+            } else if (trim) {
                 ajax.make({
                     url: 'vehicle/tireSizes',
                     data: values,
@@ -175,12 +218,7 @@ define([
                                 description: option.fitment + ' ' + option.size_description
                             });
                         });
-
-                        dispatcher.dispatch({
-                            actionType: constants.GET_VEHICLE_TIRES_SUCCESS,
-                            options: options,
-                            values: values
-                        });
+                        dispatch(options);
                     }
                 });
             }
@@ -309,6 +347,7 @@ define([
                 }
             });
         },
+
         orderCheckout: function(orderId, data) {
             ajax.make({
                 url: 'order/' + orderId + '/checkout',
@@ -333,6 +372,7 @@ define([
                 }
             });
         },
+
         orderPayment: function(orderId, token) {
             ajax.make({
                 url: 'order/' + orderId + '/payment',
@@ -395,6 +435,17 @@ define([
                     }); 
                 }
             })
+        },
+
+        setSession: function(callback) {
+            ajax.make({
+                url: 'session',
+                method: 'post',
+                data: {is_returned: config.isReturnedUser, source: (config.sa ? 'instore' : 'website') },
+                success: function(response) {
+                    callback(response.data.session_id);
+                }
+            });
         }
     };
 

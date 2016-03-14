@@ -2,19 +2,15 @@ define([
     'react',
     'classnames', 
     'load!stores/ajaxStore',
-    'load!components/popup',
-    'load!components/loading',
     'config'
 ], function(
     React,
     cn,
     ajaxStore,
-    Popup,
-    Loading,
     config
 ) {
     return {
-        displayName: 'Overlay',
+        displayName: 'Loading',
 
         getInitialState: function() {
             return  {
@@ -34,9 +30,8 @@ define([
 
         render: function() {
             return (
-                <div>
-                    <Loading />
-                    <Popup />
+                <div className={cn('loader')} style={ {display: this.state.loader ? 'block' : 'none' } }>
+                    <img src={config.imagesFolder + 'loader.gif'} alt="Loading" />
                 </div>
             )
         },

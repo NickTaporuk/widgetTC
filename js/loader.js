@@ -9,6 +9,11 @@ define([
 		load: function(name, req, onload, _config) {
 			if (_config.isBuild) {
 				// used by optimizer:
+				var path = name;
+
+		    	req([path], function () {
+		    		onload();
+		    	});
 			} else {
 
 				var path = name;

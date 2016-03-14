@@ -28,6 +28,8 @@ define([
 
         function addCSSRule(selector, rules, index) 
         {
+            index = index || 0;
+
             if (!style) {
                 style = document.createElement("style");
 
@@ -64,7 +66,7 @@ define([
             '#tcwlw_widget_outer a, ' +
 
             '#tcwlw_widget .tcwlw_font_color, ' +
-            '#tcwlw_widget_outer .tcwlw_font_color ' +
+            '#tcwlw_widget_outer .tcwlw_font_color, ' +
             
             '#tcwlw_widget .tcwlw_brand_btn_light, ' +
             '#tcwlw_widget_outer .tcwlw_brand_btn_light',
@@ -97,9 +99,9 @@ define([
         //text color 2 
         addCSSRule(
             '#tcwlw_widget a:hover, ' +
-            '#tcwlw_widget a:focus, ' +
-            '#tcwlw_widget_outer a:hover, ' +
-            '#tcwlw_widget_outer a:focus',
+            // '#tcwlw_widget a:focus, ' +
+            // '#tcwlw_widget_outer a:focus, ' +
+            '#tcwlw_widget_outer a:hover',
                 'color: ' + color2
         );
 

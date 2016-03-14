@@ -109,11 +109,13 @@ define([
 
             var btn = null;
             if (type === 'discount') {
-                btn = <td className={cn('toggle_cell')}>
-                    <button onClick={this._handleDiscountClick} className={cn({toggle_cell_btn: true, toggle_remove: offer.applied, toggle_add: !offer.applied})}>
-                        <i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: (offer.applied ? '&#xE15C;' : '&#xE147;') }} /><span>{ offer.applied ? 'Remove' : 'Add' }</span>
-                    </button>
-                </td>;
+                btn = offer.is_active 
+                    ?   <td className={cn('toggle_cell')}>
+                            <button onClick={this._handleDiscountClick} className={cn({toggle_cell_btn: true, toggle_remove: offer.applied, toggle_add: !offer.applied})}>
+                                <i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: (offer.applied ? '&#xE15C;' : '&#xE147;') }} /><span>{ offer.applied ? 'Remove' : 'Add' }</span>
+                            </button>
+                        </td>
+                    :   null;
             }
 
             return btn;

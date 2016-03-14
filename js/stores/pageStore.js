@@ -26,7 +26,7 @@ define([
         dispatchToken:  dispatcher.register(function(payload) {
             var change = false;
             switch (payload.actionType) {
-                case constants.LOAD_TIRE_PARAMETERS_SUCCESS:
+                // case constants.LOAD_TIRE_PARAMETERS_SUCCESS:
                 case 'page.update':
                     name = payload.name || 'search';
                     props = payload.props || {};

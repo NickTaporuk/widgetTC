@@ -2,18 +2,17 @@ window.TCWidget = {
     overlayNode: null,
     init: function(params) {
         requirejs.config({
-          baseUrl: './js/', 
-          paths: {
-            'lockr': 'bower_components/lockr/lockr',
-            'classnames': 'lib/classnames'
-          }
+            baseUrl: './js/', 
+            paths: {
+                lockr: 'bower_components/lockr/lockr',
+                classnames: 'lib/classnames'
+            }
         });
 
         requirejs(['config', 'lib/helper', 'lockr', 'classnames'], function(config, h, lockr, cn) {
             if (!params.apikey) {
                 throw new Error('Api key is required');
             } else {
-                // lockr.flush();
                 lockr.prefix = config.prefix + params.apikey;
                 cn.prefix = config.prefix;
             }
@@ -36,50 +35,68 @@ window.TCWidget = {
               config.setParam('apiBaseUrl', params.apiBaseUrl); 
             }
 
-
-            h.loadCss( 'css/style.css' );
-            // h.loadCss( 'css/datetime.css' );
-            h.loadCss( 'https://fonts.googleapis.com/icon?family=Material+Icons' );
+            h.loadCss(config.mainCss);
+            h.loadCss('https://fonts.googleapis.com/icon?family=Material+Icons');
 
             requirejs.config({
                 baseUrl: './js/', 
                 paths: {
-                  'isMobile': 'bower_components/isMobile/isMobile',
-                  'lodash': 'bower_components/lodash/lodash',
-                  'validate': 'bower_components/validate/validate',
-                  'moment': 'bower_components/moment/moment',
-                  'dispatcher': 'lib/dispatcher',
-                  'ajax': 'lib/ajax',
-                  'react': 'bower_components/react/react',
-                  'reactDOM': 'bower_components/react/react-dom',
-                  'microEvent': 'bower_components/microevent/microevent',
-                  'load': 'loader',
-                  'stripe': 'https://js.stripe.com/v2/stripe'
+                    // isMobile: 'bower_components/isMobile/isMobile',
+                    lodash: 'bower_components/lodash/lodash',
+                    validate: 'bower_components/validate/validate',
+                    moment: 'bower_components/moment/moment',
+                    dispatcher: 'lib/dispatcher',
+                    ajax: 'lib/ajax',
+                    react: 'bower_components/react/react',
+                    reactDOM: 'bower_components/react/react-dom',
+                    microEvent: 'bower_components/microevent/microevent',
+                    load: 'loader',
+                    stripe: 'https://js.stripe.com/v2/stripe'
                 }
             });
 
-            requirejs(['react', 'reactDOM', 'load!components/wrapper',  'load!actions/actions', 'load!components/overlay', 'classnames'], function(React, ReactDOM, Wrapper, Act, Overlay, cn) {
-                var container = document.getElementById(params.container);
+            requirejs(['react', 'reactDOM', 'load!components/wrapper', 'load!actions/actions', 'load!components/overlay', 'classnames', 'load!stores/widgetStore', 'actions/api'], 
+            function(React, ReactDOM, Wrapper, Act, Overlay, cn, widgetStore, Api) {
+                
+                var render = function() {
+                    if (widgetStore.getIsReady()) {
+                        var container = document.getElementById(params.container);
 
-                ReactDOM.render(
-                    React.createElement(Wrapper),
-                    container
-                );
+                        if (!self.overlayNode) {
+                            // append overlays (popup/message/loading/shadow) to the end of body
+                            var body = document.getElementsByTagName('body')[0];
+                            self.overlayNode = document.createElement("div");
+                            self.overlayNode.id = cn('widget_outer');
+                            body.appendChild(self.overlayNode);
+                        }
 
-                if (!self.overlayNode) {
-                  // append overlays (popup/message/loading/shadow) to the end of body
-                  var body = document.getElementsByTagName('body')[0];
-                  self.overlayNode = document.createElement("div");
-                  self.overlayNode.id = cn('widget_outer');
-                  body.appendChild(self.overlayNode);
+                        ReactDOM.unmountComponentAtNode(container); // needed if init has been called again
+                        ReactDOM.unmountComponentAtNode(self.overlayNode); // needed if init has been called again
+
+                        ReactDOM.render(
+                            React.createElement(Wrapper),
+                            container
+                        );
+
+                        ReactDOM.render(
+                            React.createElement(Overlay),
+                            self.overlayNode
+                        );
+
+                        widgetStore.unbind('change', render);
+                    }
+                };
+
+                widgetStore.bind('change', render);
+
+                if (!config.sessionId) {
+                    Api.setSession(function(sessionId) {
+                        config.setParam('sessionId', sessionId);
+                        Act.init();                        
+                    })
+                } else {
+                    Act.init();
                 }
-
-                ReactDOM.render(
-                  React.createElement(Overlay),
-                  self.overlayNode
-                );
-
-                Act.init();
             });
         });
     }
