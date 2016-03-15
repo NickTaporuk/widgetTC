@@ -26,7 +26,7 @@ define([
         name: '',
         email: '',
         phone: '',
-        preferred_time: '',
+        preferred_time: moment().add(1, 'd').minutes(00).hour(13).format('YYYY-MM-DD HH:mm'),
         way_to_contact: 'phone',
         vehicle_info: '',
         vehicle: {

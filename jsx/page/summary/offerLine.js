@@ -2,12 +2,14 @@ define([
     'react',
     'classnames',
     'lib/helper',
-    'config'
+    'config',
+    'moment'
 ], function(
     React,
     cn,
     h,
-    config
+    config,
+    moment 
 ) {
 
     return {
@@ -125,7 +127,7 @@ define([
             var offer = this.props.offer;
             var validRange = null;
             if (!offer.valid_range.is_ongoing) {
-                validRange = <span>{'Offer valid from ' + moment(offer.valid_range.start_date).format('MMM. DD') + ' - ' + moment(offer.valid_range.end_date).format('MMM. DD, YYYY') +  '.' + (legalLine ? '*' : '') }<br /></span>
+                validRange = <span>{'Offer valid from ' + moment(offer.valid_range.start_date).format('MMM. DD') + ' - ' + moment(offer.valid_range.end_date).format('MMM. DD, YYYY') +  '.' + (offer.legal_link ? '*' : '') }<br /></span>
             }
 
             return validRange;
@@ -134,7 +136,7 @@ define([
         _getLegalLine: function() {
             var offer = this.props.offer;
             var legalLine = null;
-            if (offer.legal_link && offer.legal_line) {
+            if (offer.legal_link) {
                 legalLine = <small>{ offer.valid_range.is_ongoing ? '' : '*' }<a target="_blank" rel="nofollow" href={offer.legal_link} style={{color: offer.color }} dangerouslySetInnerHTML={ {__html: offer.legal_line} } /></small>;
             }
 

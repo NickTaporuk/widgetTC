@@ -51,6 +51,48 @@ define([
 
                     <div className={cn('summary_wrapper')}>
                         <form action="appointment-confirmation.php" className={cn('appointment_form')} onSubmit={this._handleFormSubmit}>
+                            
+                            <fieldset className={cn(['sixcol', 'col_left', 'appointment_fields'])}>
+                                <div className={cn('control_wrapper')}>
+                                    <label htmlFor={cn('order_your_name')}>Your Name <span className="req">*</span></label>
+                                    <input type="text" id={cn('order_your_name')} required ref="name" defaultValue={this.state.values.name} />
+                                    {this._getError('name')}
+                                </div>
+                                <div className={cn('control_wrapper')}>
+                                    <label htmlFor={cn('order_email')}>Email Address <span className="req">*</span></label>
+                                    <input type="email" id={cn('order_email')} required ref="email" defaultValue={this.state.values.email} />
+                                    {this._getError('email')}
+                                </div>
+                                <div className={cn('control_wrapper')}>
+                                    <label htmlFor={cn('order_phone')}>Phone Number <span className="req">*</span></label>
+                                    <input type="tel" id={cn('order_phone')} required ref="phone" defaultValue={this.state.values.phone} />
+                                    {this._getError('phone')}
+                                </div>
+                                { this.props.type === 'appointment'
+                                    ?   <div className={cn('control_wrapper')}>
+                                            <label htmlFor={cn('way_to_contact')}>Best way to contact</label>
+                                            <select id={cn('way_to_contact')} ref="way_to_contact" defaultValue={this.state.values.way_to_contact}>
+                                                <option value="phone">Phone</option>
+                                                <option value="email">Email</option>
+                                            </select>
+                                        </div>
+                                    :   null
+                                }
+                                { this.props.type === 'appointment'
+                                    ?   <div className={cn('control_wrapper')}>
+                                            <label htmlFor={cn('order_date_time')}>Preferred Date and Time</label>
+                                            {/*<input type="text" id={cn('order_date_time')} className={cn('datepicker')} ref="time" defaultValue={this.state.values.preferred_time} />*/}
+                                            <DateTime isValidDate={this._isValidDate} inputProps={ {'name': "preferred_time", 'readOnly': true} } ref="datetime" defaultValue={this.state.values.preferred_time} dateFormat="YYYY-MM-DD" timeFormat="HH:mm"/>
+                                            {this._getError('preferred_time')}
+                                        </div>
+                                    :   null
+                                }
+                                <div className={cn('control_wrapper')}>
+                                    <label htmlFor={cn('order_notes')}>Notes</label>
+                                    <textarea id={cn('order_notes')} ref="notes" defaultValue={this.state.values.notes} />
+                                </div>
+                            </fieldset>
+
                             <div className={cn(['sixcol', 'last', 'right', 'col_right', 'appointment_info'])}>
 
                                 <div className={cn('control_wrapper')}>
@@ -64,14 +106,16 @@ define([
                                 </div>
 
                                 <div className={cn('control_wrapper')}>
-                                    <div className={cn(['sixcol', 'field'])}>
-                                        <SelectField name="model" options={this.state.options.models} emptyDesc="- Model -" withWrapper={false} onChange={this._vehicleChange} value={this.state.values.vehicle.model} />
+                                    <div className={cn('row')}>
+                                        <div className={cn(['sixcol', 'field'])}>
+                                            <SelectField name="model" options={this.state.options.models} emptyDesc="- Model -" withWrapper={false} onChange={this._vehicleChange} value={this.state.values.vehicle.model} />
+                                        </div>
+                                        <div className={cn(['sixcol', 'last', 'field'])}>
+                                            <SelectField name="trim" options={this.state.options.trims} emptyDesc="- Trim -" withWrapper={false} onChange={this._vehicleChange} value={this.state.values.vehicle.trim} />
+                                        </div>
                                     </div>
-                                    <div className={cn(['sixcol', 'last', 'field'])}>
-                                        <SelectField name="trim" options={this.state.options.trims} emptyDesc="- Trim -" withWrapper={false} onChange={this._vehicleChange} value={this.state.values.vehicle.trim} />
-                                    </div>
+                                    {this._getError('vehicle_info')}
                                 </div>
-                                {this._getError('vehicle_info')}
 
                                 {/*<div className={cn('twelvecol')}>
                                     <div className={cn(['fivecol', 'quote_tire'])}>
@@ -124,46 +168,6 @@ define([
                                 }
                                 {this._getBtn()}
                             </div>
-                            <fieldset className={cn(['sixcol', 'col_left', 'appointment_fields'])}>
-                                <div className={cn('control_wrapper')}>
-                                    <label htmlFor={cn('order_your_name')}>Your Name <span className="req">*</span></label>
-                                    <input type="text" id={cn('order_your_name')} required ref="name" defaultValue={this.state.values.name} />
-                                    {this._getError('name')}
-                                </div>
-                                <div className={cn('control_wrapper')}>
-                                    <label htmlFor={cn('order_email')}>Email Address <span className="req">*</span></label>
-                                    <input type="email" id={cn('order_email')} required ref="email" defaultValue={this.state.values.email} />
-                                    {this._getError('email')}
-                                </div>
-                                <div className={cn('control_wrapper')}>
-                                    <label htmlFor={cn('order_phone')}>Phone Number <span className="req">*</span></label>
-                                    <input type="tel" id={cn('order_phone')} required ref="phone" defaultValue={this.state.values.phone} />
-                                    {this._getError('phone')}
-                                </div>
-                                { this.props.type === 'appointment'
-                                    ?   <div className={cn('control_wrapper')}>
-                                            <label htmlFor={cn('way_to_contact')}>Best way to contact</label>
-                                            <select id={cn('way_to_contact')} ref="way_to_contact" defaultValue={this.state.values.way_to_contact}>
-                                                <option value="phone">Phone</option>
-                                                <option value="email">Email</option>
-                                            </select>
-                                        </div>
-                                    :   null
-                                }
-                                { this.props.type === 'appointment'
-                                    ?   <div className={cn('control_wrapper')}>
-                                            <label htmlFor={cn('order_date_time')}>Preferred Date and Time</label>
-                                            {/*<input type="text" id={cn('order_date_time')} className={cn('datepicker')} ref="time" defaultValue={this.state.values.preferred_time} />*/}
-                                            <DateTime isValidDate={this._isValidDate} inputProps={ {'name': "preferred_time", 'readOnly': true} } onChange={this._handleTimeChange} defaultValue={this.state.values.preferred_time} dateFormat="YYYY-MM-DD" timeFormat="HH:mm"/>
-                                            {this._getError('preferred_time')}
-                                        </div>
-                                    :   null
-                                }
-                                <div className={cn('control_wrapper')}>
-                                    <label htmlFor={cn('order_notes')}>Notes</label>
-                                    <textarea id={cn('order_notes')} ref="notes" defaultValue={this.state.values.notes} />
-                                </div>
-                            </fieldset>
                         </form>
                     </div>
 
@@ -177,7 +181,15 @@ define([
         },
 
         _getBackLink: function() {
-            var text = (this.props.type !== 'request') ? 'Back to your summary' : 'Back to your results';
+            var text = 'Back';
+            switch (this.props.type) {
+                case 'request':
+                    text = 'Back to your results';
+                    break;
+                case 'appointment':
+                    text = 'Back to your summary';
+                    break;
+            }
             return <a href="#summary" onClick={this._handleBackClick} className={cn('back_link')}><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE5C4;' }} />{text}</a>
         },
         _getBtn: function() {
@@ -217,14 +229,16 @@ define([
         },
         _handleBackClick: function(event) {
             event.preventDefault();
-            if (this.props.type !== 'request') {
-                Act.Page.show('summary');
-            } else {
-                Act.Page.show('results');
+            switch (this.props.type) {
+                case 'request':
+                    Act.Page.show('results');
+                    break;
+                case 'appointment':
+                    Act.Page.show('summary');
+                    break;
+                default:
+                    Act.Page.show('quote');
             }
-        },
-        _handleTimeChange: function(event) {
-            this.preferred_time = event.target.value;
         },
         _handleFormSubmit: function(event) {
             event.preventDefault();
@@ -235,8 +249,8 @@ define([
                 notes: this.refs.notes.value,
                 vehicle_info: this._getVehicleInfo()
             };
-            if (this.preferred_time) {
-                values.preferred_time = this.preferred_time;
+            if (this.refs.datetime) {
+                values.preferred_time = this.refs.datetime.value();
             }
             if (this.refs.way_to_contact) {
                 values.way_to_contact = this.refs.way_to_contact.value;

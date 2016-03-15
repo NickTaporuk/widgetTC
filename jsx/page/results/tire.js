@@ -22,7 +22,6 @@ define([
         getInitialState: function() {
             return {
                 activeTab: 'specs',
-                quantity: 4,
                 showRebate: false,
 
                 fullStock: [],

@@ -307,9 +307,9 @@
 		cursor: not-allowed;
 		
 		// &:focus,
-		&:hover {
-			background-color: $buttonColor;
-		}
+		// &:hover {
+		// 	background-color: $buttonColor;
+		// }
 
 		&:active {
 			@include translateY(0);

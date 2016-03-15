@@ -6,6 +6,7 @@ define([
     'load!components/page/order',
     'load!components/page/confirmation',
     'load!components/page/quote',
+    'load!components/page/email',
     'react',
     'load!stores/pageStore',
     'load!stores/searchStore',
@@ -23,6 +24,7 @@ define([
     Order,
     Confirmation,
     Quote,
+    Email,
     React,
     pageStore,
     searchStore,
@@ -143,6 +145,13 @@ define([
                     break;
                 case 'quote':
                     content = <Quote />
+                    break;
+                case 'email':
+                    var props = {
+                        quote: customerStore.getQuote()
+                    };
+                    content = <Email {...props} />
+                    break;
             }
 
             return content;

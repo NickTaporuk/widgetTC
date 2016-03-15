@@ -232,7 +232,7 @@
 	.tcwlw_table_wrapper {
 		position: relative;
 		width: 100%;
-		@include max-width(78);
+		// @include max-width(78);
 		@include margin-bottom($baseSpacing);
 		margin-left: auto;
 		margin-right: auto;

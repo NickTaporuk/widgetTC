@@ -90,86 +90,11 @@
 	}
 
 	.tcwlw_quote_wrapper {
-		.tcwlw_quote_left {
-			padding-right: 3.8%;
-			border-right: 1px solid $grayLighter;
-		}
+		@include padding-top($baseSpacing/2);
 
-		.tcwlw_quote_header {
-			@include padding-top($baseSpacing/2);
-			@include padding-bottom($baseSpacing/2);
-		}
-
-		.tcwlw_quote_dealer_logo {
-			float: left;
-			@include margin(0, $baseSpacing/2, $baseSpacing/2, 0);
-		}
-
-		.tcwlw_confirmation_location {
-			float: right;
-		}
-
-		.tcwlw_quote_tire {
-			@include font-size($baseFontSize);
-		}
-
-		.tcwlw_result_specs_list {
-			@include margin-bottom($baseSpacing/2);
-
-			&:last-child {
-				margin-bottom: 0;
-			}
-
-			li {
-				width: 100%;
-				margin-left: 0;
-				margin-right: 0;
-				padding: 0;
-			}
-		}
-
-		.tcwlw_quote_features {
-			@include padding-left($baseSpacing/2);
-
-			li {
-				@include font-size(1);
-			}
-		}
-
-		// Faux Media
-
-		@include tireconnect-width(small) {
-			.tcwlw_quote_left,
-			.tcwlw_quote_right {
-				clear: both;
-				width: 100%;
-				margin-right: 0;
-			}
-
-			.tcwlw_quote_left {
-				@include margin-bottom($baseSpacing);
-				@include padding(0, 0, $baseSpacing);
-				border-right: none;
-				border-bottom: 1px solid $grayLighter;
-			}
-		}
-
-		// Media
-
-		@include respond-to(smaller-screen) {
-			.tcwlw_quote_left,
-			.tcwlw_quote_right {
-				clear: both;
-				width: 100%;
-				margin-right: 0;
-			}
-
-			.tcwlw_quote_left {
-				@include margin-bottom($baseSpacing);
-				@include padding(0, 0, $baseSpacing);
-				border-right: none;
-				border-bottom: 1px solid $grayLighter;
-			}
+		p {
+			@include font-size(2);
+    		@include margin-top($baseSpacing/2);
 		}
 	}
 }

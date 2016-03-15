@@ -162,6 +162,11 @@ define([
                     Api.sendAppointment(values);
                 }
             },
+            emailForm: function() {
+                dispatcher.dispatch({
+                    actionType: 'quote.emmail.form.show'
+                });
+            },
             email: function(followUp, values) {
                 dispatcher.dispatch({
                     actionType: 'customer.values.update',
@@ -172,6 +177,7 @@ define([
                 if (Object.keys(customerStore.getValidationErrors()).length === 0) {
                     var followUp = followUp || false;
                     var data = customerStore.getParamsForQuote( followUp, 'email' );
+                    data.follow_up = followUp;
                     Api.emailQuote(data);
                 }
             },
@@ -185,6 +191,7 @@ define([
                 if (Object.keys(customerStore.getValidationErrors()).length === 0) {
                     var followUp = followUp || false;
                     values = customerStore.getParamsForQuote( followUp, 'print' );
+                    values.follow_up = followUp;
                     Api.printQuote(values);
                 }
             },

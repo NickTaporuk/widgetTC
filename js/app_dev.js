@@ -37,7 +37,7 @@ var localSettings = {
 	}
 };
 var serverSettings = {
-	apikey: params.live ? '4bfb8dedd92803b26e401bb4e0eff242' : 'cd54481198cde4559d3e0dc5035ad644',
+	apikey: params.live ? '4bfb8dedd92803b26e401bb4e0eff242' : '4bfb8dedd92803b26e401bb4e0eff242',
 	scriptPlace: params.live ? 'https://app.tireconnect.ca' : 'https://dev.tireconnect.ca/app',
 	apiBaseUrl: params.live ? 'https://wl.tireconnect.ca/api2.php/' : 'https://dev.tireconnect.ca/api2.php/'
 };

@@ -51,6 +51,11 @@ define([
                     };
                     change = true;
                     break;
+                    
+                case 'quote.emmail.form.show':
+                    name = 'email';
+                    change = true;
+                    break;
 
                 case constants.SEND_APPOINTMENT_SUCCESS:
                 case constants.PRINT_QUOTE_SUCCESS:

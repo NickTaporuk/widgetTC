@@ -279,8 +279,8 @@
 	.tcwlw_result_brand_logo {
 		width: auto;
 		max-width: 140px;
-		max-height: 20px;
-		@include margin-bottom(0.5);
+		// max-height: 20px;
+		@include margin-bottom(0.2);
 	}
 
 	.tcwlw_result_tire_wrapper {
@@ -481,7 +481,7 @@
 			background: white;
 			position: relative;
 			max-width: none;
-			@include margin-bottom($baseSpacing/1.5);
+			@include margin-bottom($baseSpacing/2.5);
 			@include padding($baseSpacing/2, $baseSpacing/2, $baseSpacing/6);
 			border-width: 1px;
 			border-style: solid;
@@ -554,6 +554,7 @@
 		.tcwlw_result_left {
 			width: 30%;
 			@include padding-bottom(1);
+			@include margin-top(-0.6);
 			padding-right: 3%;
 			text-align: center;
 		}

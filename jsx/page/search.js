@@ -128,7 +128,7 @@ define([
                         <SelectField 
                                     options={this.state.fieldOptions.base_category}                                                            
                                     value={this.state.fieldValues.vehicle.base_category} onChange={this._handleFieldChange} 
-                                    name="vehicle_base_category" label="Tire Type"
+                                    name="vehicle_base_category" label="Tire Category"
                                     className={cn(['sixcol', 'field'])} emptyDesc="All Tires" />
                         <SelectField 
                                     options={this.state.fieldOptions.car_tire_id}   
@@ -159,7 +159,7 @@ define([
                         <SelectField 
                                     options={this.state.fieldOptions.base_category} 
                                     value={this.state.fieldValues.size.base_category} onChange={this._handleFieldChange} 
-                                    name="size_base_category" label="Tire Type"
+                                    name="size_base_category" label="Tire Category"
                                     className={cn(['sixcol', 'last', 'field'])} emptyDesc="All Tires" />
                         <SelectField 
                                     options={this.state.fieldOptions.speed_rating} 

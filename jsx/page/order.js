@@ -77,7 +77,7 @@ define([
                                     <div className={cn('order_option_inner')}>
                                         <input style={ {display: 'none'} } type="radio" name="order_options" id={cn('order_option_cc')} value="credit-card" defaultChecked={true} />
                                         <label htmlFor={cn('order_option_cc')}>
-                                            Pay with credit card 
+                                            Supported credit cards
                                             <img src={config.imagesFolder + 'credit-cards.png'} alt="Visa, MasterCard, or American Express" />
                                         </label>
                                     </div>
@@ -101,10 +101,42 @@ define([
                                 </div>
                                 <div className={cn('control_wrapper')}>
                                     <label htmlFor={cn('order_date_time')}>Preferred Date and Time</label>
-                                    {/* <input type="text" id={cn('order_date_time')} className={cn('datepicker')} ref="preferred_time" defaultValue={this.state.values.preferred_time} disabled={this.state.status == 'incomplete'} /> */}
-                                    <DateTime isValidDate={this._isValidDate} inputProps={ {'name': "preferred_time", 'readOnly': true} } onChange={this._handleTimeChange} defaultValue={this.state.values.preferred_time} dateFormat="YYYY-MM-DD" timeFormat="HH:mm"/>
+                                    <DateTime isValidDate={this._isValidDate} inputProps={ {'name': "preferred_time", 'readOnly': true} } ref="datetime" defaultValue={this.state.values.preferred_time} dateFormat="YYYY-MM-DD" timeFormat="HH:mm"/>
                                     {this._getError('preferred_time')}
                                 </div>
+                                <div className={cn('control_wrapper')}>
+                                    <label htmlFor={cn('vehicle_year')}>Vehicle Info <span className="req">*</span></label>
+                                    <div className={cn(['sixcol', 'field'])}>
+                                        <SelectField name="year" options={this.state.options.years} emptyDesc="- Year -" withWrapper={false} onChange={this._vehicleChange} value={this.state.values.vehicle.year} />
+                                    </div>
+                                    <div className={cn(['sixcol', 'last', 'field'])}>
+                                        <SelectField name="make" options={this.state.options.makes} emptyDesc="- Make -" withWrapper={false} onChange={this._vehicleChange} value={this.state.values.vehicle.make} />
+                                    </div>
+                                </div>
+
+                                <div className={cn('control_wrapper')}>
+                                    <div className={cn('row')}>
+                                        <div className={cn(['sixcol', 'field'])}>
+                                            <SelectField name="model" options={this.state.options.models} emptyDesc="- Model -" withWrapper={false} onChange={this._vehicleChange} value={this.state.values.vehicle.model} />
+                                        </div>
+                                        <div className={cn(['sixcol', 'last', 'field'])}>
+                                            <SelectField name="trim" options={this.state.options.trims} emptyDesc="- Trim -" withWrapper={false} onChange={this._vehicleChange} value={this.state.values.vehicle.trim} />
+                                        </div>
+                                    </div>
+                                    {this._getError('vehicle_info')}
+                                </div>
+                                
+                                <div className={cn('control_wrapper')}>
+                                    <label htmlFor={cn('order_notes')}>Notes</label>
+                                    <textarea id={cn('order_notes')} defaultValue={this.state.values.notes} ref="notes" disabled={this.state.status == 'incomplete'} />
+                                </div>
+                            </fieldset>
+                            <div className={cn(['sixcol', 'last', 'col_right', 'order_info'])}>
+                                
+                                {/*<div className={cn('control_wrapper')}>
+                                    <label htmlFor={cn('vehicle_info')}>Vehicle Info</label>
+                                    <textarea id={cn('vehicle_info')} defaultValue={this.state.values.vehicle_info ? this.state.values.vehicle_info : this.props.vehicleInfo} ref="vehicle_info" disabled={this.state.status == 'incomplete'} />
+                                </div>*/}
                                 <div className={cn('control_wrapper')}>
                                     <label htmlFor={cn('order_card_number')}>Credit Card Number <span className="req">*</span></label>
                                     <input type="text" id={cn('order_card_number')} autoComplete="off" pattern="\d*" required ref="card_number" defaultValue="4242424242424242" />
@@ -124,37 +156,7 @@ define([
                                     {this._getError('exp_month')}
                                     {this._getError('exp_year')}
                                 </div>
-                                <div className={cn('control_wrapper')}>
-                                    <label htmlFor={cn('order_notes')}>Notes</label>
-                                    <textarea id={cn('order_notes')} defaultValue={this.state.values.notes} ref="notes" disabled={this.state.status == 'incomplete'} />
-                                </div>
-                            </fieldset>
-                            <div className={cn(['sixcol', 'last', 'col_right', 'order_info'])}>
                                 
-                                {/*<div className={cn('control_wrapper')}>
-                                    <label htmlFor={cn('vehicle_info')}>Vehicle Info</label>
-                                    <textarea id={cn('vehicle_info')} defaultValue={this.state.values.vehicle_info ? this.state.values.vehicle_info : this.props.vehicleInfo} ref="vehicle_info" disabled={this.state.status == 'incomplete'} />
-                                </div>*/}
-
-                                <div className={cn('control_wrapper')}>
-                                    <label htmlFor={cn('vehicle_year')}>Vehicle Info <span className="req">*</span></label>
-                                    <div className={cn(['sixcol', 'field'])}>
-                                        <SelectField name="year" options={this.state.options.years} emptyDesc="- Year -" withWrapper={false} onChange={this._vehicleChange} value={this.state.values.vehicle.year} />
-                                    </div>
-                                    <div className={cn(['sixcol', 'last', 'field'])}>
-                                        <SelectField name="make" options={this.state.options.makes} emptyDesc="- Make -" withWrapper={false} onChange={this._vehicleChange} value={this.state.values.vehicle.make} />
-                                    </div>
-                                </div>
-
-                                <div className={cn('control_wrapper')}>
-                                    <div className={cn(['sixcol', 'field'])}>
-                                        <SelectField name="model" options={this.state.options.models} emptyDesc="- Model -" withWrapper={false} onChange={this._vehicleChange} value={this.state.values.vehicle.model} />
-                                    </div>
-                                    <div className={cn(['sixcol', 'last', 'field'])}>
-                                        <SelectField name="trim" options={this.state.options.trims} emptyDesc="- Trim -" withWrapper={false} onChange={this._vehicleChange} value={this.state.values.vehicle.trim} />
-                                    </div>
-                                </div>
-                                {this._getError('vehicle_info')}
 
                                 <div className={cn('table_wrapper')}>
                                     <table className={cn('table')}>
@@ -287,9 +289,6 @@ define([
             return (errors === undefined);
         },
 
-        _handleTimeChange: function(event) {
-            this.preferred_time = event.target.value;
-        },
         _handleFormSubmit: function(event) {
             event.preventDefault();
             this.setState({'disabled': true});
@@ -319,13 +318,10 @@ define([
                             name: self.refs.name.value,
                             email: self.refs.email.value,
                             phone: self.refs.phone.value,
-                            // preferred_time: self.refs.preferred_time.value,
+                            preferred_time: self.refs.datetime.value(),
                             notes: self.refs.notes.value,
-                            vehicle_info: self._getVehicleInfo()
+                            vehicle_info: self._getVehicleInfo(),
                         };
-                        if (self.preferred_time) {
-                            values.preferred_time = self.preferred_time;
-                        }
 
                         Act.Order.payment(values); 
                     }

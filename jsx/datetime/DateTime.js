@@ -110,6 +110,10 @@ define(['react', './src/DaysView', 'moment', 'lodash', 'config'], //'./src/onCli
 			};
 		},
 
+		value: function() {
+			return this.state.inputValue;
+		},
+
 		getFormats: function( props ){
 			var formats = {
 					date: props.dateFormat || '',
