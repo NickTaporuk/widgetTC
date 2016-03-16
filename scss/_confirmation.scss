@@ -47,3 +47,9 @@
 		}
 	}
 }
+
+@media print {
+	#tcwlw_widget .tcwlw_bottom_btns {
+		display: none;
+	}
+}

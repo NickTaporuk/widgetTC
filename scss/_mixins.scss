@@ -305,6 +305,8 @@
 		background-color: $gray;
 		opacity: 0.75;
 		cursor: not-allowed;
+
+		@include box-shadow(none);
 		
 		// &:focus,
 		// &:hover {

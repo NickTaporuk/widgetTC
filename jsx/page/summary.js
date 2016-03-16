@@ -178,8 +178,9 @@ define([
                     <tr key={i} className={ cn({service_added: (isOptional && info.applied)}) }>
                         {toggleCell}
                         <td>
-                            {info.name + ' '}
-                            <small>{info.description}</small>
+                            {info.name}<br />
+                            {info.description ? <small>{info.description}<br /></small> : null}
+                            {info.link ? <small><a href={info.link} target="_blank">Learn more</a></small> : null}
                         </td>
                         <td>${h.priceFormat(info.total_price)}</td>
                     </tr>

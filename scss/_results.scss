@@ -482,7 +482,7 @@
 			position: relative;
 			max-width: none;
 			@include margin-bottom($baseSpacing/2.5);
-			@include padding($baseSpacing/2, $baseSpacing/2, $baseSpacing/6);
+			@include padding($baseSpacing/4, $baseSpacing/4, 0);
 			border-width: 1px;
 			border-style: solid;
 			display: block;
@@ -506,9 +506,9 @@
 			@include clearfix();
 		}
 
-		.tcwlw_result_header {
-			@include padding-bottom($baseSpacing/4);
-		}
+		// .tcwlw_result_header {
+		// 	@include padding-bottom($baseSpacing/4);
+		// }
 
 		.tcwlw_result_title,
 		.tcwlw_result_compare {
@@ -553,17 +553,17 @@
 
 		.tcwlw_result_left {
 			width: 30%;
-			@include padding-bottom(1);
-			@include margin-top(-0.6);
+			@include padding-bottom(0.3);
+			// @include margin-top(-0.6);
 			padding-right: 3%;
 			text-align: center;
 		}
 
 		.tcwlw_result_right {
 			width: 70%;
-			@include margin-top(-$baseSpacing/6);
+			// @include margin-top(-$baseSpacing/6);
 			padding-left: 1%;
-			@include padding-bottom(1);
+			@include padding-bottom(0.5);
 		}
 
 		.tcwlw_result_rating {
@@ -583,7 +583,7 @@
 		}
 
 		.tcwlw_result_intro {
-			@include margin-bottom($baseSpacing/2);
+			@include margin-bottom($baseSpacing/3);
 			overflow: hidden;
 
 			p {
@@ -602,7 +602,7 @@
 			margin-right: 0;
 
 			a {
-				background: $grayDarkest;
+				background: $orangeLight;
 				color: white;
 
 				&:hover {
@@ -610,11 +610,11 @@
 				}
 
 				&[aria-selected="false"] {
-					border-color: $grayDarkest;
+					border-color: $orangeLight;
 				}
 
 				&[aria-selected="true"] {
-					color: $grayDarker;
+					color: $orangeLight;
 				}
 			}
 		}
@@ -713,11 +713,21 @@
 			}
 		}
 
+		// Stock tab
+		.tcwlw_stock_suppliers {
+			li {
+				.tcwlw_btn_small {
+					@include padding(0.4);
+					@include margin-left(1);
+				}
+			}
+		}
+
 		// Price & QTY info
 
 		.tcwlw_result_select_actions {
 			width: 100%;
-			@include margin-bottom($baseSpacing/2);
+			@include margin-bottom($baseSpacing/3);
 			@include padding($baseSpacing/4, $baseSpacing/3);
 			border: 1px solid $grayLighter;
 			display: table;
@@ -848,9 +858,9 @@
 					padding-right: 0;
 				}
 
-				.tcwlw_result_left {
-					@include padding-bottom(1);
-				}
+				// .tcwlw_result_left {
+				// 	@include padding-bottom(1);
+				// }
 
 				.tcwlw_result_type,
 				.tcwlw_warranty {

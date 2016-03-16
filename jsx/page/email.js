@@ -65,6 +65,14 @@ define([
                                                 <td>Sub-total</td>
                                                 <td>${h.priceFormat(quote.total.sub_total)}</td>
                                             </tr>
+                                            {
+                                                quote.discount && quote.discount.applied
+                                                ?   <tr>
+                                                        <td>Discount</td>
+                                                        <td>${h.priceFormat(quote.discount.total_value)}</td>
+                                                    </tr> 
+                                                :   null
+                                            }
                                             { recyclingFee && quote.recycling_fee.is_taxable ? recyclingFee : null }
                                             <tr>
                                                 <td>{quote.tax.name}</td>

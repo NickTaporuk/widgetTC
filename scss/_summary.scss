@@ -7,7 +7,7 @@
 #tcwlw_widget {
 	.tcwlw_summary_wrapper {
 		@include padding-top($baseSpacing/2);
-
+		
 		.tcwlw_discount_row,
 		.tcwlw_rebate_row {
 			@include font-size(1);

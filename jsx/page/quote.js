@@ -23,7 +23,8 @@ define([
         },
         componentWillUnmount: function() {
             customerStore.unbind('change', this._updateState);    
-        }, */
+        }, 
+        */
 
         render: function() {
             return (
@@ -76,28 +77,12 @@ define([
                 </div>
             );
         },
-/*
-        _updateState: function() {
-            this.setState({
-                email: customerStore.getCustomer().email
-            })
-        },*/
+
 
         _handleBackClick: function(event) {
             event.preventDefault();
             Act.Page.show('summary');
         },
-/*
-        _handleEmailClick: function(event) {
-            event.preventDefault();
-            var email = this.refs.email.value;
-
-            if ( this.refs.follow_up.checked ) {
-                Act.Quote.appointmentForm('email', { email: email } );
-            } else {
-                Act.Quote.email(false, {email: email} );
-            }
-        },*/
 
         _handlePrintClick: function(event) {
             event.preventDefault();

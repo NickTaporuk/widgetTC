@@ -23,9 +23,9 @@ define([
         quote = {};
 
     var customer = {
-        name: '',
-        email: '',
-        phone: '',
+        name: 'test',
+        email: 'test@not.ru',
+        phone: '2342342345',
         preferred_time: moment().add(1, 'd').minutes(00).hour(13).format('YYYY-MM-DD HH:mm'),
         way_to_contact: 'phone',
         vehicle_info: '',
@@ -76,6 +76,9 @@ define([
             datetime: {
                 earliest: moment()
             },
+        },
+        notes: {
+            length: {maximum: 500}
         }
     };
 

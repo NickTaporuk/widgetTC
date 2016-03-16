@@ -2,12 +2,14 @@ define([
     'react',
     'classnames',
     'load!actions/actions',
-    'lib/helper'
+    'lib/helper',
+    'config'
 ], function(
     React,
     cn,
     Act,
-    h
+    h,
+    config
 ) {
 
     return {
@@ -116,7 +118,7 @@ define([
 
                         <div className={cn(['twelvecol', 'bottom_btns'])}>
                             <a href="#search" onClick={this._handleToStartClick} className={cn(['brand_btn_light', 'btn_small', 'left'])}><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE5C4;' }} /> Start over</a>
-                            <a href="javascript:window.print()" className={cn(['brand_btn_light', 'btn_small', 'right'])}><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE8AD;' }} /> Print this page</a>
+                            <a href="#print" onClick={this._handelPrintClick} className={cn(['brand_btn_light', 'btn_small', 'right'])}><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE8AD;' }} /> Print this page</a>
                         </div>
                     </div>
                 </div>
@@ -193,6 +195,12 @@ define([
         _handleToStartClick: function(event) {
             event.preventDefault();
             Act.Page.show('search');
+        },
+
+        _handelPrintClick: function(event) {
+            event.preventDefault();
+            var el = window.document.getElementById(cn('widget'));
+            h.printHtml(el.outerHTML, [config.mainCss]);
         }
     }
 

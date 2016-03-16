@@ -1,4 +1,4 @@
-define([], function() {
+define(['config'], function(config) {
 	return {
 		priceFormat: function(_number,_decimal,_separator)
 		{
@@ -21,21 +21,33 @@ define([], function() {
 		printHtml: function(html, cssUrls)
 		{
 	        var printWindow = window.open('', 'Print', 'left=0,top=0,width=800,height=800,toolbar=0,scrollbars=0,status=0');
+	        var htmlPage = '<html><head><title>Print</title>';
+
+
 	        printWindow.document.write('<html><head><title>Print</title>');
 	        if (cssUrls) {
 	        	cssUrls.map(function(url){
-	        		printWindow.document.write('<link rel="stylesheet" href="' + url + '" type="text/css" />');
+	        		htmlPage += '<link rel="stylesheet" href="' + url + '" type="text/css" />';
 	        	});
 	       	}
-	        printWindow.document.write('</head><body class="' + config.prefix + 'widget">');
-	        printWindow.document.write(html);
-	        printWindow.document.write('</body></html>');
+	       	htmlPage += '</head><body>' + html + '</body></html>';
+	        printWindow.document.write(htmlPage);
 
-	        printWindow.document.close(); // necessary for IE >= 10
-	        printWindow.focus(); // necessary for IE >= 10
+        	printWindow.document.close(); // necessary for IE >= 10
+        	printWindow.focus(); // necessary for IE >= 10
 
-	        printWindow.print();
-	        printWindow.close();
+	        // console.log(printWindow.document.readyState);
+	        if (printWindow.document.readyState == 'complete') {
+	        	// console.log('ready');
+        		printWindow.print();
+	        	printWindow.close();	        	
+	        } else {
+		        printWindow.onload = function() {
+		        	// console.log('load');
+	        		printWindow.print();
+		        	printWindow.close();
+		        };
+		    }
 
 	        return true;
 	    },
@@ -67,9 +79,6 @@ define([], function() {
 		    var left = box.left + scrollLeft - clientLeft
 		    
 		    return { top: Math.round(top), left: Math.round(left) }
-		},
-		CN: function() {
-			
 		}
 	}
 });

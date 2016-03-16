@@ -59,7 +59,12 @@ define([
             if (tire.description) {
                 var items = [];
                 tire.description.map(function(desc, i){
-                    items.push(<li key={i}>{desc}</li>);
+                    if (typeof desc === 'object') {
+                        items.push(<h5 key={i+'h'}>{desc.feature}</h5>);
+                        items.push(<p key={i+'d'}>{desc.benefit}</p>);
+                    } else {
+                        items.push(<li key={i}>{desc}</li>);
+                    }
                 });
                 features = <div className={cn('tab_cont')} id={cn('features_result_1')} aria-hidden={!(tab == 'features')}><ul>{items}</ul></div>;
             }
@@ -75,7 +80,8 @@ define([
                         <h3 className={cn(['result_title', 'font_color'])}>
                             {tire.model}
                             <span className={cn('result_subtitle')}>
-                                <span className={cn('result_type')}>{tire.category}</span><span className={cn('warranty')}>Warranty: <strong className={cn('warranty_value')}>{warranty ? warranty : 'NA'}</strong> {this.props.isInMile ? 'mi' : 'km'}</span>
+                                {tire.category == 'Not Defined' ? null : <span className={cn('result_type')}>{tire.category}</span>}
+                                <span className={cn('warranty')}>Warranty: <strong className={cn('warranty_value')}>{warranty ? warranty : 'NA'}</strong> {warranty ? (this.props.isInMile ? 'mi' : 'km') : null}</span>
                             </span>
                         </h3>
                         {/*<label className={cn('result_compare')}>
@@ -100,12 +106,18 @@ define([
                             {this._getRatingBlock()}
                         </div>
                         <div className={cn('result_right')}>
+                            { this.props.tire.external_info.marketing.statement
+                                ?   <div className={cn('result_intro')}>
+                                        <p>{this.props.tire.external_info.marketing.statement}</p>
+                                    </div>
+                                :   null
+                            }
                             <div className={cn('result_select_actions')}>
                                 <div className={cn('result_price_wrapper')}>
                                     <div className={cn('result_price')}>
                                         <label className={cn('qty')}>
                                             <span className={cn('qty_label')}>Qty:</span>
-                                            <select name={cn('qty_result_1')} onChange={this._handleQuantityChange} defaultValue={tire.selected_quantity} ref="quantity">
+                                            <select name={cn('qty_result_1')} onChange={this._handleQuantityChange} value={this.state.selQuantity} ref="quantity">
                                                 {quantityItems}
                                             </select>
                                         </label>
@@ -212,15 +224,14 @@ define([
                     info.push( 
                         <li key={i}>
                             <a href={'#'+ i} onClick={this._handleStockClick}>{supplierInfo.supplier.nice_name + ': ' + supplierInfo.quantity}</a>
-                            <span> </span>
-                            <a href={'#'+ i} className={cn('btn_small')} dangerouslySetInnerHTML={{ __html: supplierInfo.supplier.name == this.state.supplier ? 'View &#x2714;' : 'View' }} onClick={this._handleSupplierViewClick} />
+                            <a href={'#'+ i} className={cn(['btn_small', 'brand_btn'])} disabled={ supplierInfo.supplier.name == this.state.supplier } dangerouslySetInnerHTML={{ __html: supplierInfo.supplier.name == this.state.supplier ? 'View &#x2714;' : 'View' }} onClick={this._handleSupplierViewClick} />
                         </li> 
                     );
                 }.bind(this));
 
                 return <div>
                     <h5 className={cn('result_reviews_heading')}>Item: {this.props.tire.part_number}</h5>
-                    <ul>{info}</ul>
+                    <ul className={cn('stock_suppliers')}>{info}</ul>
                 </div>
             } else if (this.state.stock.length > 0) {
                 this.state.stock.map(function(branch, i) {
@@ -393,7 +404,7 @@ define([
             this.setState({
                 price:  supplier.price,
                 quantity: supplier.quantity,
-                selQuantity: supplier.quantity < this.state.selQuantity ? 1 : this.state.selQuantity,
+                selQuantity: supplier.quantity < this.state.selQuantity ? parseInt(supplier.quantity) : this.state.selQuantity,
                 supplierIndex: index,
                 supplier: supplier.supplier.name
             });

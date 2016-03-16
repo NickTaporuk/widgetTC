@@ -39,8 +39,11 @@ define([
 
             if (!tire.external_info.marketing) {
                 tire.external_info.marketing = {
-                    images: []
+                    images: [],
+                    statement: ''
                 };
+            } else if (tire.external_info.marketing.features && tire.external_info.marketing.features.length > 0) {
+                tire.description = tire.external_info.marketing.features;
             }
 
             if (!tire.external_info.rating) {

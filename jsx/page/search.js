@@ -179,14 +179,15 @@ define([
             if (config.sa) {
                 contents.push((
                     <div key={3} className={cn(['tab_cont', 'search_fields', 'by_part_number_tab'])} id={cn('by_part_number_tab')} role="tabpanel" tabIndex="0" aria-hidden={this.state.activeTab !== 'part_number'}>
-                        <fieldset className={cn('fields_wrapper_')}>
-                            <div className={cn(['sixcol', 'field'])}>
-                                <label htmlFor={cn('part_number')}>
-                                    <span>Enter part number </span><span className="req">*</span>
-                                </label>
-                                <input onChange={this._handleFieldChange} type="text" id={cn('part_number')} name="part_number" value={this.state.fieldValues.part_number.part_number} />
+                        <fieldset>
+                            <div className={cn('row')}>
+                                <div className={cn(['sixcol', 'field'])}>
+                                    <label htmlFor={cn('part_number')}>
+                                        <span>Enter part number </span><span className="req">*</span>
+                                    </label>
+                                    <input onChange={this._handleFieldChange} type="text" id={cn('part_number')} name="part_number" value={this.state.fieldValues.part_number.part_number} />
+                                </div>
                             </div>
-
                             <button type="submit" disabled={!this._isReadyForSearch()} className={cn(['btn', 'brand_btn'])}><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE8B6;' }} /> Find Your Tires</button>
                         </fieldset>
                     </div>
