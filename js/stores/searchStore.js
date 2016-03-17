@@ -34,6 +34,8 @@ define([
         brand: []
     };
 
+    var defaultValues = {};
+
     var fieldValues = {
         size: {
             width: '195',
@@ -63,7 +65,8 @@ define([
 
             run_flat: [],
             light_truck: [],
-            brand: []
+            brand: [],
+            category: []
         }
     };
 
@@ -80,10 +83,10 @@ define([
         } else if (field == 'brand' || field == 'run_flat' || field == 'light_truck') {
             options = fieldOptions[field];
             var value = [];
-            options.forEach(function(option, i, options) {
-                value.push(option.value);
-            });
-            setValue('common', field, value);
+            // options.forEach(function(option, i, options) {
+            //     value.push(option.value);
+            // });
+            setValue('common', field, []);
         }
     }
 
@@ -146,7 +149,13 @@ define([
         getAllValues: function() {
             return _.cloneDeep(fieldValues);
         },
+        // getParamsForSearch: function(isClarifying) {
+        //     if (!isClarifying) {
+        //         //set filter for category
+        //     } else {
 
+        //     }
+        // },
 
         dispatchToken: dispatcher.register(function(payload) {
             var change = false;
@@ -168,6 +177,24 @@ define([
                     });
                     change = true;
                     break;
+                case 'tire.search':
+                    if (!payload.isClarifying) {
+                        setDefaultValue('display');
+                        setDefaultValue('brand');
+                        setDefaultValue('run_flat');
+                        setDefaultValue('light_truck');
+
+                        // set filter by category base on base_category
+                        var baseCategoriesLength = fieldOptions.base_category.length;
+                        for (var i = 0; i < baseCategoriesLength; i++) {
+                            if (fieldValues[activeSection].base_category == fieldOptions.base_category[i]['value']) {
+                                fieldValues['common']['category'] = fieldOptions.base_category[i]['categories'];
+                                break;
+                            }
+                        }
+                    }
+                    // console.log(fieldValues);
+                    break;
                 case constants.LOAD_DEALER_CONFIG_SUCCESS:
                     var c = payload.config;
                     setValue('common', 'order_by', c.default_order.iframe);
@@ -180,17 +207,17 @@ define([
                     activeSection = payload.section;
                     change = true;
                     break;
-                case 'page.update':
-                    var pageStore = require('load!stores/pageStore');
-                    dispatcher.waitFor([pageStore.dispatchToken]);
-                    if (pageStore.getPageName() == 'search') {
-                        setDefaultValue('display');
-                        setDefaultValue('brand');
-                        setDefaultValue('run_flat');
-                        setDefaultValue('light_truck');
-                        change = true;
-                    }
-                    break;
+                // case 'page.update':
+                //     var pageStore = require('load!stores/pageStore');
+                //     dispatcher.waitFor([pageStore.dispatchToken]);
+                //     if (pageStore.getPageName() == 'search') {
+                //         setDefaultValue('display');
+                //         setDefaultValue('brand');
+                //         setDefaultValue('run_flat');
+                //         setDefaultValue('light_truck');
+                //         change = true;
+                //     }
+                //     break;
                 case constants.GET_VEHICLE_YEARS_SUCCESS:
                 case constants.GET_VEHICLE_MAKES_SUCCESS:
                 case constants.GET_VEHICLE_MODELS_SUCCESS:

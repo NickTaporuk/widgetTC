@@ -16,6 +16,7 @@ define([
                 allValues: []
             }
         },
+
         getDefaultProps: function() {
             return {
                 allDesc: 'All'
@@ -33,6 +34,7 @@ define([
                 allValues: allValues
             });
         },
+        
         shouldComponentUpdate: function(nextProps, nextState) {
             return this.state.checkedValues.length !== nextState.checkedValues.length || this.state.isShown !== nextState.isShown;
         },
@@ -84,6 +86,7 @@ define([
                 isShown: !this.state.isShown
             });
         },
+
         _handleFieldChange: function(event) {
             var value = event.target.value;
 
@@ -102,6 +105,7 @@ define([
 
             this.props.onChange(this.props.name, checkedValues, event);
         },
+
         _handleAllClick: function(event) {
             var checkedValues = _.cloneDeep(this.state.checkedValues);
             

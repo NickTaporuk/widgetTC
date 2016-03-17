@@ -80,7 +80,7 @@ define([
                         <h3 className={cn(['result_title', 'font_color'])}>
                             {tire.model}
                             <span className={cn('result_subtitle')}>
-                                {tire.category == 'Not Defined' ? null : <span className={cn('result_type')}>{tire.category}</span>}
+                                <span className={cn('result_type')}>{tire.category}</span>
                                 <span className={cn('warranty')}>Warranty: <strong className={cn('warranty_value')}>{warranty ? warranty : 'NA'}</strong> {warranty ? (this.props.isInMile ? 'mi' : 'km') : null}</span>
                             </span>
                         </h3>
@@ -224,7 +224,7 @@ define([
                     info.push( 
                         <li key={i}>
                             <a href={'#'+ i} onClick={this._handleStockClick}>{supplierInfo.supplier.nice_name + ': ' + supplierInfo.quantity}</a>
-                            <a href={'#'+ i} className={cn(['btn_small', 'brand_btn'])} disabled={ supplierInfo.supplier.name == this.state.supplier } dangerouslySetInnerHTML={{ __html: supplierInfo.supplier.name == this.state.supplier ? 'View &#x2714;' : 'View' }} onClick={this._handleSupplierViewClick} />
+                            <a href={'#'+ i} className={cn(['btn_small', 'brand_btn'])} disabled={ supplierInfo.supplier.name == this.state.supplier } dangerouslySetInnerHTML={{ __html: supplierInfo.supplier.name == this.state.supplier ? 'Selected &#x2714;' : 'Select' }} onClick={this._handleSupplierViewClick} />
                         </li> 
                     );
                 }.bind(this));
@@ -313,7 +313,7 @@ define([
                 offer = rebates[0];
             } else if (tire.discount) {
                 offer = tire.discount;
-                if (offer[0] !== undefined) { // needed as there are bug in response (if no discont we receive array. But it must be null)
+                if (offer[0] !== undefined) { // needed as there are bug in response (if no discount we receive array. But it must be null)
                     offer = null;
                 }
             }
@@ -323,11 +323,17 @@ define([
                 if (offer.coupon_link && offer.coupon_line) {
                     link = <a target="_blank" rel="nofollow" href={offer.coupon_link}>{offer.coupon_line}</a>          
                 }
+
                 var range;
-                if (offer.valid_range.is_ongoing) {
-                    range = 'Valid from ' + moment(offer.valid_range.start_date).format('MMM. DD') + ' to ' + moment(offer.valid_range.end_date).format('MMM. DD, YYYY');
+                if (!offer.valid_range.is_ongoing) {
+                    range = 'Valid from ' + moment(offer.valid_range.start_date).format('MMM. DD') + ' to ' + moment(offer.valid_range.end_date).format('MMM. DD, YYYY') + '*';
                 }
 
+                var legalLine;
+                if (offer.legal_link) {
+                    legalLine = <span>{ offer.valid_range.is_ongoing ? '' : '*' }<a target="_blank" rel="nofollow" href={offer.legal_link} style={{color: offer.color }} dangerouslySetInnerHTML={ {__html: offer.legal_line} } /></span>;
+                }
+                
                 block = (
                     <span className={cn(['result_rebate', 'tooltip'])}>
                         <a href="#show_rebate" onClick={this._showRebate} className={cn({toggle: true, toggle_open: this.state.showRebate})}>{offer.name} <i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE887;'}} /></a>
@@ -335,8 +341,9 @@ define([
                         <span className={cn(['tooltip_content', 'toggle_content']) + ' ' + cn({toggle_hidden: !this.state.showRebate})} id={cn('result_2_rebate')}>
                             <p>
                                 {offer.description} {range ? <br /> : null}
-                                {range} {link ? <br /> : null}
-                                {link}
+                                {range} <br />
+                                {link} {link ? <br /> : null}
+                                {legalLine}
                             </p>
                         </span>
                     </span>
@@ -417,7 +424,7 @@ define([
         _handleSelectClick: function(event) {
             event.preventDefault();
             var supplier = this.state.supplierIndex ? this.state.fullStock[this.state.supplierIndex] : null;
-            Act.Tire.select(this.props.tire.id, this.state.selQuantity, supplier);
+            Act.Tire.select(this.props.tire, this.state.selQuantity, supplier);
         },
         _handleGetQuoteClick: function(event) {
             event.preventDefault();

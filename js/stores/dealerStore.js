@@ -1,11 +1,13 @@
 define([
     'dispatcher',
     'lodash',
-    'load!actions/constants'
+    'load!actions/constants',
+    'config'
 ], function(
     dispatcher,
     _,
-    constants
+    constants,
+    config
 ) {
 
     var ecommerce = {
@@ -47,10 +49,10 @@ define([
             }
 
             // add prefix for each id/class
-            // selector = ('.widget ' + selector)
-            //             .split(',').join(', .widget')
-            //             .split('.').join('.' + config.prefix)
-            //             .split('#').join('#' + config.prefix);
+            selector = selector
+                        .split('.').join('.' + config.prefix)
+                        .split('#').join('#' + config.prefix);
+            
 
             if("insertRule" in this.styleSheet) {
                 this.styleSheet.insertRule(selector + "{" + rules + "}", index);
@@ -62,59 +64,61 @@ define([
 
         // text color1
         addCSSRule(
-            '#tcwlw_widget a, ' + 
-            '#tcwlw_widget_outer a, ' +
+            '#widget .price, ' +
 
-            '#tcwlw_widget .tcwlw_font_color, ' +
-            '#tcwlw_widget_outer .tcwlw_font_color, ' +
+            '#widget a, ' + 
+            '#widget_outer a, ' +
+
+            '#widget .font_color, ' +
+            '#widget_outer .font_color, ' +
             
-            '#tcwlw_widget .tcwlw_brand_btn_light, ' +
-            '#tcwlw_widget_outer .tcwlw_brand_btn_light',
+            '#widget .brand_btn_light, ' +
+            '#widget_outer .brand_btn_light',
                 'color: '+ color1
         );
 
         //bg color1
         addCSSRule(
-            '#tcwlw_widget .tcwlw_btn, ' +
-            '#tcwlw_widget .tcwlw_brand_btn, ' +
-            '#tcwlw_widget_outer .tcwlw_btn, ' +
-            '#tcwlw_widget_outer .tcwlw_brand_btn, ' +
+            '#widget .btn, ' +
+            '#widget .brand_btn, ' +
+            '#widget_outer .btn, ' +
+            '#widget_outer .brand_btn, ' +
 
-            '#tcwlw_widget .tcwlw_results .tcwlw_result_featured:after',
+            '#widget .results .result_featured:after',
                 'background-color: '+ color1
         );
 
         //border color1
         addCSSRule(
-            '#tcwlw_widget .tcwlw_border_color',
+            '#widget .border_color',
                 'border-color: ' + color1
         );
 
         addCSSRule(
-            '#tcwlw_widget .tcwlw_steps_list .tcwlw_steps_list_item.tcwlw_active',
+            '#widget .steps_list .steps_list_item.active',
                 'background-color: ' + color1 +'; ' +
                 'border-color: ' + color1 +';'
         );
 
         //text color 2 
         addCSSRule(
-            '#tcwlw_widget a:hover, ' +
-            // '#tcwlw_widget a:focus, ' +
-            // '#tcwlw_widget_outer a:focus, ' +
-            '#tcwlw_widget_outer a:hover',
+            '#widget a:hover, ' +
+            // '#widget a:focus, ' +
+            // '#widget_outer a:focus, ' +
+            '#widget_outer a:hover',
                 'color: ' + color2
         );
 
         //bg color2
         addCSSRule(
-            '#tcwlw_widget .tcwlw_bg_color, ' +
-            '#tcwlw_widget .tcwlw_fields_wrapper .tcwlw_field:before',
+            '#widget .bg_color, ' +
+            '#widget .fields_wrapper .field:before',
                 'background-color: '+ color2
         );
 
     
         addCSSRule(
-            '#tcwlw_widget .tcwlw_steps_list .tcwlw_steps_list_item',
+            '#widget .steps_list .steps_list_item',
                 'background-color: ' + color2 +'; ' +
                 'border-color: ' + color2 +';'
         );

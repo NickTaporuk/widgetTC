@@ -216,21 +216,13 @@ define([
         },
 
         _updateStatus: function() {
-            // var currentLocation = locationsStore.getCurrentLocation();
-            // var locId = currentLocation ? currentLocation.id : null;
-            // console.log(locId, this.state.currentLocId);
-            // if (locId !== this.state.currentLocId) {
-                // this._handleSubmit();
-            // } else {
-                var fieldValues = searchStore.getAllValues();
-                var options = searchStore.getAllOptions();
-                this.setState({
-                    'activeTab': searchStore.getActiveSection(),
-                    'fieldOptions': options,
-                    'fieldValues': fieldValues
-                    // 'currentLocId': locId
-                });
-            // }
+            var fieldValues = searchStore.getAllValues();
+            var options = searchStore.getAllOptions();
+            this.setState({
+                'activeTab': searchStore.getActiveSection(),
+                'fieldOptions': options,
+                'fieldValues': fieldValues
+            });
         },
 
         _handleTabClick: function(tab, event) {

@@ -70,11 +70,19 @@ define([
             }
         },
         Tire: {
-            search: function(addParams) {
+            search: function(addParams, isClarifying) {
+                dispatcher.dispatch({
+                    actionType: 'tire.search',
+                    isClarifying: isClarifying || false
+                });
+
                 var location = locationsStore.getCurrentLocation();
                 if (location) {
                     var section = searchStore.getActiveSection();
                     var searchParams = searchStore.getSectionValues(section);
+                    if (searchParams.base_category) {
+                        delete searchParams.base_category;
+                    }
                     searchParams.location_id = location.id;
                     searchParams.items_per_page = resultsStore.getItemsPerPage();
 
@@ -83,9 +91,10 @@ define([
                     searchParams.filters = {
                         'brand': searchStore.getValue('common', 'brand'),
                         'light_truck': searchStore.getValue('common', 'light_truck'),
-                        'run_flat': searchStore.getValue('common', 'run_flat')
+                        'run_flat': searchStore.getValue('common', 'run_flat'),
+                        'category': searchStore.getValue('common', 'category')
                     };
-                    searchParams.needed_filters = ['brand', 'run_flat', 'light_truck'];
+                    searchParams.needed_filters = ['brand', 'run_flat', 'light_truck', 'category'];
 
                     if (addParams) {
                         searchParams = _.assign(searchParams, addParams);
@@ -108,15 +117,16 @@ define([
             loadRewiews: function(tireId, offset) {
                 Api.loadReviews(tireId, offset);
             },
-            select: function(tireId, selQuantity, supplier) {
+            select: function(tire, selQuantity, supplier) {
                 dispatcher.dispatch({
                     actionType: 'tire.select',
-                    tireId: tireId,
+                    tireId: tire.id,
                     selQuantity: selQuantity,
                     supplier: supplier
                 });
 
-                Api.loadQuote((supplier ? supplier.tire_id : tireId), selQuantity);
+                var withDiscount = tire.discount && tire.discount.added_by_default;
+                Api.loadQuote((supplier ? supplier.tire_id : tire.id), selQuantity, 'use_default', withDiscount);
             },
             enlargeImage: function(image, model) {
                 dispatcher.dispatch({

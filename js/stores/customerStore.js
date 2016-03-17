@@ -19,7 +19,6 @@ define([
     // private section
     var selectedTire,
         selectedQuantity,
-        customDiscount,
         quote = {};
 
     var customer = {
@@ -117,19 +116,16 @@ define([
     // public section
     var store = {
         getSelectedTireId: function() {
-            return selectedTire;
+            return quote.tire_id;
         },
         getSelectedTire: function() {
-            return resultsStore.getTire(selectedTire);
+            return resultsStore.getTire(quote.tire_id);
         },
         getSelectedQuantity: function() {
             return selectedQuantity;
         },
         getQuote: function() {
             return _.cloneDeep(quote);
-        },
-        getCustomDiscount: function() {
-            return customDiscount;
         },
         getValidationErrors: function() {
             return validationErrors;
@@ -149,9 +145,6 @@ define([
             if (withCustomer) {
                 values = store.getCustomer();
                 delete values.vehicle;
-                if (type == 'appointment' && customDiscount) {
-                    values.custom_discount = customDiscount;
-                }
             } else if (type == 'email') {
                 values.email = customer.email;
             }
@@ -160,6 +153,7 @@ define([
             
             var quote = store.getQuote();
             values.with_discount = quote.discount ? quote.discount.applied : false;
+            values.custom_discount = quote.discount && quote.discount.is_custom ? quote.discount.total_value : null;
             var optionalServices = [];
             quote.optional_services.map(function(service) {
                 if (service.applied) {
@@ -178,7 +172,6 @@ define([
             var change = false;
             switch (payload.actionType) {
                 case constants.LOAD_QUOTE_SUCCESS:
-                    customDiscount = payload.customDiscount;
                 case 'quote.request.form.show':
                     selectedTire = payload.tireId;
                     selectedQuantity = payload.quantity;

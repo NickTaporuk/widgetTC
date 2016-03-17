@@ -204,52 +204,12 @@ define([
         },
        
         _updateQuote: function() {
-            this.setState({
+            var state = {
                 quote: customerStore.getQuote(),
-                quantity: customerStore.getSelectedQuantity(),
-                customDiscount: customerStore.getCustomDiscount()
-            });
-        },
-        _handleBackClick: function(event) {
-            event.preventDefault();
-            Act.Page.show('results');
-        },
-        _handleServiceClick: function(serviceKey, event) {
-            event.preventDefault();
-            var optServices = this._getActiveOptServicesKeys();
-            //add/remove clicked service
-            if (optServices.indexOf(serviceKey) === -1) {
-                optServices.push(serviceKey);
-            } else {
-                _.remove(optServices, function(key) {
-                  return key == serviceKey;
-                });
-            }
-            var params = this._getParamsForQuote();
-            Act.Quote.update(params.tireId, params.quantity, optServices, params.isDiscountApplied, params.customDiscount);
-        },
-        _getParamsForQuote: function() {
-            return {
-                tireId: this.props.tire.id,
-                quantity: this.state.quantity,
-                optServices: this._getActiveOptServicesKeys(),
-                isDiscountApplied: this.state.quote.discount && this.state.quote.discount.applied,
-                customDiscount: this.state.customDiscount
-            }
-        },
-        _handleQuantityChange: function(event) {
-            var params = this._getParamsForQuote();
-            Act.Quote.update(params.tireId, event.target.value, params.optServices, params.isDiscountApplied, params.customDiscount);
-        },
-        _handleDiscountClick: function(event) {
-            event.preventDefault();
-            var params = this._getParamsForQuote();
-            Act.Quote.update(params.tireId, params.quantity, params.optServices, !params.isDiscountApplied, params.customDiscount);
-        },
-        _handleDiscountChange: function(event) {
-            event.preventDefault();
-            var params = this._getParamsForQuote();
-            Act.Quote.update(params.tireId, params.quantity, params.optServices, params.isDiscountApplied, event.target.value);
+                quantity: customerStore.getSelectedQuantity()
+            };
+
+            this.setState(state);
         },
 
         _getActiveOptServicesKeys: function() {
@@ -262,14 +222,65 @@ define([
 
             return keys;
         },
+
+        _getParamsForQuote: function() {
+            var discount = this.state.quote.discount;
+            return {
+                tireId: this.props.tire.id,
+                quantity: this.state.quantity,
+                optServices: this._getActiveOptServicesKeys(),
+                withDiscount: discount && discount.tried_to_apply,
+                customDiscount: discount && discount.is_custom ? discount.total_value : null
+            }
+        },
+
+        _handleBackClick: function(event) {
+            event.preventDefault();
+            Act.Page.show('results');
+        },
+
+        _handleServiceClick: function(serviceKey, event) {
+            event.preventDefault();
+            var optServices = this._getActiveOptServicesKeys();
+            //add/remove clicked service
+            if (optServices.indexOf(serviceKey) === -1) {
+                optServices.push(serviceKey);
+            } else {
+                _.remove(optServices, function(key) {
+                  return key == serviceKey;
+                });
+            }
+            var params = this._getParamsForQuote();
+            Act.Quote.update(params.tireId, params.quantity, optServices, params.withDiscount, params.customDiscount);
+        },
+
+        _handleQuantityChange: function(event) {
+            var params = this._getParamsForQuote();
+            Act.Quote.update(params.tireId, event.target.value, params.optServices, params.withDiscount, params.customDiscount);
+        },
+
+        _handleDiscountClick: function(event) {
+            event.preventDefault();
+            var params = this._getParamsForQuote();
+            Act.Quote.update(params.tireId, params.quantity, params.optServices, !params.withDiscount, params.customDiscount);
+        },
+
+        _handleDiscountChange: function(event) {
+            event.preventDefault();
+            var params = this._getParamsForQuote();
+            Act.Quote.update(params.tireId, params.quantity, params.optServices, params.withDiscount, event.target.value);
+        },
+
         _handleAppointmentClick: function(event) {
             event.preventDefault();
             Act.Quote.appointmentForm()
         },
+
         _handleOrderClick: function(event) {
             event.preventDefault();
             Act.Order.create();
         },
+
         _handleQuoteClick: function(event) {
             event.preventDefault();
             Act.Page.show('quote');

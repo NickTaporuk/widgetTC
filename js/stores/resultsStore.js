@@ -52,6 +52,10 @@ define([
                     average_rating: null
                 };
             }
+
+            if (tire.category == 'Not Defined') {
+                tire.category = 'Undefined Category';
+            }
         });
     }
 

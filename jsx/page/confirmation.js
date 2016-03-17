@@ -54,8 +54,8 @@ define([
                                     <tr>
                                         <td>{tire.brand + ' ' + tire.model}</td>
                                         <td>${h.priceFormat(tire.price)}</td>
-                                        <td>{tire.selected_quantity}</td>
-                                        <td>${h.priceFormat( tire.selected_quantity * tire.price )}</td>
+                                        <td>{quote.tires_count}</td>
+                                        <td>${h.priceFormat( quote.tires_count * tire.price )}</td>
                                     </tr>
                                     <tr>
                                         <td>{ tire.size_short + ' ' + tire.load_index + tire.speed_rating}</td>

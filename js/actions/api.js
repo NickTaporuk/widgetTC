@@ -261,12 +261,18 @@ define([
                     custom_discount: customDiscount || null
                 },
                 success: function(response) {
+                    var quote = response.data;
+                    quote.tire_id = tireId;
+                    quote.tires_count = quantity;
+                    if (quote.discount) {
+                        quote.discount.tried_to_apply = withDiscount;
+                        quote.discount.is_custom = customDiscount ? true : false;
+                    }
                     dispatcher.dispatch({
                         actionType: constants.LOAD_QUOTE_SUCCESS,
                         tireId: tireId,
                         quantity: quantity,
-                        customDiscount: customDiscount,
-                        quote: response.data
+                        quote: quote
                     });
                 }
             });

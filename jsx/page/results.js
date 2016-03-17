@@ -52,11 +52,17 @@ define([
 
             var filters = null;
             if (Object.keys(this.state.filters).length > 0) {
-                var filtersInfo = [{key: 'run_flat', desc: 'Run-Flat', all: ''}, {key: 'light_truck', desc: 'Light Track', all: ''}, {key: 'brand', desc: 'Brand', all: 'All Brands'}];
+                var filtersInfo = [
+                    {key: 'run_flat', desc: 'Run-Flat', all: ''}, 
+                    {key: 'light_truck', desc: 'Light Track', all: ''}, 
+                    {key: 'brand', desc: 'Brand', all: 'All Brands'},
+                    {key: 'category', desc: 'Category', all: 'All Categories'}
+                ];
                 filters = [];
                 filtersInfo.forEach(function(info, i) {
                     if (this.state.filters[info.key].parameters.length > 1) {
                         filters.push((
+                            // defaultValues={}
                             <FilterBlock key={i} by={info.desc} name={info.key} allDesc={info.all} params={ this.state.filters[info.key].parameters } onChange={this._handleFilterChange} />
                         ));
                     }
@@ -136,15 +142,15 @@ define([
         _handleFieldChange: function(event) {
             var fieldName = event.target.name.replace('filter_', '');
             Act.Search.updateField('common', fieldName, event.target.value);
-            Act.Tire.search();
+            Act.Tire.search(null, true);
         },
         _handleFilterChange: function(name, values, event) {
             Act.Search.updateField('common', name, values);
-            Act.Tire.search();
+            Act.Tire.search(null, true);
         },
         _handlePageClick: function(page, event) {
             event.preventDefault();
-            Act.Tire.search({page: page});
+            Act.Tire.search({page: page}, true);
         }
     }
 
