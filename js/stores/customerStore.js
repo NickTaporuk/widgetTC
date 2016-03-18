@@ -62,8 +62,12 @@ define([
       }
     });
     var constraints = {
+        name: {
+            length: {maximum: 255}
+        },
         email: {
-            email: true
+            email: true,
+            length: {maximum: 255}
         },
         phone: {
             format: {
@@ -224,6 +228,11 @@ define([
                     order.status = payload.status;
                     change = true;
                     break;
+
+                case constants.SEND_APPOINTMENT_ERROR:
+                case constants.REQUEST_QUOTE_ERROR:
+                case constants.EMAIL_QUOTE_ERROR:
+                case constants.PRINT_QUOTE_ERROR:
 
                 case constants.ORDER_CHECKOUT_ERROR:
                 case constants.ORDER_PAYMENT_ERROR:

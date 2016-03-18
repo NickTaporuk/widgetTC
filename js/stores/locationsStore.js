@@ -10,22 +10,33 @@ define([
     constants
 ) {
     var locations = {};
-    var currectLocation;
+    var locsConfig = {};
+
+    var currectLocationId;
+    
+
+    if (lockr.get('location_id')) {
+        currectLocationId = lockr.get('location_id');
+    }
 
     function setLocations(locs) {
         locs.map(function(location) {
             locations[location.id] = location;
+            // generate default config for location
+            if (!locsConfig[location.id]) {
+                locsConfig[location.id] = {
+                    call_number: null
+                }
+            }
         });
         
         if (locs.length == 1) {
-            currectLocation = locs[0].id;
-        } else if (lockr.get('location_id')) {
-            currectLocation = lockr.get('location_id');
+            currectLocationId = locs[0].id;
         }
     }
 
     function setCurrentLocation(id) {
-        currectLocation = id;
+        currectLocationId = id;
     }
 
     var locationsStore = {
@@ -36,7 +47,13 @@ define([
             return locations;
         },
         getCurrentLocation: function() {
-            return currectLocation ? this.getLocation(currectLocation) : null;
+            return currectLocationId ? this.getLocation(currectLocationId) : null;
+        },
+        getCurLocId: function() {
+            return currectLocationId;
+        },
+        getCurLocConfig: function() {
+            return locsConfig[currectLocationId] ? locsConfig[currectLocationId] : null;
         },
 
         dispatchToken: dispatcher.register(function(payload) {
@@ -46,10 +63,15 @@ define([
                     setLocations(payload.locations);
                     change = true;
                     break;
+
+                case constants.LOAD_LOCATION_CONFIG_SUCCESS:
+                    locsConfig[currectLocationId] = payload.config;
+                    change = true;
+                    break;
                     
                 case 'locations.current.change': 
-                    currectLocation = payload.id;
-                    lockr.set('location_id', currectLocation);
+                    currectLocationId = payload.id;
+                    lockr.set('location_id', currectLocationId);
                     change = true;
                     break;
             }

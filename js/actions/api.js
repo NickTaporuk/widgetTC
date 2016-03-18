@@ -1,12 +1,14 @@
 define([
     'dispatcher',
     'ajax',
+    'isMobile',
     'load!actions/constants',
     'load!stores/vehicleStore',
     'config'
 ], function(
     dispatcher,
     ajax,
+    isMobile,
     constants,
     vehicleStore,
     config
@@ -54,6 +56,29 @@ define([
                     });
                 }
             });
+        },
+
+        loadLocationConfig: function(locationId) {
+            var dispatch = function(config) {
+                dispatcher.dispatch({
+                    actionType: constants.LOAD_LOCATION_CONFIG_SUCCESS,
+                    config: config
+                });
+            }
+            
+            // we need location config only for mobile version (to gate call number) for now
+            if (isMobile.any) {
+                ajax.make({
+                    url: 'location/' + locationId + '/config',
+                    success: function(response) {
+                        dispatch(response.data);
+                    }
+                });
+            } else {
+                dispatch({
+                    call_number: null
+                });
+            }
         },
 
         loadTireParameters: function() {
@@ -289,6 +314,16 @@ define([
                         title: 'Thank you!', 
                         content: response.notice
                     });
+                },
+                error: function(response) {
+                    if (response.error_code == 400001) {
+                        dispatcher.dispatch({
+                            actionType: constants.SEND_APPOINTMENT_ERROR,
+                            errors: response.errors
+                        });
+                    } else {
+                        ajax.error(response);
+                    }
                 }
             });
         },
@@ -306,6 +341,17 @@ define([
                     dispatcher.dispatch({
                         actionType: constants.PRINT_QUOTE_SUCCESS
                     });
+                },
+                error: function(response) {
+                    WinPrint.close();
+                    if (response.error_code == 400001) {
+                        dispatcher.dispatch({
+                            actionType: constants.PRINT_QUOTE_ERROR,
+                            errors: response.errors
+                        });
+                    } else {
+                        ajax.error(response);
+                    }
                 }
             });
         },
@@ -321,6 +367,16 @@ define([
                         title: response.notice,
                         content: ''
                     });
+                },
+                error: function(response) {
+                    if (response.error_code == 400001) {
+                        dispatcher.dispatch({
+                            actionType: constants.EMAIL_QUOTE_ERROR,
+                            errors: response.errors
+                        });
+                    } else {
+                        ajax.error(response);
+                    }
                 }
             });
         },
@@ -336,6 +392,16 @@ define([
                         title: 'Thank you!',
                         content: response.notice
                     });
+                },
+                error: function(response) {
+                    if (response.error_code == 400001) {
+                        dispatcher.dispatch({
+                            actionType: constants.REQUEST_QUOTE_ERROR,
+                            errors: response.errors
+                        });
+                    } else {
+                        ajax.error(response);
+                    }
                 }
             });
         },

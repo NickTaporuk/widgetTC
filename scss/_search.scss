@@ -63,6 +63,7 @@
 			float: none;
 			color: $secondaryColor;
 			position: relative;
+			width: 100%;
 			min-width: 248px;
 			margin-left: -4px;
 			@include padding(0, 0, 0, $baseSpacing*2);
@@ -96,6 +97,10 @@
 				@include margin-bottom($baseSpacing);
 			}
 		}
+
+		.tcwlw_fields_wrapper_2 {
+			counter-reset: steps-counter 3;
+		}
 	}
 
 
@@ -122,6 +127,11 @@
 
 	@include tireconnect-width(tiny) {
 		.tcwlw_fields_wrapper {
+			.tcwlw_sixcol {
+				width: 100%;
+				margin-right: 0;
+			}
+
 			.tcwlw_field {
 				width: 100%;
 				min-width: 0;
@@ -169,6 +179,11 @@
 		}
 
 		.tcwlw_fields_wrapper {
+			.tcwlw_sixcol {
+				width: 100%;
+				margin-right: 0;
+			}
+
 			.tcwlw_field {
 				width: 100%;
 				min-width: 0;

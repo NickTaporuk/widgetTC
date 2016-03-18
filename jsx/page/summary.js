@@ -5,7 +5,8 @@ define([
     'load!actions/actions',
     'lib/helper',
     'load!stores/customerStore',
-    'load!components/page/summary/offerLine'
+    'load!components/page/summary/offerLine',
+    'isMobile'
 ], function(
     React,
     cn,
@@ -13,7 +14,8 @@ define([
     Act,
     h,
     customerStore,
-    OfferLine
+    OfferLine,
+    isMobile
 ) {
 
    
@@ -117,7 +119,7 @@ define([
                                 </tbody>
                                 <tfoot>
                                     <tr>
-                                        <td>Total Price:</td>
+                                        <td><sup dangerouslySetInnerHTML={{ __html: '&#8224;' }} />Total Price:</td>
                                         <td>${h.priceFormat(quote.total.price)}</td>
                                     </tr>
                                     <OfferLine type="rebate" offer={this.state.quote.rebates[0]} />
@@ -141,9 +143,17 @@ define([
             if (this.props.withOrderBtn) {
                 btns.order = <a href="#order" onClick={this._handleOrderClick} className={cn('brand_btn')}>Order Your Tires <i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE5C8;' }} /></a>
             }
+
+            if (isMobile.any && this.props.callNumber) {
+                btns.clickToCall = <a href={'tel:' + this.props.callNumber} className={cn('brand_btn_light', 'btn_small')}><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE0B0;' }} /> Call Us</a>
+            }
             
             return (
                 <div className={cn(['twelvecol', 'bottom_btns'])}>
+                    {btns.clickToCall
+                        ? <div>{btns.clickToCall}</div>
+                        : null
+                    } 
                     <div className={cn(['sixcol', 'col_left'])}>
                         {btns.quote}
                         {this.props.withOrderBtn ? btns.appointment : null}

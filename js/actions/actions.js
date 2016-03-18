@@ -16,11 +16,22 @@ define([
 
     var Actions = {
         init: function() {
+            // action 1
             Api.loadLocations();
+            // action 2
             Api.loadTireParameters();
+            // action 3
             Api.getVehicleYears();
+            // action 4
             Api.loadDealerConfig();
-            Api.loadDealerInfo();    
+            // action 5
+            Api.loadDealerInfo();  
+
+            var curLocId = locationsStore.getCurLocId();
+            if (curLocId) {
+                // action 6
+                Api.loadLocationConfig(curLocId);
+            }
         },
         Page: {
             show: function(name, props) {
@@ -51,6 +62,8 @@ define([
                     actionType: 'locations.current.change',
                     id: id
                 });
+
+                Api.loadLocationConfig(id);
             }
         },
         Search: {
@@ -70,10 +83,10 @@ define([
             }
         },
         Tire: {
-            search: function(addParams, isClarifying) {
+            search: function(addParams, step) {
                 dispatcher.dispatch({
                     actionType: 'tire.search',
-                    isClarifying: isClarifying || false
+                    step: step || 2
                 });
 
                 var location = locationsStore.getCurrentLocation();

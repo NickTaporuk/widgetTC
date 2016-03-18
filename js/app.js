@@ -41,7 +41,7 @@ window.TCWidget = {
             requirejs.config({
                 baseUrl: './js/', 
                 paths: {
-                    // isMobile: 'bower_components/isMobile/isMobile',
+                    isMobile: 'bower_components/isMobile/isMobile',
                     lodash: 'bower_components/lodash/lodash',
                     validate: 'bower_components/validate/validate',
                     moment: 'bower_components/moment/moment',

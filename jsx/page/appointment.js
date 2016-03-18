@@ -222,7 +222,7 @@ define([
         _getError: function(fieldName) {
             if (this.state.errors[fieldName]) {
                 return <span className={cn(['message', 'error', 'appointment_fields'])}>
-                    <i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE000;' }} /> {this.state.errors[fieldName][0]}
+                    <i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE000;' }} /> {Array.isArray(this.state.errors[fieldName]) ? this.state.errors[fieldName][0] : this.state.errors[fieldName]}
                 </span>;
             } else {
                 return null;

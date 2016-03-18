@@ -80,7 +80,7 @@ define([
         } else if (field == 'display') {
             options = fieldOptions.display;
             setValue('common', 'display', options[0].value);
-        } else if (field == 'brand' || field == 'run_flat' || field == 'light_truck') {
+        } else if (field == 'brand' || field == 'run_flat' || field == 'light_truck' || field == 'category') {
             options = fieldOptions[field];
             var value = [];
             // options.forEach(function(option, i, options) {
@@ -178,11 +178,12 @@ define([
                     change = true;
                     break;
                 case 'tire.search':
-                    if (!payload.isClarifying) {
+                    if (payload.step == 1) {
                         setDefaultValue('display');
                         setDefaultValue('brand');
                         setDefaultValue('run_flat');
                         setDefaultValue('light_truck');
+                        setDefaultValue('category');
 
                         // set filter by category base on base_category
                         var baseCategoriesLength = fieldOptions.base_category.length;
@@ -193,7 +194,7 @@ define([
                             }
                         }
                     }
-                    // console.log(fieldValues);
+                    change = true;
                     break;
                 case constants.LOAD_DEALER_CONFIG_SUCCESS:
                     var c = payload.config;

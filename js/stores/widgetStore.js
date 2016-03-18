@@ -1,16 +1,20 @@
 define([
     'dispatcher',
-    'load!actions/constants'
+    'load!actions/constants',
+    'load!stores/locationsStore',
 ], function(
     dispatcher,
-    constants
+    constants,
+    locationsStore
 ) {
-    var stepsForReady = 4;
-    var currentStepToReady = 0;
+    var curLocId = locationsStore.getCurLocId();
+
+    var eventsForReady = curLocId ? 6 : 5;
+    var count = 0;
 
     var store = {
         getIsReady: function() {
-            return currentStepToReady == stepsForReady;
+            return count == eventsForReady;
         },
 
         dispatchToken: dispatcher.register(function(payload) {
@@ -21,13 +25,11 @@ define([
                 case constants.LOAD_TIRE_PARAMETERS_SUCCESS:
                 case constants.LOAD_DEALER_INFO_SUCCESS:
                 case constants.GET_VEHICLE_YEARS_SUCCESS:
-                    currentStepToReady++;
+                case constants.LOAD_LOCATION_CONFIG_SUCCESS:
+                    count++;
                     
                     change = true;
                     break;
-                
-                // case constants.SESSION_SET_SUCCESS:
-                    // change = true;
             }
 
             if (change) {

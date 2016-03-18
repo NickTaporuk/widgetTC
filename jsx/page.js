@@ -75,16 +75,16 @@ define([
                     switch (tab) {
                         case 'size':
                             queryParams = {
-                                first: searchStore.getValueDesc(tab, 'base_category'),
-                                second: searchStore.getValueDesc(tab, 'width') + '/' + searchStore.getValueDesc(tab, 'height') + 'R' + searchStore.getValueDesc(tab, 'rim'),
+                                // first: searchStore.getValueDesc(tab, 'base_category'),
+                                first: searchStore.getValueDesc(tab, 'width') + '/' + searchStore.getValueDesc(tab, 'height') + 'R' + searchStore.getValueDesc(tab, 'rim'),
                             }
                             break;
 
                         case 'vehicle':
                             queryParams = {
                                 first: searchStore.getValueDesc(tab, 'year') + ' ' + searchStore.getValueDesc(tab, 'make') + ' ' + searchStore.getValueDesc(tab, 'model') + ' ' + searchStore.getValueDesc(tab, 'trim'),
-                                second: searchStore.getValueDesc(tab, 'base_category'),
-                                third: searchStore.getValueDesc(tab, 'car_tire_id')
+                                // second: searchStore.getValueDesc(tab, 'base_category'),
+                                second: searchStore.getValueDesc(tab, 'car_tire_id')
                             }
                             break;
 
@@ -107,7 +107,8 @@ define([
                             order_by: searchStore.getValue('common', 'order_by'),
                             brand: searchStore.getValue('common', 'brand'),
                             run_flat: searchStore.getValue('common', 'run_flat'),
-                            light_truck: searchStore.getValue('common', 'light_truck')
+                            light_truck: searchStore.getValue('common', 'light_truck'),
+                            category: searchStore.getValue('common', 'category')
                         },
                         queryParams: queryParams,
                         isInMile: locationsStore.getCurrentLocation().country !== 'Canada'
@@ -116,8 +117,9 @@ define([
                     break;
                 case 'summary':
                     var props = {
-                        tire: customerStore.getSelectedTire(),
-                        withOrderBtn: dealerStore.getStripeKey() !== null && !config.sa
+                        tire:         customerStore.getSelectedTire(),
+                        withOrderBtn: dealerStore.getStripeKey() !== null && !config.sa,
+                        callNumber:   locationsStore.getCurLocConfig().call_number
                     };
                     content = <Summary {...props} />
                     break;

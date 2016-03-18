@@ -1,13 +1,11 @@
 define([
     'load!components/popup/locations',
-    // 'load!components/popup/message',
     'react',
     'load!stores/popupStore',
     'load!actions/actions',
     'classnames'
 ], function(
     Locations,
-    // Message,
     React,
     popupStore,
     Act,
@@ -46,6 +44,7 @@ define([
                     if (this.state.props.image) {
                         content = <img src={this.state.props.image} />
                     } else {
+                        console.log(this.state.props.content);
                         content = this.state.props.content ? <p dangerouslySetInnerHTML={ {__html: this.state.props.content} } /> : null;
                     }
                     break;
@@ -64,7 +63,7 @@ define([
                     <div className={cn('row')}>
                         <div id={cn('modal_content')} className={cn('modal_content')}>
                             <div className={cn('modal_content_top')}>
-                                <h4>{title}</h4>
+                                <h4 dangerouslySetInnerHTML={ {__html: title} } />
                                 <button onClick={this._handleCloseClick} className={cn(['brand_btn_light', 'btn_small', 'modal_close'])} title="Close this modal" aria-label="Close this modal"><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE5C9;' }} /> Close</button>
                             </div>
                             {content}
@@ -81,6 +80,7 @@ define([
                 isHidden: popupStore.isHidden()
             });
         },
+
         _handleCloseClick: function() {
             Act.Popup.close();
         }

@@ -14,6 +14,7 @@
         end: "}());"
     },
 	paths: {
+	  'isMobile': 'bower_components/isMobile/isMobile',
 	  'moment': 'bower_components/moment/moment',
 	  'react': 'bower_components/react/react',
 	  'reactDOM': 'bower_components/react/react-dom',

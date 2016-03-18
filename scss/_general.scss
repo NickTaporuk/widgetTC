@@ -29,6 +29,10 @@ body {
 }
 
 #tcwlw_widget {
+	sup {
+		vertical-align: 0.5em;
+	}
+
 	@include margin-bottom($baseSpacing);
 
 	.tcwlw_wrapper {

@@ -129,6 +129,7 @@ define([
                                 <div className={cn('control_wrapper')}>
                                     <label htmlFor={cn('order_notes')}>Notes</label>
                                     <textarea id={cn('order_notes')} defaultValue={this.state.values.notes} ref="notes" disabled={this.state.status == 'incomplete'} />
+                                    {this._getError('notes')}
                                 </div>
                             </fieldset>
                             <div className={cn(['sixcol', 'last', 'col_right', 'order_info'])}>
@@ -171,6 +172,14 @@ define([
                                                 <td>Sub-total</td>
                                                 <td>${h.priceFormat(quote.total.sub_total)}</td>
                                             </tr>
+                                            {
+                                                quote.discount && quote.discount.applied
+                                                ?   <tr>
+                                                        <td>Discount</td>
+                                                        <td>${h.priceFormat(quote.discount.total_value)}</td>
+                                                    </tr> 
+                                                :   null
+                                            }
                                             { recyclingFee && quote.recycling_fee.is_taxable ? recyclingFee : null }
                                             <tr>
                                                 <td>{quote.tax.name}</td>

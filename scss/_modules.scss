@@ -134,8 +134,9 @@
 			@include margin-right(1);
 		}
 
-		.tcwlw_col_left,
-		.tcwlw_col_right {
+		// .tcwlw_col_left,
+		// .tcwlw_col_right {
+		> div {
 			[class*="btn"] {
 				width: 100%;
 				display: block;

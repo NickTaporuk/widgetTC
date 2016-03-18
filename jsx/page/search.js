@@ -105,72 +105,80 @@ define([
             var contents = [
                 <div key={1} className={cn(['tab_cont', 'search_fields', 'by_vehicle_tab'])} id={cn('by_vehicle_tab')} role="tabpanel" tabIndex="0" aria-hidden={this.state.activeTab !== 'vehicle'}>
                     <fieldset className={cn('fields_wrapper')}>
-                        <SelectField 
-                                    options={this.state.fieldOptions.year}                                                                     
-                                    value={this.state.fieldValues.vehicle.year} onChange={this._handleVehicleChange} 
-                                    name="vehicle_year" label="Choose Year"
-                                    className={cn(['sixcol', 'field'])} require={true} />
-                        <SelectField 
-                                    options={this.state.fieldOptions.make}          
-                                    value={this.state.fieldValues.vehicle.make} onChange={this._handleVehicleChange}
-                                    name="vehicle_make" label="Choose Make" require={true}
-                                    className={cn(['sixcol', 'last', 'field'])} disabled={this.state.fieldOptions.make.length <= 0} />
-                        <SelectField 
-                                    options={this.state.fieldOptions.model}         
-                                    value={this.state.fieldValues.vehicle.model} onChange={this._handleVehicleChange}
-                                    name="vehicle_model" label="Choose Model"
-                                    className={cn(['sixcol', 'field'])} disabled={this.state.fieldOptions.model.length <= 0} require="1" />
-                        <SelectField 
-                                    options={this.state.fieldOptions.trim}          
-                                    value={this.state.fieldValues.vehicle.trim} onChange={this._handleVehicleChange}
-                                    name="vehicle_trim" label="Choose Trim"
-                                    className={cn(['sixcol', 'last', 'field'])} disabled={this.state.fieldOptions.trim.length <= 0} require="1" />
-                        <SelectField 
-                                    options={this.state.fieldOptions.base_category}                                                            
-                                    value={this.state.fieldValues.vehicle.base_category} onChange={this._handleFieldChange} 
-                                    name="vehicle_base_category" label="Tire Category"
-                                    className={cn(['sixcol', 'field'])} emptyDesc="All Tires" />
-                        <SelectField 
-                                    options={this.state.fieldOptions.car_tire_id}   
-                                    value={this.state.fieldValues.vehicle.car_tire_id} onChange={this._handleFieldChange}
-                                    name="vehicle_car_tire_id" label="Tire Size"    
-                                    className={cn(['sixcol', 'last', 'field'])} disabled={this.state.fieldOptions.car_tire_id.length <= 0} require="1" emptyDesc={false}/>
+                        <div className={cn(['sixcol', 'fields_wrapper_1'])}>
+                            <SelectField 
+                                        options={this.state.fieldOptions.year}                                                                     
+                                        value={this.state.fieldValues.vehicle.year} onChange={this._handleVehicleChange} 
+                                        name="vehicle_year" label="Choose Year"
+                                        className={cn(['field'])} require={true} />
+                            <SelectField 
+                                        options={this.state.fieldOptions.make}          
+                                        value={this.state.fieldValues.vehicle.make} onChange={this._handleVehicleChange}
+                                        name="vehicle_make" label="Choose Make" require={true}
+                                        className={cn(['last', 'field'])} disabled={this.state.fieldOptions.make.length <= 0} />
+                            <SelectField 
+                                        options={this.state.fieldOptions.model}         
+                                        value={this.state.fieldValues.vehicle.model} onChange={this._handleVehicleChange}
+                                        name="vehicle_model" label="Choose Model"
+                                        className={cn(['field'])} disabled={this.state.fieldOptions.model.length <= 0} require="1" />
+                        </div>
+                        <div className={cn(['sixcol', 'last', 'fields_wrapper_2'])}>
+                            <SelectField 
+                                        options={this.state.fieldOptions.trim}          
+                                        value={this.state.fieldValues.vehicle.trim} onChange={this._handleVehicleChange}
+                                        name="vehicle_trim" label="Choose Trim"
+                                        className={cn(['last', 'field'])} disabled={this.state.fieldOptions.trim.length <= 0} require="1" />
+                            <SelectField 
+                                        options={this.state.fieldOptions.car_tire_id}   
+                                        value={this.state.fieldValues.vehicle.car_tire_id} onChange={this._handleFieldChange}
+                                        name="vehicle_car_tire_id" label="Tire Size"    
+                                        className={cn(['last', 'field'])} disabled={this.state.fieldOptions.car_tire_id.length <= 0} require="1" emptyDesc={false}/>
+                            <SelectField 
+                                        options={this.state.fieldOptions.base_category}                                                            
+                                        value={this.state.fieldValues.vehicle.base_category} onChange={this._handleFieldChange} 
+                                        name="vehicle_base_category" label="Tire Category"
+                                        className={cn(['field'])} emptyDesc="All Tires" />
+                        </div>
                         
                         <button type="submit" disabled={!this._isReadyForSearch()} className={cn(['btn', 'brand_btn'])}><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE8B6;' }} /> Find Your Tires</button>
                     </fieldset>
                 </div>,
                 <div key={2} className={cn(['tab_cont', 'search_fields', 'by_tire_size_tab'])} id={cn('by_tire_size_tab')} role="tabpanel" tabIndex="0" aria-hidden={this.state.activeTab !== 'size'}>
                     <fieldset className={cn('fields_wrapper')}>
-                        <SelectField 
-                                    options={this.state.fieldOptions.width}         
-                                    value={this.state.fieldValues.size.width} onChange={this._handleFieldChange}          
-                                    name="size_width" label="Choose Width"  
-                                    className={cn(['sixcol', 'field'])} require="1" />
-                        <SelectField 
-                                    options={this.state.fieldOptions.height}        
-                                    value={this.state.fieldValues.size.height} onChange={this._handleFieldChange}  
-                                    name="size_height" label="Choose Height" require="1" 
-                                    className={cn(['sixcol', 'last', 'field'])} />
-                        <SelectField 
-                                    options={this.state.fieldOptions.rim}           
-                                    value={this.state.fieldValues.size.rim} onChange={this._handleFieldChange} 
-                                    name="size_rim" label="Choose Rim"    
-                                    className={cn(['sixcol', 'field'])} require="1" />
-                        <SelectField 
-                                    options={this.state.fieldOptions.base_category} 
-                                    value={this.state.fieldValues.size.base_category} onChange={this._handleFieldChange} 
-                                    name="size_base_category" label="Tire Category"
-                                    className={cn(['sixcol', 'last', 'field'])} emptyDesc="All Tires" />
-                        <SelectField 
-                                    options={this.state.fieldOptions.speed_rating} 
-                                    value={this.state.fieldValues.size.speed_rating} onChange={this._handleFieldChange} 
-                                    name="size_speed_rating" label="Speed Rating" 
-                                    className={cn(['sixcol', 'field'])}  />
-                        <SelectField 
-                                    options={this.state.fieldOptions.load_index} 
-                                    value={this.state.fieldValues.size.load_index} onChange={this._handleFieldChange} 
-                                    name="size_load_index" label="Load Index" 
-                                    className={cn(['sixcol', 'last', 'field'])} />
+                        <div className={cn(['sixcol', 'fields_wrapper_1'])}>
+                            <SelectField 
+                                        options={this.state.fieldOptions.width}         
+                                        value={this.state.fieldValues.size.width} onChange={this._handleFieldChange}          
+                                        name="size_width" label="Choose Width"  
+                                        className={cn(['field'])} require="1" />
+                            <SelectField 
+                                        options={this.state.fieldOptions.height}        
+                                        value={this.state.fieldValues.size.height} onChange={this._handleFieldChange}  
+                                        name="size_height" label="Choose Height" require="1" 
+                                        className={cn(['last', 'field'])} />
+                            <SelectField 
+                                        options={this.state.fieldOptions.rim}           
+                                        value={this.state.fieldValues.size.rim} onChange={this._handleFieldChange} 
+                                        name="size_rim" label="Choose Rim"    
+                                        className={cn(['field'])} require="1" />
+                        </div>
+                        <div className={cn(['sixcol', 'last', 'fields_wrapper_2'])}>
+                            <SelectField 
+                                        options={this.state.fieldOptions.speed_rating} 
+                                        value={this.state.fieldValues.size.speed_rating} onChange={this._handleFieldChange} 
+                                        name="size_speed_rating" label="Speed Rating" 
+                                        className={cn(['field'])}  />
+                            <SelectField 
+                                        options={this.state.fieldOptions.load_index} 
+                                        value={this.state.fieldValues.size.load_index} onChange={this._handleFieldChange} 
+                                        name="size_load_index" label="Load Index" 
+                                        className={cn(['last', 'field'])} />
+                            <SelectField 
+                                        options={this.state.fieldOptions.base_category} 
+                                        value={this.state.fieldValues.size.base_category} onChange={this._handleFieldChange} 
+                                        name="size_base_category" label="Tire Category"
+                                        className={cn(['last', 'field'])} emptyDesc="All Tires" />
+                        </div>
 
                         <button type="submit" disabled={!this._isReadyForSearch()} className={cn(['btn', 'brand_btn'])}><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE8B6;' }} /> Find Your Tires</button>
                     </fieldset>
@@ -179,14 +187,12 @@ define([
             if (config.sa) {
                 contents.push((
                     <div key={3} className={cn(['tab_cont', 'search_fields', 'by_part_number_tab'])} id={cn('by_part_number_tab')} role="tabpanel" tabIndex="0" aria-hidden={this.state.activeTab !== 'part_number'}>
-                        <fieldset>
-                            <div className={cn('row')}>
-                                <div className={cn(['sixcol', 'field'])}>
-                                    <label htmlFor={cn('part_number')}>
-                                        <span>Enter part number </span><span className="req">*</span>
-                                    </label>
-                                    <input onChange={this._handleFieldChange} type="text" id={cn('part_number')} name="part_number" value={this.state.fieldValues.part_number.part_number} />
-                                </div>
+                        <fieldset className={cn('fields_wrapper')}>
+                            <div className={cn(['sixcol'])}>
+                                <label htmlFor={cn('part_number')}>
+                                    <span>Enter part number </span><span className="req">*</span>
+                                </label>
+                                <input onChange={this._handleFieldChange} type="text" id={cn('part_number')} name="part_number" value={this.state.fieldValues.part_number.part_number} />
                             </div>
                             <button type="submit" disabled={!this._isReadyForSearch()} className={cn(['btn', 'brand_btn'])}><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE8B6;' }} /> Find Your Tires</button>
                         </fieldset>
@@ -234,7 +240,7 @@ define([
             if (event) {
                 event.preventDefault();
             }
-            Act.Tire.search();
+            Act.Tire.search(null, 1);
         },
 
         _handleFieldChange: function(event) {

@@ -205,6 +205,7 @@
 				max-height: none;
 				padding: 0;
 				border: none;
+				@include width(27);
 				@include box-shadow(none);
 
 				&.tcwlw_toggle_hidden {
@@ -242,11 +243,18 @@
 				@include box();
 				position: absolute;
 				max-height: 296px;
+				@include width(29);
 				@include padding($baseSpacing/2, $baseSpacing/2, $baseSpacing/3);
 
 				&.tcwlw_toggle_hidden {
 					display: none;
 				}
+			}
+		}
+
+		@include tireconnect-width(tiny) {
+			.tcwlw_filters_wrapper {
+				width: 100%;
 			}
 		}
 	}

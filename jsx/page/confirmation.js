@@ -97,7 +97,7 @@ define([
                                     </tr>
                                     { recyclingFee && quote.recycling_fee.is_taxable ? null : recyclingFee }
                                     <tr className={cn('dark')}>
-                                        <td>Total Price:</td>
+                                        <td><sup dangerouslySetInnerHTML={{ __html: '&#8224;' }} />Total Price:</td>
                                         <td>${h.priceFormat(quote.total.price)}</td>
                                     </tr>
                                     <tr>

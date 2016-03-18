@@ -13,13 +13,15 @@ define([
             return {
                 isShown: false,
                 checkedValues: [],
-                allValues: []
+                allValues: [],
+
             }
         },
 
         getDefaultProps: function() {
             return {
-                allDesc: 'All'
+                allDesc: 'All',
+                defaultValue: []
             }
         },
 
@@ -30,7 +32,7 @@ define([
             }, this);
 
             this.setState({
-                checkedValues: allValues,
+                checkedValues: this.props.defaultValue.length > 0 ? this.props.defaultValue : allValues,
                 allValues: allValues
             });
         },
@@ -40,8 +42,6 @@ define([
         },
 
         render: function() {
-            // console.log('filter render start');
-            
             var list = [];
 
             this.props.params.map(function(option, i) {
@@ -89,6 +89,9 @@ define([
 
         _handleFieldChange: function(event) {
             var value = event.target.value;
+            if (!isNaN(parseInt(value))) {
+                value = parseInt(value);
+            }
 
             var checkedValues = _.cloneDeep(this.state.checkedValues);
 
