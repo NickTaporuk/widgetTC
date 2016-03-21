@@ -1,4 +1,6 @@
 define([
+    'reactDOM',
+    'lib/helper',
     'load!components/page/search',
     'load!components/page/results',
     'load!components/page/summary',
@@ -17,6 +19,8 @@ define([
     'classnames',
     'config'
 ], function(
+    ReactDOM,
+    h,
     Search,
     Results,
     Summary,
@@ -59,7 +63,6 @@ define([
         },
 
         _getContent: function() {
-
             var content = null;
             switch (this.state.name) {
                 case 'search':
@@ -164,6 +167,18 @@ define([
                 name: pageStore.getPageName(),
                 props: pageStore.getProps()
             });
+            this._scrollToTop();
+        },
+
+        _scrollToTop: function() {
+            var scrollPos = h.getScrollPos();
+            var widget = document.getElementById(cn('widget'));
+            var offset = h.getOffset(widget);
+
+            if (scrollPos[1] > offset.top) {
+                var winHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+                window.scrollTo(0, offset.top - winHeight/8);
+            }
         }
     };
 

@@ -11,7 +11,7 @@
 #tcwlw_widget,
 #tcwlw_widget_outer {
 	font-family: $fontSans;
-	font-size: 62.5%;
+	font-size: 10px; //62.5%;
 	line-height: 1.5;
 	color: $grayDarkest;
 
@@ -21,6 +21,7 @@
 	}
 
 	a {
+		text-decoration: underline;
 		@include font-size($baseFontSize);
 		color: $linkColor;
 		@include transition();

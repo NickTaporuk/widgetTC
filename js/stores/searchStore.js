@@ -198,10 +198,14 @@ define([
                     break;
                 case constants.LOAD_DEALER_CONFIG_SUCCESS:
                     var c = payload.config;
-                    setValue('common', 'order_by', c.default_order.iframe);
+                    if (c.default_order.iframe) {
+                        setValue('common', 'order_by', c.default_order.iframe);
+                    }
                     setValue('size', 'base_category', c.default_base_category);
                     setValue('vehicle', 'base_category', c.default_base_category);
-                    activeSection = c.default_searching.iframe.replace('by_', '');
+                    if (c.default_searching.iframe) {
+                        activeSection = c.default_searching.iframe.replace('by_', '');
+                    }
                     change = true;
                     break;
                 case 'search.active_section.update':
