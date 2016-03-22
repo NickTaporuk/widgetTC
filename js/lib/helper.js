@@ -1,5 +1,5 @@
 define(['config'], function(config) {
-	return {
+	var h = {
 		priceFormat: function(_number,_decimal,_separator)
 		{
 		  var decimal = (typeof(_decimal) != 'undefined') ? _decimal : 2;
@@ -89,6 +89,17 @@ define(['config'], function(config) {
 			 	sy= r.scrollTop || b.scrollTop || 0;
 			 	return [sx, sy];
 			}
-		}
+		},
+		scrollToTop: function(el) {
+            var scrollPos = h.getScrollPos();
+            var offset = h.getOffset(el);
+
+            if (scrollPos[1] > offset.top) {
+                var winHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+                window.scrollTo(0, offset.top - winHeight/8);
+            }
+        }
 	}
+
+	return h;
 });

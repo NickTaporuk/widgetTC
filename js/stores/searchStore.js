@@ -198,31 +198,22 @@ define([
                     break;
                 case constants.LOAD_DEALER_CONFIG_SUCCESS:
                     var c = payload.config;
-                    if (c.default_order.iframe) {
-                        setValue('common', 'order_by', c.default_order.iframe);
+                    if (c.default_order) {
+                        setValue('common', 'order_by', c.default_order);
                     }
                     setValue('size', 'base_category', c.default_base_category);
                     setValue('vehicle', 'base_category', c.default_base_category);
-                    if (c.default_searching.iframe) {
-                        activeSection = c.default_searching.iframe.replace('by_', '');
+                    if (c.default_searching) {
+                        activeSection = c.default_searching.replace('by_', '');
                     }
                     change = true;
                     break;
+                    
                 case 'search.active_section.update':
                     activeSection = payload.section;
                     change = true;
                     break;
-                // case 'page.update':
-                //     var pageStore = require('load!stores/pageStore');
-                //     dispatcher.waitFor([pageStore.dispatchToken]);
-                //     if (pageStore.getPageName() == 'search') {
-                //         setDefaultValue('display');
-                //         setDefaultValue('brand');
-                //         setDefaultValue('run_flat');
-                //         setDefaultValue('light_truck');
-                //         change = true;
-                //     }
-                //     break;
+
                 case constants.GET_VEHICLE_YEARS_SUCCESS:
                 case constants.GET_VEHICLE_MAKES_SUCCESS:
                 case constants.GET_VEHICLE_MODELS_SUCCESS:

@@ -1,5 +1,7 @@
 define([
     'react',
+    'reactDOM',
+    'lib/helper',
     'classnames',
     'lodash',
     'load!actions/actions',
@@ -10,6 +12,8 @@ define([
     'load!components/page/results/filterBlock'
 ], function(
     React,
+    ReactDOM ,
+    h,
     cn,
     _,
     Act,
@@ -35,11 +39,19 @@ define([
         componentWillMount: function() {
             this._updateStatus();
         },
+
         componentDidMount: function() {
             resultsStore.bind('change', this._updateStatus);
         },
+
         componentWillUnmount: function() {
             resultsStore.unbind('change', this._updateStatus);    
+        },
+
+        componentDidUpdate: function(prevProps, prevState) {
+            if (this.state.page !== prevState.page) {   //|| this.state.totalCount !== prevState.totalCount
+                this._scrollToTop();
+            }
         },
 
         render: function() {
@@ -53,8 +65,8 @@ define([
             var filters = null;
             if (Object.keys(this.state.filters).length > 0) {
                 var filtersInfo = [
-                    {key: 'run_flat', desc: 'Run-Flat', all: ''}, 
-                    {key: 'light_truck', desc: 'Light Track', all: ''}, 
+                    {key: 'run_flat', desc: 'Run-Flat', all: 'All/None'}, 
+                    {key: 'light_truck', desc: 'Light Track', all: 'All/None'}, 
                     {key: 'brand', desc: 'Brand', all: 'All Brands'},
                     {key: 'category', desc: 'Category', all: 'All Categories'}
                 ];
@@ -128,25 +140,35 @@ define([
                 itemsOnPage: resultsStore.getItemsPerPage()
             })
         },
+
+        _scrollToTop: function() {
+            var results = ReactDOM.findDOMNode(this);
+            h.scrollToTop(results);
+        },
+
         _handleBackClick: function(event) {
             event.preventDefault();
             Act.Page.show('search');
         },
+
         _handleToggleBrandsClick: function(event) {
             event.preventDefault();
             this.setState({
                 isBrandsShown: !this.state.isBrandsShown
             });
         },
+
         _handleFieldChange: function(event) {
             var fieldName = event.target.name.replace('filter_', '');
             Act.Search.updateField('common', fieldName, event.target.value);
             Act.Tire.search();
         },
+
         _handleFilterChange: function(name, values, event) {
             Act.Search.updateField('common', name, values);
             Act.Tire.search();
         },
+
         _handlePageClick: function(page, event) {
             event.preventDefault();
             Act.Tire.search({page: page});

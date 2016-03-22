@@ -1,14 +1,18 @@
 define([
     'react',
     'classnames',
-    'lodash'
+    'lodash',
+    'load!mixins/visibilityToggle'
 ], function(
     React,
     cn,
-    _
+    _,
+    visibilityToggle
 ) {
 
     return {
+        mixins: [visibilityToggle],
+
         getInitialState: function() {
             return {
                 isShown: false,
@@ -36,7 +40,7 @@ define([
                 allValues: allValues
             });
         },
-        
+
         shouldComponentUpdate: function(nextProps, nextState) {
             return this.state.checkedValues.length !== nextState.checkedValues.length || this.state.isShown !== nextState.isShown;
         },
@@ -56,7 +60,7 @@ define([
 
 
             var allCheckbox = null;
-            if (this.props.params.length > 2 && this.props.allDesc) {
+            if (this.props.params.length > 1 && this.props.allDesc) {
                 allCheckbox = <li>
                     <label className={cn('filters_all')}>
                         <input type="checkbox" defaultChecked={true} onClick={this._handleAllClick} /> {this.props.allDesc}
@@ -65,10 +69,10 @@ define([
             }
 
             return (
-                <div className={cn('filters_wrapper')}>
-                    <h4 className={cn('filters_title')}>
+                <div className={cn('filters_wrapper')} onMouseDown={this._handleMouseDown} onMouseUp={this._handleMouseUp}>
+                    <h4 className={cn('filters_title')} onMouseDown={this._handleToggleBtnMouseDown}>
                         <span>{ 'Filter by ' + this.props.by + ':'}</span>
-                        <a href="#brands_filters_list" onClick={this._handleToggleClick} className={cn(['toggle', 'filters_toggle']) + ' ' + cn({'toggle_open': this.state.isShown})}>
+                        <a href="javascript:;" className={cn(['toggle', 'filters_toggle']) + ' ' + cn({'toggle_open': this.state.isShown})}>
                             <i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE145;' }} />{'Toggle ' + this.props.by}
                         </a>
                     </h4>
@@ -78,13 +82,6 @@ define([
                     </ul>
                 </div>
             );
-        },
-
-        _handleToggleClick: function(event) {
-            event.preventDefault();
-            this.setState({
-                isShown: !this.state.isShown
-            });
         },
 
         _handleFieldChange: function(event) {

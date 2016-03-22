@@ -40,7 +40,7 @@ define([
     config
 ) {
 
-    return {
+    var Page = {
         displayName: 'Page',
 
         getInitialState: function() {
@@ -56,6 +56,14 @@ define([
 
         componentWillUnmount: function() {
             pageStore.unbind('change', this._changeState);
+        },
+
+        componentDidUpdate: function() {
+            if (this.state.props.lastScrollPos) {
+                window.scrollTo(0, this.state.props.lastScrollPos);
+            } else {
+                this._scrollToTop();
+            }
         },
 
         render: function() {
@@ -167,19 +175,13 @@ define([
                 name: pageStore.getPageName(),
                 props: pageStore.getProps()
             });
-            this._scrollToTop();
         },
 
         _scrollToTop: function() {
-            var scrollPos = h.getScrollPos();
             var widget = document.getElementById(cn('widget'));
-            var offset = h.getOffset(widget);
-
-            if (scrollPos[1] > offset.top) {
-                var winHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
-                window.scrollTo(0, offset.top - winHeight/8);
-            }
+            h.scrollToTop(widget);
         }
-    };
+    }
 
+    return Page;
 });
