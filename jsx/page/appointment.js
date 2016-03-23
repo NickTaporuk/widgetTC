@@ -1,28 +1,51 @@
 define([
     'react',
+    'config',
     'classnames',
     'load!actions/actions',
     'lib/helper',
     'load!stores/customerStore',
     'load!stores/vehicleStore',
     'load!components/elements/select',
+    'load!components/page/common/mainPrices',
     'components/datetime/DateTime',
     'moment'
 ], function(
     React,
+    config,
     cn,
     Act,
     h,
     customerStore,
     vehicleStore,
     SelectField,
+    MainPrices,
     DateTime,
     moment
 ) {
 
+    var types = {
+        email: {
+            submit: {action: Act.Quote.email, text: 'Send email'},
+            back:   {to: config.sa ? 'summary' : 'quote', text: 'Back'}
+        },
+        print: {
+            submit: {action: Act.Quote.print, text: 'Print quote'},
+            back:   {to: config.sa ? 'summary' : 'quote', text: 'Back'}
+        },
+        request: {
+            submit: {action: Act.Quote.request, text: 'Request quote'},
+            back:   {to: 'results', text: 'Back to results'}
+        },
+        appointment: {
+            submit: {action: Act.Quote.sendAppointment, text: 'Send'},
+            back:   {to: 'summary', text: 'Back to summary'}
+        }
+    };
+
     return {
         componentWillMount: function() {
-            this._updateState();
+            this._updateState(true);
         },
         componentDidMount: function() {
             customerStore.bind('change', this._updateState);
@@ -34,16 +57,7 @@ define([
         },
 
         render: function() {
-            var quote = this.props.quote;
             var tire = this.props.tire;
-
-            var recyclingFee = null;
-            if (quote.recycling_fee) {
-                recyclingFee = <tr>
-                    <td>{quote.recycling_fee.name}</td>
-                    <td>${h.priceFormat(quote.recycling_fee.total_value)}</td>
-                </tr>;
-            }
 
             return (
                 <div>
@@ -118,51 +132,8 @@ define([
                                     {this._getError('vehicle_info')}
                                 </div>
 
-                                {/*<div className={cn('twelvecol')}>
-                                    <div className={cn(['fivecol', 'quote_tire'])}>
-                                        <img src={tire.brand_logo} alt="Falken Tire" className={cn('result_brand_logo')} />
-                                        <img src={tire.image} alt="An image of the tire" className={cn('result_tire')} />
-                                    </div>
-                                    <p className={cn(['sevencol', 'last'])}>Contact us now to and setup a time to speak with one of our representatives. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris mollis turpis a sapien cursus dictum. </p>
-                                </div>*/}
-                                {this.props.type !== 'request' 
-                                    ?   <div className={cn('table_wrapper')}>
-                                            <table className={cn('table')}>
-                                                <thead>
-                                                    <tr>
-                                                        <th>Total</th>
-                                                        <th></th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <tr>
-                                                        <td>Sub-total</td>
-                                                        <td>${h.priceFormat(quote.total.sub_total)}</td>
-                                                    </tr>
-                                                    {
-                                                        quote.discount && quote.discount.applied
-                                                        ?   <tr>
-                                                                <td>Discount</td>
-                                                                <td>${h.priceFormat(quote.discount.total_value)}</td>
-                                                            </tr> 
-                                                        :   null
-                                                    }
-
-                                                    { recyclingFee && quote.recycling_fee.is_taxable ? recyclingFee : null }
-                                                    <tr>
-                                                        <td>{quote.tax.name}</td>
-                                                        <td>${h.priceFormat(quote.tax.total_value)}</td>
-                                                    </tr>
-                                                    { recyclingFee && quote.recycling_fee.is_taxable ? null : recyclingFee }
-                                                </tbody>
-                                                <tfoot>
-                                                    <tr className={cn('light')}>
-                                                        <td>Total Price:</td>
-                                                        <td>${h.priceFormat(quote.total.price)}</td>
-                                                    </tr>
-                                                </tfoot>
-                                            </table>
-                                        </div>
+                                {this.props.type !== 'request'
+                                    ?   <MainPrices quote={this.props.quote} />
                                     :   <div className={cn('twelvecol')}>
                                             <div className={cn(['fivecol', 'quote_tire'])}>
                                                 <img src={tire.brand_logo} alt="Falken Tire" className={cn('result_brand_logo')} />
@@ -191,32 +162,11 @@ define([
         },
 
         _getBackLink: function() {
-            var text = 'Back';
-            switch (this.props.type) {
-                case 'request':
-                    text = 'Back to your results';
-                    break;
-                case 'appointment':
-                    text = 'Back to your summary';
-                    break;
-            }
+            var text =  types[this.props.type].back.text;
             return <a href="#summary" onClick={this._handleBackClick} className={cn('back_link')}><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE5C4;' }} />{text}</a>
         },
         _getBtn: function() {
-            var text;
-            switch (this.props.type) {
-                case 'print':
-                    text = 'Print quote';
-                    break;
-                case 'request':
-                    text = 'Request quote';
-                    break;
-                case 'email':
-                    text = 'Send email';
-                    break;
-                default:
-                    text = 'Send';
-            }
+            var text = types[this.props.type].submit.text;
             return <button type="submit" className={cn('brand_btn')}><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE0BE;' }} /> {text}</button>
         },
         _getError: function(fieldName) {
@@ -228,27 +178,18 @@ define([
                 return null;
             }
         },
-        _updateState: function() {
+        _updateState: function(isInit) {
             var values = customerStore.getCustomer();
 
             this.setState({
-                errors: customerStore.getValidationErrors(),
+                errors: isInit ? {} : customerStore.getValidationErrors(),
                 values: values,
                 options: vehicleStore.getAll(values.vehicle.year, values.vehicle.make, values.vehicle.model, values.vehicle.trim)
             });
         },
         _handleBackClick: function(event) {
             event.preventDefault();
-            switch (this.props.type) {
-                case 'request':
-                    Act.Page.show('results');
-                    break;
-                case 'appointment':
-                    Act.Page.show('summary');
-                    break;
-                default:
-                    Act.Page.show('quote');
-            }
+            Act.Page.show(types[this.props.type].back.to);
         },
         _handleFormSubmit: function(event) {
             event.preventDefault();
@@ -266,19 +207,7 @@ define([
                 values.way_to_contact = this.refs.way_to_contact.value;
             }
 
-            switch (this.props.type) {
-                case 'email':
-                    Act.Quote.email(true, values);
-                    break;
-                case 'print':
-                    Act.Quote.print(true, values);
-                    break;
-                case 'request':
-                    Act.Quote.request(values);
-                    break;
-                default:
-                    Act.Quote.sendAppointment(values);
-            }
+            types[this.props.type].submit.action(values);
         },
 
         _getVehicleInfo: function() {

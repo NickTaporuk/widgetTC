@@ -2,30 +2,13 @@ define([
     'react',
     'classnames',
     'load!actions/actions'
-    // 'lib/helper'
-    // 'load!stores/customerStore',
 ], function(
     React,
     cn,
     Act
-    // h
-    // customerStore
 ) {
-
    
     return {
-        /*
-        componentWillMount: function() {
-            this._updateState();
-        },
-        componentDidMount: function() {
-            customerStore.bind('change', this._updateState);
-        },
-        componentWillUnmount: function() {
-            customerStore.unbind('change', this._updateState);    
-        }, 
-        */
-
         render: function() {
             return (
                 <div>
@@ -48,36 +31,14 @@ define([
                             </p>
                             <div className={cn('control_wrapper')}>
                                 <label>
-                                    <input type="checkbox" ref="follow_up" /> Request a callback
+                                    <input type="checkbox" ref="follow_up" defaultChecked={this.props.followUp} /> Request a callback
                                 </label>
                             </div>
-                            {/*
-                            <p>A tire specialist is standing by to call and answer any questions you may have or help you schedule an appointment.</p>
-                            <form action="#quote_submit" onSubmit={this._handleEmailClick} className={cn('appointment_form')}>
-                                <fieldset>
-                                    <div className={cn('control_wrapper')}>
-                                        <label htmlFor={cn('order_email')}>Email Address <span className="req">*</span></label>
-                                        <input type="email" id={cn('order_email')} defaultValue={this.state.email} required ref="email" />
-                                    </div> 
-                                    <div className={cn('control_wrapper')}>
-                                        <label>
-                                            <input type="checkbox" ref="follow_up" /> Please follow up regarding this quote
-                                        </label>
-                                    </div>
-                                    <button type="submit" className={cn('brand_btn')}><i className={cn('material_icons')}>&#xE0BE;</i> Send</button>
-                                </fieldset>
-                            </form>
-                            */}
                         </div>
-                        {/*
-                        <div className={cn(['sixcol', 'last', 'quote_right'])}>
-                            {/*<h3>Email Yourself</h3>
-                        </div>*/}
                     </div>
                 </div>
             );
         },
-
 
         _handleBackClick: function(event) {
             event.preventDefault();
@@ -87,23 +48,21 @@ define([
         _handlePrintClick: function(event) {
             event.preventDefault();
             if ( this.refs.follow_up.checked ) {
-                Act.Quote.appointmentForm('print');
+                Act.Quote.appointmentForm('print', {follow_up: true});
             } else {
-                Act.Quote.print();
+                Act.Quote.print({follow_up: false});
             }
         },
         
         _handleEmailClick: function(event) {
             event.preventDefault();
             if ( this.refs.follow_up.checked ) {
-                Act.Quote.appointmentForm('email');
+                Act.Quote.appointmentForm('email', {follow_up: true});
             } else {
-                Act.Quote.emailForm();
+                Act.Quote.emailForm({follow_up: false});
             }  
         }
-     
-
-    } 
+    }
 
 
 });

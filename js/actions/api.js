@@ -2,6 +2,8 @@ define([
     'dispatcher',
     'ajax',
     'isMobile',
+    'validate',
+    'moment',
     'load!actions/constants',
     'load!stores/vehicleStore',
     'config'
@@ -9,6 +11,8 @@ define([
     dispatcher,
     ajax,
     isMobile,
+    validate,
+    moment,
     constants,
     vehicleStore,
     config
@@ -44,6 +48,56 @@ define([
 
         return newOptions;
     }
+
+    validate.extend(validate.validators.datetime, {
+        // The value is guaranteed not to be null or undefined but otherwise it
+        // could be anything.
+        parse: function(value, options) {
+            return +moment(value);
+        },
+        // Input is a unix timestamp
+        format: function(value, options) {
+            var format = options.dateOnly ? 'YYYY-MM-DD' : this.timeFormat;
+            return moment(value).format(format);
+        }
+    });
+
+    function validateParamsForQuote(values, requiredParams) {
+        var constraints = {
+            name: {
+                length: {maximum: 255}
+            },
+            email: {
+                email: true,
+                length: {maximum: 255}
+            },
+            phone: {
+                format: {
+                    pattern: "^\\(?[0-9]{3}\\)?[-. ]?[0-9]{3}[-. ]?[0-9]{4}$",
+                    message: "is not valid phone number"
+                }
+            },
+            preferred_time: {
+                datetime: {
+                    earliest: moment()
+                },
+            },
+            notes: {
+                length: {maximum: 500}
+            }
+        };
+
+        if (requiredParams) {
+            requiredParams.map(function(field) {
+                if (!constraints[field]) {
+                    constraints[field] = {};
+                }
+                constraints[field].presence = true;
+            });
+        }
+        return validate(values, constraints);
+    }
+
 
     Api = {
         loadLocations: function() {
@@ -274,7 +328,7 @@ define([
             });
         },
 
-        loadQuote: function(tireId, quantity, services, withDiscount, customDiscount) {
+        loadQuote: function(tireId, quantity, services, withDiscount, customDiscount, track) {
             ajax.make({
                 url: 'quote/display',
                 method: 'post',
@@ -283,7 +337,8 @@ define([
                     quantity: quantity,
                     optional_services: services || 'use_default',
                     with_discount: withDiscount || false,
-                    custom_discount: customDiscount || null
+                    custom_discount: customDiscount || null,
+                    track: track || null
                 },
                 success: function(response) {
                     var quote = response.data;
@@ -304,106 +359,142 @@ define([
         },
 
         sendAppointment: function(data) {
-            ajax.make({
-                url: 'quote/appointment',
-                method: 'post',
-                data: data,
-                success: function(response) {
-                    dispatcher.dispatch({
-                        actionType: constants.SEND_APPOINTMENT_SUCCESS,
-                        title: 'Thank you!', 
-                        content: response.notice
-                    });
-                },
-                error: function(response) {
-                    if (response.error_code == 400001) {
+            var dispatchError = function(errors) {
+                dispatcher.dispatch({
+                    actionType: constants.SEND_APPOINTMENT_ERROR,
+                    errors: errors
+                });
+            };
+
+            var validationErrors = validateParamsForQuote(data, ['name', 'email', 'phone', 'vehicle_info']);  
+            if (validationErrors) {
+                dispatchError(validationErrors);
+            } else {
+                ajax.make({
+                    url: 'quote/appointment',
+                    method: 'post',
+                    data: data,
+                    success: function(response) {
                         dispatcher.dispatch({
-                            actionType: constants.SEND_APPOINTMENT_ERROR,
-                            errors: response.errors
+                            actionType: constants.SEND_APPOINTMENT_SUCCESS,
+                            title: 'Thank you!', 
+                            content: response.notice
                         });
-                    } else {
-                        ajax.error(response);
+                    },
+                    error: function(response) {
+                        if (response.error_code == 400001) {
+                            dispatchError(response.errors);
+                        } else {
+                            ajax.error(response);
+                        }
                     }
-                }
-            });
+                });
+            }
         },
 
         printQuote: function(data) {
-            var WinPrint = window.open('', '', 'left=0,top=0,width=800,height=800,toolbar=0,scrollbars=0,status=0');
-            ajax.make({
-                url: 'quote/print',
-                method: 'post',
-                data: data,
-                success: function(response) {
-                    WinPrint.focus();
-                    WinPrint.document.write(response.data.html);
-                    WinPrint.document.close();
-                    dispatcher.dispatch({
-                        actionType: constants.PRINT_QUOTE_SUCCESS
-                    });
-                },
-                error: function(response) {
-                    WinPrint.close();
-                    if (response.error_code == 400001) {
+            var dispatchError = function(errors) {
+                dispatcher.dispatch({
+                    actionType: constants.PRINT_QUOTE_ERROR,
+                    errors: errors
+                });
+            };
+
+            var validationErrors = validateParamsForQuote(data, data.name ? ['name', 'email', 'phone', 'vehicle_info'] : []);
+            if (validationErrors) {
+                dispatchError(validationErrors);
+            } else {
+                var WinPrint = window.open('', '', 'left=0,top=0,width=800,height=800,toolbar=0,scrollbars=0,status=0');
+                ajax.make({
+                    url: 'quote/print',
+                    method: 'post',
+                    data: data,
+                    success: function(response) {
+                        WinPrint.focus();
+                        WinPrint.document.write(response.data.html);
+                        WinPrint.document.close();
                         dispatcher.dispatch({
-                            actionType: constants.PRINT_QUOTE_ERROR,
-                            errors: response.errors
+                            actionType: constants.PRINT_QUOTE_SUCCESS
                         });
-                    } else {
-                        ajax.error(response);
+                    },
+                    error: function(response) {
+                        WinPrint.close();
+                        if (response.error_code == 400001) {
+                            dispatchError(response.errors);
+                        } else {
+                            ajax.error(response);
+                        }
                     }
-                }
-            });
+                });
+            }
         },
 
         emailQuote: function(data) {
-            ajax.make({
-                url: 'quote/email',
-                method: 'post',
-                data: data,
-                success: function(response) {
-                    dispatcher.dispatch({
-                        actionType: constants.EMAIL_QUOTE_SUCCESS,
-                        title: response.notice,
-                        content: ''
-                    });
-                },
-                error: function(response) {
-                    if (response.error_code == 400001) {
+            var dispatchError = function(errors) {
+                dispatcher.dispatch({
+                    actionType: constants.EMAIL_QUOTE_ERROR,
+                    errors: errors
+                });
+            };
+
+            var validationErrors = validateParamsForQuote(data, data.name ? ['name', 'email', 'phone', 'vehicle_info'] : ['email']);
+            if (validationErrors) {
+                dispatchError(validationErrors);
+            } else {
+                ajax.make({
+                    url: 'quote/email',
+                    method: 'post',
+                    data: data,
+                    success: function(response) {
                         dispatcher.dispatch({
-                            actionType: constants.EMAIL_QUOTE_ERROR,
-                            errors: response.errors
+                            actionType: constants.EMAIL_QUOTE_SUCCESS,
+                            title: response.notice,
+                            content: ''
                         });
-                    } else {
-                        ajax.error(response);
+                    },
+                    error: function(response) {
+                        if (response.error_code == 400001) {
+                            dispatchError(response.errors);
+                        } else {
+                            ajax.error(response);
+                        }
                     }
-                }
-            });
+                });
+            }
         },
 
         requestQuote: function(data) {
-            ajax.make({
-                url: 'quote/request',
-                method: 'post',
-                data: data,
-                success: function(response) {
-                    dispatcher.dispatch({
-                        actionType: constants.REQUEST_QUOTE_SUCCESS,
-                        title: 'Thank you!',
-                        content: response.notice
-                    });
-                },
-                error: function(response) {
-                    if (response.error_code == 400001) {
+            var dispatchError = function(errors) {
+                dispatcher.dispatch({
+                    actionType: constants.REQUEST_QUOTE_ERROR,
+                    errors: errors
+                });
+            };
+
+            var validationErrors = validateParamsForQuote(data, ['name', 'email', 'phone', 'vehicle_info']);
+            if (validationErrors) {
+                dispatchError(validationErrors);
+            } else {
+                ajax.make({
+                    url: 'quote/request',
+                    method: 'post',
+                    data: data,
+                    success: function(response) {
                         dispatcher.dispatch({
-                            actionType: constants.REQUEST_QUOTE_ERROR,
-                            errors: response.errors
+                            actionType: constants.REQUEST_QUOTE_SUCCESS,
+                            title: 'Thank you!',
+                            content: response.notice
                         });
-                    } else {
-                        ajax.error(response);
+                    },
+                    error: function(response) {
+                        if (response.error_code == 400001) {
+                            dispatchError(response.errors);
+                        } else {
+                            ajax.error(response);
+                        }
                     }
-                }
-            });
+                });
+            }
         },
 
         orderCreate: function(data) {
@@ -421,28 +512,37 @@ define([
         },
 
         orderCheckout: function(orderId, data) {
-            ajax.make({
-                url: 'order/' + orderId + '/checkout',
-                method: 'post',
-                data: data,
-                success: function(response) {
-                    var orderInfo = response.data;
-                    orderInfo.actionType = constants.ORDER_CHECKOUT_SUCCESS;
-                    dispatcher.dispatch(orderInfo);
+            var dispatchError = function(errors) {
+                dispatcher.dispatch({
+                    actionType: constants.ORDER_CHECKOUT_ERROR,
+                    errors: errors
+                });
+            };
 
-                    Api.orderPayment(orderId, data.token); // auto payment if success
-                }, 
-                error: function(response) {
-                    if (response.error_code == 400001) {
-                        dispatcher.dispatch({
-                            actionType: constants.ORDER_CHECKOUT_ERROR,
-                            errors: response.errors
-                        });
-                    } else {
-                        ajax.error(response);
+            var validationErrors = validateParamsForQuote(data, ['name', 'email', 'phone', 'vehicle_info']);
+            if (validationErrors) {
+                dispatchError(validationErrors);
+            } else {
+                ajax.make({
+                    url: 'order/' + orderId + '/checkout',
+                    method: 'post',
+                    data: data,
+                    success: function(response) {
+                        var orderInfo = response.data;
+                        orderInfo.actionType = constants.ORDER_CHECKOUT_SUCCESS;
+                        dispatcher.dispatch(orderInfo);
+
+                        Api.orderPayment(orderId, data.token); // auto payment if success
+                    }, 
+                    error: function(response) {
+                        if (response.error_code == 400001) {
+                            dispatchError(response.errors);
+                        } else {
+                            ajax.error(response);
+                        }
                     }
-                }
-            });
+                });
+            }
         },
 
         orderPayment: function(orderId, token) {

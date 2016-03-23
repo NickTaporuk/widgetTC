@@ -3,13 +3,15 @@ define([
     'classnames',
     'load!actions/actions',
     'lib/helper',
-    'load!stores/customerStore'
+    'load!stores/customerStore',
+    'load!components/page/common/mainPrices'
 ], function(
     React,
     cn,
     Act,
     h,
-    customerStore
+    customerStore,
+    MainPrices
 ) {
 
     return {
@@ -26,16 +28,7 @@ define([
         },
 
         render: function() {
-            var quote = this.props.quote;
             var tire = this.props.tire;
-
-            var recyclingFee = null;
-            if (quote.recycling_fee) {
-                recyclingFee = <tr>
-                    <td>{quote.recycling_fee.name}</td>
-                    <td>${h.priceFormat(quote.recycling_fee.total_value)}</td>
-                </tr>;
-            }
 
             return (
                 <div>
@@ -52,42 +45,7 @@ define([
                                 {this._getBtn()}
                             </fieldset>
                             <div className={cn(['sixcol', 'col_left', 'appointment_info'])}>
-                                <div className={cn('table_wrapper')}>
-                                    <table className={cn('table')}>
-                                        <thead>
-                                            <tr>
-                                                <th>Total</th>
-                                                <th></th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td>Sub-total</td>
-                                                <td>${h.priceFormat(quote.total.sub_total)}</td>
-                                            </tr>
-                                            {
-                                                quote.discount && quote.discount.applied
-                                                ?   <tr>
-                                                        <td>Discount</td>
-                                                        <td>${h.priceFormat(quote.discount.total_value)}</td>
-                                                    </tr> 
-                                                :   null
-                                            }
-                                            { recyclingFee && quote.recycling_fee.is_taxable ? recyclingFee : null }
-                                            <tr>
-                                                <td>{quote.tax.name}</td>
-                                                <td>${h.priceFormat(quote.tax.total_value)}</td>
-                                            </tr>
-                                            { recyclingFee && quote.recycling_fee.is_taxable ? null : recyclingFee }
-                                        </tbody>
-                                        <tfoot>
-                                            <tr className={cn('light')}>
-                                                <td>Total Price:</td>
-                                                <td>${h.priceFormat(quote.total.price)}</td>
-                                            </tr>
-                                        </tfoot>
-                                    </table>
-                                </div>
+                                <MainPrices quote={this.props.quote} />
                             </div>
                         </form>
                     </div>
@@ -127,7 +85,7 @@ define([
 
         _handleFormSubmit: function(event) {
             event.preventDefault();
-            Act.Quote.email(false, { email: this.refs.email.value });
+            Act.Quote.email({ email: this.refs.email.value });
         }
     }
 

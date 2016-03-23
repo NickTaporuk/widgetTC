@@ -64,6 +64,10 @@ define([
                 });
 
                 Api.loadLocationConfig(id);
+
+                // var section = searchStore.getActiveSection();
+                // var searchParams = searchStore.getParamsForSearch();             
+                // Api.searchTires(section, searchParams);
             }
         },
         Search: {
@@ -92,23 +96,27 @@ define([
                 var location = locationsStore.getCurrentLocation();
                 if (location) {
                     var section = searchStore.getActiveSection();
-                    var searchParams = searchStore.getSectionValues(section);
-                    if (searchParams.base_category) {
-                        delete searchParams.base_category;
-                    }
-                    searchParams.location_id = location.id;
-                    searchParams.items_per_page = resultsStore.getItemsPerPage();
+                    // var searchParams = searchStore.getSectionValues(section);
+                    // if (searchParams.base_category) {
+                    //     delete searchParams.base_category;
+                    // }
+                    // searchParams.location_id = location.id;
+                    // searchParams.items_per_page = resultsStore.getItemsPerPage();
 
-                    searchParams.display = searchStore.getValue('common', 'display');
-                    searchParams.order_by = searchStore.getValue('common', 'order_by');
-                    searchParams.filters = {
-                        'brand': searchStore.getValue('common', 'brand'),
-                        'light_truck': searchStore.getValue('common', 'light_truck'),
-                        'run_flat': searchStore.getValue('common', 'run_flat'),
-                        'category': searchStore.getValue('common', 'category')
-                    };
-                    searchParams.needed_filters = ['brand', 'run_flat', 'light_truck', 'category'];
+                    // searchParams.display = searchStore.getValue('common', 'display');
+                    // searchParams.order_by = searchStore.getValue('common', 'order_by');
+                    // searchParams.filters = {
+                    //     'brand': searchStore.getValue('common', 'brand'),
+                    //     'light_truck': searchStore.getValue('common', 'light_truck'),
+                    //     'run_flat': searchStore.getValue('common', 'run_flat'),
+                    //     'category': searchStore.getValue('common', 'category')
+                    // };
+                    // searchParams.needed_filters = ['brand', 'run_flat', 'light_truck', 'category'];
 
+                    // if (addParams) {
+                    //     searchParams = _.assign(searchParams, addParams);
+                    // }
+                    var searchParams = searchStore.getParamsForSearch();                    
                     if (addParams) {
                         searchParams = _.assign(searchParams, addParams);
                     }
@@ -139,7 +147,7 @@ define([
                 });
 
                 var withDiscount = tire.discount && tire.discount.added_by_default;
-                Api.loadQuote((supplier ? supplier.tire_id : tire.id), selQuantity, 'use_default', withDiscount);
+                Api.loadQuote((supplier ? supplier.tire_id : tire.id), selQuantity, 'use_default', withDiscount, null, true);
             },
             enlargeImage: function(image, model) {
                 dispatcher.dispatch({
@@ -176,61 +184,46 @@ define([
             sendAppointment: function(values) {
                 dispatcher.dispatch({
                     actionType: 'customer.values.update',
-                    values: values,
-                    required:  ['name', 'email', 'phone', 'vehicle_info']
+                    values: values
                 });
 
-                if (Object.keys(customerStore.getValidationErrors()).length === 0) {
-                    values = customerStore.getParamsForQuote(true, 'appointment');
-                    Api.sendAppointment(values);
-                }
+                values = customerStore.getParamsForQuote('appointment');
+                Api.sendAppointment(values);
             },
-            emailForm: function() {
+            emailForm: function(values) {
                 dispatcher.dispatch({
-                    actionType: 'quote.emmail.form.show'
+                    actionType: 'quote.emmail.form.show',
+                    values: values || {}
                 });
             },
-            email: function(followUp, values) {
+            email: function(values) {
                 dispatcher.dispatch({
                     actionType: 'customer.values.update',
-                    values: values,
-                    required: values.name ? ['name', 'email', 'phone', 'vehicle_info'] : ['email']
+                    values: values
                 });
 
-                if (Object.keys(customerStore.getValidationErrors()).length === 0) {
-                    var followUp = followUp || false;
-                    var data = customerStore.getParamsForQuote( followUp, 'email' );
-                    data.follow_up = followUp;
-                    Api.emailQuote(data);
-                }
+                var data = customerStore.getParamsForQuote('email');
+                Api.emailQuote(data);
             },
-            print: function(followUp, values) {
+            print: function(values) {
                 dispatcher.dispatch({
                     actionType: 'customer.values.update',
-                    values: values || {},
-                    required: values ? ['name', 'email', 'phone', 'vehicle_info'] : []
+                    values: values || {}
                 });
 
-                if (Object.keys(customerStore.getValidationErrors()).length === 0) {
-                    var followUp = followUp || false;
-                    values = customerStore.getParamsForQuote( followUp, 'print' );
-                    values.follow_up = followUp;
-                    Api.printQuote(values);
-                }
+                values = customerStore.getParamsForQuote('print');
+                Api.printQuote(values);
             },
             request: function(values) {
                 dispatcher.dispatch({
                     actionType: 'customer.values.update',
-                    values: values || {},
-                    required:  ['name', 'email', 'phone', 'vehicle_info']
+                    values: values || {}
                 });
 
-                if (Object.keys(customerStore.getValidationErrors()).length === 0) {
-                    values.tire_id = customerStore.getSelectedTireId();
-                    values.quantity = customerStore.getSelectedQuantity();
+                values.tire_id = customerStore.getSelectedTireId();
+                values.quantity = customerStore.getSelectedQuantity();
 
-                    Api.requestQuote(values);
-                }
+                Api.requestQuote(values);
             }
         },
         Order: {
@@ -256,18 +249,15 @@ define([
             payment: function(values) {
                 dispatcher.dispatch({
                     actionType: 'order.payment',
-                    values: values,
-                    required: ['name', 'email', 'phone', 'vehicle_info']
+                    values: values
                 });
 
-                if (Object.keys(customerStore.getValidationErrors()).length === 0) {
-                    var order = customerStore.getOrder();
+                var order = customerStore.getOrder();
 
-                    if (order.status === 'initiated') {
-                        Api.orderCheckout(order.order_id, values);
-                    } else {
-                        Api.orderPayment(order.order_id, values.token);
-                    }
+                if (order.status === 'initiated') {
+                    Api.orderCheckout(order.order_id, values);
+                } else {
+                    Api.orderPayment(order.order_id, values.token);
                 }
             }
         },

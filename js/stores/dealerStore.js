@@ -17,6 +17,7 @@ define([
     };
 
     var showTCLogo = true;
+    // var defaultQuoteCallBack = false;
 
     var companyName;
     var logo;
@@ -137,6 +138,9 @@ define([
         getLogo: function() {
             return logo;
         },
+        // getDefaultQuoteCallBack: function() {
+        //     return defaultQuoteCallBack;
+        // },
 
         dispatchToken: dispatcher.register(function(payload) {
             change = false;
@@ -145,10 +149,11 @@ define([
                     var c = payload.config;
                     if (c.ecommerce.enabled && c.ecommerce.services && c.ecommerce.services.stripe) {
                         ecommerce.stripe.key = c.ecommerce.services.stripe.publishable_key;
-                        change = true;
                     }
                     showTCLogo = c.show_tireconnect_logo;
+                    // defaultQuoteCallBack = config.sa ? false : c.default_quote_call_back;
                     changeColorScheme('#' + c.colors.color1, '#' + c.colors.color2);
+                    change = true;
                     break;
 
                 case constants.LOAD_DEALER_INFO_SUCCESS:

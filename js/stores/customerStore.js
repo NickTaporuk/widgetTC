@@ -1,5 +1,6 @@
 define([
     'dispatcher',
+    'config',
     'load!stores/resultsStore',
     'load!stores/searchStore',
     'lodash',
@@ -8,6 +9,7 @@ define([
     'load!actions/constants'
 ], function(
     dispatcher,
+    config,
     resultsStore,
     searchStore,
     _,
@@ -34,7 +36,8 @@ define([
             model: null,
             trim: null
         },
-        notes: ''
+        notes: '',
+        follow_up: false
     };
 
     var order = {
@@ -47,43 +50,6 @@ define([
     };
 
     var validationErrors = {};
-
-
-    validate.extend(validate.validators.datetime, {
-      // The value is guaranteed not to be null or undefined but otherwise it
-      // could be anything.
-      parse: function(value, options) {
-        return +moment(value);
-      },
-      // Input is a unix timestamp
-      format: function(value, options) {
-        var format = options.dateOnly ? 'YYYY-MM-DD' : this.timeFormat;
-        return moment(value).format(format);
-      }
-    });
-    var constraints = {
-        name: {
-            length: {maximum: 255}
-        },
-        email: {
-            email: true,
-            length: {maximum: 255}
-        },
-        phone: {
-            format: {
-                pattern: "^\\(?[0-9]{3}\\)?[-. ]?[0-9]{3}[-. ]?[0-9]{4}$",
-                message: "is not valid phone number"
-            }
-        },
-        preferred_time: {
-            datetime: {
-                earliest: moment()
-            },
-        },
-        notes: {
-            length: {maximum: 500}
-        }
-    };
 
     function setQuote(q) {
         //convert objects to array if needed
@@ -116,8 +82,6 @@ define([
         quote = q;
     }
 
-
-    // public section
     var store = {
         getSelectedTireId: function() {
             return quote.tire_id;
@@ -134,6 +98,9 @@ define([
         getValidationErrors: function() {
             return validationErrors;
         },
+        hasErrors: function() {
+            return Object.keys(store.getValidationErrors()).length > 0;
+        },
         getCustomer: function() {
             var _customer = _.cloneDeep(customer);
             if (_customer.vehicle.year === null && searchStore.getActiveSection() == 'vehicle') {
@@ -144,9 +111,12 @@ define([
             }
             return _customer;
         },
-        getParamsForQuote: function(withCustomer, type) {
+        getCustomerValue: function(param) {
+            return customer[param];
+        },
+        getParamsForQuote: function(type) {
             var values = {};
-            if (withCustomer) {
+            if (type == 'appointment' || customer.follow_up || config.sa) {
                 values = store.getCustomer();
                 delete values.vehicle;
             } else if (type == 'email') {
@@ -175,6 +145,10 @@ define([
         dispatchToken:  dispatcher.register(function(payload) {
             var change = false;
             switch (payload.actionType) {
+                case constants.LOAD_DEALER_CONFIG_SUCCESS:
+                    customer.follow_up = config.sa ? false : payload.config.default_quote_call_back;
+                    change = true;
+                    break;
                 case constants.LOAD_QUOTE_SUCCESS:
                 case 'quote.request.form.show':
                     selectedTire = payload.tireId;
@@ -199,22 +173,10 @@ define([
 
                 case 'order.payment':
                 case 'quote.appointment.form.show':
+                case 'quote.emmail.form.show':
                 case 'customer.values.update':
-                    var c = _.cloneDeep(constraints);
-                    if (payload.required) {
-                        payload.required.map(function(field) {
-                            if (!c[field]) {
-                                c[field] = {};
-                            }
-                            c[field].presence = true;
-                        });
-                    }
-
-                    validationErrors = validate(payload.values, c);
-                    if (validationErrors === undefined) {
-                        validationErrors = {};
-                        _.merge(customer, payload.values);
-                    }
+                    _.merge(customer, payload.values);
+                    validationErrors = {};
                     change = true;
                     break;
 
@@ -236,6 +198,7 @@ define([
 
                 case constants.ORDER_CHECKOUT_ERROR:
                 case constants.ORDER_PAYMENT_ERROR:
+                
                     validationErrors = payload.errors;
                     if (validationErrors.prefered_time) {
                         validationErrors.preferred_time = validationErrors.prefered_time; //temporary for compatibility

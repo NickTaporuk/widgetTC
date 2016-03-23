@@ -18,7 +18,6 @@ define([
     isMobile
 ) {
 
-   
     return {
         componentWillMount: function() {
             this._updateQuote();
@@ -136,16 +135,24 @@ define([
         },
 
         _getButtons: function() {
-            var btns = {
-                'quote': <a href="#quote" onClick={this._handleQuoteClick} className={cn(['brand_btn_light', 'btn_small'])}><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE14F;' }} /> Get a Quote</a>,
-                'appointment': <a href="#appointment" onClick={this._handleAppointmentClick} className={cn(['brand_btn_light', 'btn_small'])}><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE192;' }} /> Make an Appointment</a>
-            }
-            if (this.props.withOrderBtn) {
-                btns.order = <a href="#order" onClick={this._handleOrderClick} className={cn('brand_btn')}>Order Your Tires <i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE5C8;' }} /></a>
-            }
+            var btns = {};
+            if (config.sa) {
+                var btns = {
+                    email: <a href="#email" onClick={this._handleEmailClick} className={cn(['brand_btn_light', 'btn_small'])}><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE0BE;' }} /> Email Quote</a>,
+                    print: <a href="#print" onClick={this._handlePrintClick} className={cn(['brand_btn_light', 'btn_small'])}><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE8AD;' }} /> Print Quote</a>
+                };
+            } else {
+                var btns = {
+                    quote: <a href="#quote" onClick={this._handleQuoteClick} className={cn(['brand_btn_light', 'btn_small'])}><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE14F;' }} /> Get a Quote</a>,
+                    appointment: <a href="#appointment" onClick={this._handleAppointmentClick} className={cn(['brand_btn_light', 'btn_small'])}><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE192;' }} /> Make an Appointment</a>
+                };
+                if (this.props.withOrderBtn) {
+                    btns.order = <a href="#order" onClick={this._handleOrderClick} className={cn('brand_btn')}>Order Your Tires <i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE5C8;' }} /></a>
+                }
 
-            if (isMobile.any && this.props.callNumber) {
-                btns.clickToCall = <a href={'tel:' + this.props.callNumber} className={cn('brand_btn_light', 'btn_small')}><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE0B0;' }} /> Call Us</a>
+                if (isMobile.any && this.props.callNumber) {
+                    btns.clickToCall = <a href={'tel:' + this.props.callNumber} className={cn('brand_btn_light', 'btn_small')}><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE0B0;' }} /> Call Us</a>
+                }
             }
             
             return (
@@ -155,11 +162,16 @@ define([
                         : null
                     } 
                     <div className={cn(['sixcol', 'col_left'])}>
-                        {btns.quote}
-                        {this.props.withOrderBtn ? btns.appointment : null}
+                        {btns.quote ? btns.quote : null}
+                        {btns.order ? btns.appointment : null}
+
+                        {btns.email ? btns.email : null}
+                        
                     </div>
                     <div className={cn(['sixcol', 'last', 'col_right'])}>
-                        {this.props.withOrderBtn ? btns.order : btns.appointment}
+                        {btns.print ? btns.print : null}
+
+                        {btns.order ? btns.order : btns.appointment}
                     </div>
                 </div>
             );
@@ -294,6 +306,17 @@ define([
         _handleQuoteClick: function(event) {
             event.preventDefault();
             Act.Page.show('quote');
+        },
+
+        _handleEmailClick: function(event) {
+            event.preventDefault();
+            Act.Quote.appointmentForm('email');
+        },
+
+        _handlePrintClick: function(event) {
+            event.preventDefault();
+            Act.Quote.appointmentForm('print');
         }
+
     }
 });

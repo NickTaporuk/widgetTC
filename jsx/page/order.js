@@ -6,6 +6,7 @@ define([
     'load!stores/customerStore',
     'load!stores/vehicleStore',
     'load!components/elements/select',
+    'load!components/page/common/mainPrices',
     'validate',
     'moment',
     'components/datetime/DateTime',
@@ -18,6 +19,7 @@ define([
     customerStore,
     vehicleStore,
     SelectField,
+    MainPrices,
     validate,
     moment,
     DateTime,
@@ -54,18 +56,6 @@ define([
         },
 
         render: function() {
-            var quote = this.props.quote;
-            var tire = this.props.tire;
-            var order = this.props.order;
-
-            var recyclingFee = null;
-            if (quote.recycling_fee) {
-                recyclingFee = <tr>
-                    <td>{quote.recycling_fee.name}</td>
-                    <td>${h.priceFormat(quote.recycling_fee.total_value)}</td>
-                </tr>;
-            }
-
             return (
                 <div>
                     <a href="#summary" onClick={this._handleBackClick} className={cn('back_link')}><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE5C4;' }} />Back to your summary</a>
@@ -158,51 +148,8 @@ define([
                                     {this._getError('exp_year')}
                                 </div>
                                 
-
-                                <div className={cn('table_wrapper')}>
-                                    <table className={cn('table')}>
-                                        <thead>
-                                            <tr>
-                                                <th>Total</th>
-                                                <th></th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td>Sub-total</td>
-                                                <td>${h.priceFormat(quote.total.sub_total)}</td>
-                                            </tr>
-                                            {
-                                                quote.discount && quote.discount.applied
-                                                ?   <tr>
-                                                        <td>Discount</td>
-                                                        <td>${h.priceFormat(quote.discount.total_value)}</td>
-                                                    </tr> 
-                                                :   null
-                                            }
-                                            { recyclingFee && quote.recycling_fee.is_taxable ? recyclingFee : null }
-                                            <tr>
-                                                <td>{quote.tax.name}</td>
-                                                <td>${h.priceFormat(quote.tax.total_value)}</td>
-                                            </tr>
-                                            { recyclingFee && quote.recycling_fee.is_taxable ? null : recyclingFee }
-                                        </tbody>
-                                        <tfoot>
-                                            <tr className={cn('light')}>
-                                                <td>Total Price:</td>
-                                                <td>${h.priceFormat(quote.total.price)}</td>
-                                            </tr>
-                                            <tr>
-                                                <td>What you pay today:</td>
-                                                <td>${h.priceFormat(order.deposit_payment)}</td>
-                                            </tr>
-                                            <tr className={cn('light')}>
-                                                <td>Outstanding Balance:</td>
-                                                <td>${h.priceFormat(order.outstanding_balance)}</td>
-                                            </tr>
-                                        </tfoot>
-                                    </table>
-                                </div>
+                                <MainPrices quote={this.props.quote} order={this.props.order} />
+                                
                                 <p className={cn('textcenter')}>
                                     <em>* Outstanding balance will be payable after installation.</em>
                                     <img src={config.imagesFolder + 'verify-security.png'} alt="GoDaddy.com verified and secured" className={cn('verified')} />

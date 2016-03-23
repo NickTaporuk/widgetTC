@@ -157,7 +157,10 @@ define([
                     }
                     break;
                 case 'quote':
-                    content = <Quote />
+                    var props = {
+                        followUp: customerStore.getCustomerValue('follow_up')
+                    };
+                    content = <Quote {...props} />
                     break;
                 case 'email':
                     var props = {

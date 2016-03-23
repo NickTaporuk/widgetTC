@@ -149,14 +149,37 @@ define([
         getAllValues: function() {
             return _.cloneDeep(fieldValues);
         },
-        // getParamsForSearch: function(isClarifying) {
-        //     if (!isClarifying) {
-        //         //set filter for category
-        //     } else {
+        getParamsForSearch: function() {
+            var resultsStore = require('load!stores/resultsStore');
+            var locationsStore = require('load!stores/locationsStore');
 
-        //     }
-        // },
+            var section = searchStore.getActiveSection();
 
+            var params = searchStore.getSectionValues(section);
+
+            // needed categories will be returned base on filter
+            if (params.base_category) {
+                delete params.base_category;
+            }
+
+            params.location_id = locationsStore.getCurrentLocation().id;
+            params.items_per_page = resultsStore.getItemsPerPage();
+
+            params.display = searchStore.getValue('common', 'display');
+            params.order_by = searchStore.getValue('common', 'order_by');
+            params.filters = {
+                'brand': searchStore.getValue('common', 'brand'),
+                'light_truck': searchStore.getValue('common', 'light_truck'),
+                'run_flat': searchStore.getValue('common', 'run_flat'),
+                'category': searchStore.getValue('common', 'category')
+            };
+            params.needed_filters = ['brand', 'run_flat', 'light_truck', 'category'];
+
+            return params;
+        },
+        isReadyForSearch: function() {
+            
+        },
         dispatchToken: dispatcher.register(function(payload) {
             var change = false;
             switch (payload.actionType) {
