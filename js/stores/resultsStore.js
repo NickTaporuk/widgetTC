@@ -8,7 +8,6 @@ define([
     constants
 ) {
 
-    var itemsPerPage = 6;
     var showInStock = true;
     var defaultSelectedQuantity = 4;
 
@@ -86,9 +85,6 @@ define([
         getTire: function(id) {
             return _.cloneDeep(tires[tiresIndexes[id]]);
         },
-        getItemsPerPage: function() {
-            return itemsPerPage;
-        },
         // getShowInStock: function() {
         //     return showInStock;
         // },
@@ -105,7 +101,6 @@ define([
                     break;
                 case constants.LOAD_DEALER_CONFIG_SUCCESS:
                     var c = payload.config;
-                    itemsPerPage = c.items_per_page;
                     defaultSelectedQuantity = c.default_selected_quantity;
                     // showInStock = c.show_in_stock;
                     change = true;

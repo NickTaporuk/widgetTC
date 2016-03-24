@@ -63,11 +63,9 @@ define([
                     id: id
                 });
 
-                Api.loadLocationConfig(id);
+                Api.searchTires(searchStore.getParamsForSearch());
 
-                // var section = searchStore.getActiveSection();
-                // var searchParams = searchStore.getParamsForSearch();             
-                // Api.searchTires(section, searchParams);
+                Api.loadLocationConfig(id);
             }
         },
         Search: {
@@ -87,41 +85,16 @@ define([
             }
         },
         Tire: {
-            search: function(addParams, step) {
+            search: function(values, step) {
                 dispatcher.dispatch({
                     actionType: 'tire.search',
-                    step: step || 2
+                    step: step || 2,
+                    values: values
                 });
 
                 var location = locationsStore.getCurrentLocation();
                 if (location) {
-                    var section = searchStore.getActiveSection();
-                    // var searchParams = searchStore.getSectionValues(section);
-                    // if (searchParams.base_category) {
-                    //     delete searchParams.base_category;
-                    // }
-                    // searchParams.location_id = location.id;
-                    // searchParams.items_per_page = resultsStore.getItemsPerPage();
-
-                    // searchParams.display = searchStore.getValue('common', 'display');
-                    // searchParams.order_by = searchStore.getValue('common', 'order_by');
-                    // searchParams.filters = {
-                    //     'brand': searchStore.getValue('common', 'brand'),
-                    //     'light_truck': searchStore.getValue('common', 'light_truck'),
-                    //     'run_flat': searchStore.getValue('common', 'run_flat'),
-                    //     'category': searchStore.getValue('common', 'category')
-                    // };
-                    // searchParams.needed_filters = ['brand', 'run_flat', 'light_truck', 'category'];
-
-                    // if (addParams) {
-                    //     searchParams = _.assign(searchParams, addParams);
-                    // }
-                    var searchParams = searchStore.getParamsForSearch();                    
-                    if (addParams) {
-                        searchParams = _.assign(searchParams, addParams);
-                    }
-
-                    Api.searchTires(section, searchParams);
+                    Api.searchTires(searchStore.getParamsForSearch());
                 } else {
                     dispatcher.dispatch({
                         actionType: 'popup.update',

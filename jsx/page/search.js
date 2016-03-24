@@ -64,7 +64,6 @@ define([
             return (
                 <div className={cn('search_wrapper')} id={cn('search_wrapper')}>
                     <div className={cn('search_inner')}>
-                        <p className={cn('search_intro')}>Find your tires using the form below. You can search by vehicle or tire size. You can also narrow down your search by tire category and brand.</p>
                         <form id={cn('search_by')} className={cn('search_by')} role="search" onSubmit={this._handleSubmit}>
                             { this.props.canChangeLocation 
                                 ? <a href="#locations" onClick={this._handleLocationsClick} className={cn(['change_location', 'modal_open'])}><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE0C8;' }} />Change Location</a>
@@ -204,21 +203,7 @@ define([
         },
 
         _isReadyForSearch: function() {
-            var sectionValues = this.state.fieldValues[this.state.activeTab];
-            var isReady = false;
-            switch (this.state.activeTab) {
-                case 'size':
-                    isReady = (sectionValues.width && sectionValues.height && sectionValues.rim);
-                    break;
-                case 'vehicle':
-                    isReady = (sectionValues.car_tire_id != false);
-                    break;
-                case 'part_number':
-                    isReady = (sectionValues.part_number != false);
-                    break;
-            }
-
-            return isReady;
+            return searchStore.isReadyForSearch();
         },
 
         _updateStatus: function() {

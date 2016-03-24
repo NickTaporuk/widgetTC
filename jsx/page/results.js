@@ -105,7 +105,7 @@ define([
                         </div>
                         <div className={cn('results')}>
                             <div className={cn('twelvecol')}>
-                                <Pagination activePage={this.state.page} itemsOnPage={this.state.itemsOnPage} totalItems={this.state.totalCount} onPageClick={this._handlePageClick} />
+                                <Pagination activePage={this.state.page} itemsOnPage={this.props.itemsOnPage} totalItems={this.state.totalCount} onPageClick={this._handlePageClick} />
                                 {/*<div className={cn('compare_btn_wrapper')}>
                                     <span className={cn(['font_color', 'compare_number'])}>2</span>
                                     <a href="#compare" className={cn(['brand_btn_light', 'btn_small', 'compare_btn'])}><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE915;' }} /> Compare Selected Tires</a>
@@ -123,7 +123,7 @@ define([
                                 }
                             </div>
                             <div className={cn('twelvecol')}>
-                                <Pagination activePage={this.state.page} itemsOnPage={this.state.itemsOnPage} totalItems={this.state.totalCount} onPageClick={this._handlePageClick} />
+                                <Pagination activePage={this.state.page} itemsOnPage={this.props.itemsOnPage} totalItems={this.state.totalCount} onPageClick={this._handlePageClick} />
                             </div>
                         </div>
                     </div>
@@ -136,8 +136,7 @@ define([
                 tires: resultsStore.getTires(),
                 totalCount: resultsStore.getTotalCount(),
                 page: resultsStore.getPage(),
-                filters: resultsStore.getFilters(),
-                itemsOnPage: resultsStore.getItemsPerPage()
+                filters: resultsStore.getFilters()
             })
         },
 
@@ -161,12 +160,12 @@ define([
         _handleFieldChange: function(event) {
             var fieldName = event.target.name.replace('filter_', '');
             Act.Search.updateField('common', fieldName, event.target.value);
-            Act.Tire.search();
+            Act.Tire.search({page: 1});
         },
 
         _handleFilterChange: function(name, values, event) {
-            Act.Search.updateField('common', name, values);
-            Act.Tire.search();
+            Act.Search.updateField('filters', name, values);
+            Act.Tire.search({page: 1});
         },
 
         _handlePageClick: function(page, event) {

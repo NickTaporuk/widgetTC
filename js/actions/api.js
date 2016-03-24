@@ -147,23 +147,25 @@ define([
             });
         },
 
-        searchTires: function(type, searchParams) {
-            var method;
-            switch (type) {
-                case 'size':
-                    method = 'searchBySize';
-                    break;
-                case 'vehicle':
-                    method = 'searchByCarTire';
-                    break;
-                case 'part_number':
-                    method = 'searchByPartNumbers';
-                    if (!searchParams.part_numbers && searchParams.part_number) {
-                        searchParams.part_numbers = [searchParams.part_number];
-                        delete searchParams.part_number;
-                    }
-                    break;
+        searchTires: function(searchParams) {
+            if (!searchParams) {
+                return;
             }
+            
+            var method;
+            if (searchParams.part_number) {
+                method = 'searchByPartNumbers';
+                if (!searchParams.part_numbers && searchParams.part_number) {
+                    searchParams.part_numbers = [searchParams.part_number];
+                    delete searchParams.part_number;
+                }
+            } else if (searchParams.car_tire_id) {
+                method = 'searchByCarTire';
+            } else {
+                method = 'searchBySize';
+            }
+
+            searchParams.needed_filters = ['brand', 'run_flat', 'light_truck', 'category'];
 
             ajax.make({
                 url: 'tire/' + method,

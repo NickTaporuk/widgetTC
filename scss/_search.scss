@@ -26,17 +26,10 @@
 		}
 	}
 
-	.tcwlw_search_intro {
-		margin-left: auto;
-		margin-right: auto;
-		@include margin-bottom($baseSpacing);
-		text-align: center;
-	}
 
 	.tcwlw_change_location {
 		position: relative;
 		float: right;
-		@include margin-top(-$baseSpacing/1.5);
 		@include margin-bottom($baseSpacing/6);
 		display: block;
 		z-index: 10;

@@ -116,13 +116,14 @@ define([
                         fieldValues: {
                             display: searchStore.getValue('common', 'display'),
                             order_by: searchStore.getValue('common', 'order_by'),
-                            brand: searchStore.getValue('common', 'brand'),
-                            run_flat: searchStore.getValue('common', 'run_flat'),
-                            light_truck: searchStore.getValue('common', 'light_truck'),
-                            category: searchStore.getValue('common', 'category')
+                            brand: searchStore.getValue('filters', 'brand'),
+                            run_flat: searchStore.getValue('filters', 'run_flat'),
+                            light_truck: searchStore.getValue('filters', 'light_truck'),
+                            category: searchStore.getValue('filters', 'category')
                         },
                         queryParams: queryParams,
-                        isInMile: locationsStore.getCurrentLocation().country !== 'Canada'
+                        isInMile: locationsStore.getCurrentLocation().country !== 'Canada',
+                        itemsOnPage: searchStore.getValue('common', 'items_per_page')
                     };
                     content = <Results {...props} />
                     break;

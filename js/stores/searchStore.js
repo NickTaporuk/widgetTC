@@ -60,9 +60,13 @@ define([
         },
 
         common: {
+            page: 1,
+            items_per_page: 6,
             display: '',
-            order_by: '',
+            order_by: ''
+        },
 
+        filters: {
             run_flat: [],
             light_truck: [],
             brand: [],
@@ -80,13 +84,10 @@ define([
         } else if (field == 'display') {
             options = fieldOptions.display;
             setValue('common', 'display', options[0].value);
-        } else if (field == 'brand' || field == 'run_flat' || field == 'light_truck' || field == 'category') {
-            options = fieldOptions[field];
-            var value = [];
-            // options.forEach(function(option, i, options) {
-            //     value.push(option.value);
-            // });
-            setValue('common', field, []);
+        } else if (fieldValues.filters[field]) {
+            setValue('filters', field, []);
+        } else if (field == 'page') {
+            setValue('common', field, 1);
         }
     }
 
@@ -150,12 +151,14 @@ define([
             return _.cloneDeep(fieldValues);
         },
         getParamsForSearch: function() {
-            var resultsStore = require('load!stores/resultsStore');
+            if (!searchStore.isReadyForSearch()) {
+                return null;
+            }
+
+            // var resultsStore = require('load!stores/resultsStore');
             var locationsStore = require('load!stores/locationsStore');
 
-            var section = searchStore.getActiveSection();
-
-            var params = searchStore.getSectionValues(section);
+            var params = searchStore.getSectionValues(activeSection);
 
             // needed categories will be returned base on filter
             if (params.base_category) {
@@ -163,22 +166,30 @@ define([
             }
 
             params.location_id = locationsStore.getCurrentLocation().id;
-            params.items_per_page = resultsStore.getItemsPerPage();
+            // params.items_per_page = resultsStore.getItemsPerPage();
 
-            params.display = searchStore.getValue('common', 'display');
-            params.order_by = searchStore.getValue('common', 'order_by');
-            params.filters = {
-                'brand': searchStore.getValue('common', 'brand'),
-                'light_truck': searchStore.getValue('common', 'light_truck'),
-                'run_flat': searchStore.getValue('common', 'run_flat'),
-                'category': searchStore.getValue('common', 'category')
-            };
-            params.needed_filters = ['brand', 'run_flat', 'light_truck', 'category'];
+            params = _.assign(params, searchStore.getSectionValues('common'));
+
+            params.filters = searchStore.getSectionValues('filters');
 
             return params;
         },
         isReadyForSearch: function() {
-            
+            var sectionValues = searchStore.getSectionValues(activeSection);
+            var isReady = false;
+            switch (activeSection) {
+                case 'size':
+                    isReady = (sectionValues.width && sectionValues.height && sectionValues.rim);
+                    break;
+                case 'vehicle':
+                    isReady = (sectionValues.car_tire_id != false);
+                    break;
+                case 'part_number':
+                    isReady = (sectionValues.part_number != false);
+                    break;
+            }
+
+            return isReady;
         },
         dispatchToken: dispatcher.register(function(payload) {
             var change = false;
@@ -200,6 +211,9 @@ define([
                     });
                     change = true;
                     break;
+
+                case 'locations.current.change':
+                    payload.step = 1;
                 case 'tire.search':
                     if (payload.step == 1) {
                         setDefaultValue('display');
@@ -207,17 +221,23 @@ define([
                         setDefaultValue('run_flat');
                         setDefaultValue('light_truck');
                         setDefaultValue('category');
+                        setDefaultValue('page');
 
                         // set filter by category base on base_category
                         var baseCategoriesLength = fieldOptions.base_category.length;
                         for (var i = 0; i < baseCategoriesLength; i++) {
-                            if (fieldValues[activeSection].base_category == fieldOptions.base_category[i]['value']) {
-                                fieldValues['common']['category'] = fieldOptions.base_category[i]['categories'];
+                            if (fieldValues[activeSection].base_category == fieldOptions.base_category[i].value) {
+                                fieldValues.filters.category = fieldOptions.base_category[i].categories;
                                 break;
                             }
                         }
+
+                        change = true;
+                    } else if (payload.values) {
+                        if (payload.values.page) {
+                            setValue('common', 'page', payload.values.page);
+                        }
                     }
-                    change = true;
                     break;
                 case constants.LOAD_DEALER_CONFIG_SUCCESS:
                     var c = payload.config;
@@ -226,6 +246,7 @@ define([
                     }
                     setValue('size', 'base_category', c.default_base_category);
                     setValue('vehicle', 'base_category', c.default_base_category);
+                    setValue('common', 'items_per_page', c.items_per_page);
                     if (c.default_searching) {
                         activeSection = c.default_searching.replace('by_', '');
                     }
