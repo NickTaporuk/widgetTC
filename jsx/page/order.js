@@ -36,6 +36,7 @@ define([
         componentWillMount: function() {
             this._updateState();
         },
+
         componentDidMount: function() {
             customerStore.bind('change', this._updateState);
             vehicleStore.bind('change', this._updateState);
@@ -50,6 +51,7 @@ define([
                 self._isStripeLoaded = true;
             }
         },
+        
         componentWillUnmount: function() {
             customerStore.unbind('change', this._updateState);
             vehicleStore.unbind('change', this._updateState);    

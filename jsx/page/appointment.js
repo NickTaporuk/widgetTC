@@ -8,6 +8,7 @@ define([
     'load!stores/vehicleStore',
     'load!components/elements/select',
     'load!components/page/common/mainPrices',
+    'load!components/page/common/formField',
     'components/datetime/DateTime',
     'moment'
 ], function(
@@ -20,6 +21,7 @@ define([
     vehicleStore,
     SelectField,
     MainPrices,
+    Field,
     DateTime,
     moment
 ) {
@@ -67,21 +69,10 @@ define([
                         <form action="appointment-confirmation.php" className={cn('appointment_form')} onSubmit={this._handleFormSubmit}>
                             
                             <fieldset className={cn(['sixcol', 'col_left', 'appointment_fields'])}>
-                                <div className={cn('control_wrapper')}>
-                                    <label htmlFor={cn('order_your_name')}>Your Name <span className="req">*</span></label>
-                                    <input type="text" id={cn('order_your_name')} required ref="name" defaultValue={this.state.values.name} />
-                                    {this._getError('name')}
-                                </div>
-                                <div className={cn('control_wrapper')}>
-                                    <label htmlFor={cn('order_email')}>Email Address <span className="req">*</span></label>
-                                    <input type="email" id={cn('order_email')} required ref="email" defaultValue={this.state.values.email} />
-                                    {this._getError('email')}
-                                </div>
-                                <div className={cn('control_wrapper')}>
-                                    <label htmlFor={cn('order_phone')}>Phone Number <span className="req">*</span></label>
-                                    <input type="tel" id={cn('order_phone')} required ref="phone" defaultValue={this.state.values.phone} />
-                                    {this._getError('phone')}
-                                </div>
+                                <Field type="text" name="name" defaultValue={this.state.values.name} ref="name" label="Your Name" required={true} error={this._getError('name')} />
+                                <Field type="email" name="email" defaultValue={this.state.values.email} ref="email" label="Email Address" required={true} error={this._getError('email')} />
+                                <Field type="tel" name="phone" defaultValue={this.state.values.phone} ref="phone" label="Phone Number" required={true} error={this._getError('phone')} />
+
                                 { this.props.type === 'appointment'
                                     ?   <div className={cn('control_wrapper')}>
                                             <label htmlFor={cn('way_to_contact')}>Best way to contact</label>
@@ -93,19 +84,16 @@ define([
                                     :   null
                                 }
                                 { this.props.type === 'appointment'
-                                    ?   <div className={cn('control_wrapper')}>
-                                            <label htmlFor={cn('order_date_time')}>Preferred Date and Time</label>
-                                            {/*<input type="text" id={cn('order_date_time')} className={cn('datepicker')} ref="time" defaultValue={this.state.values.preferred_time} />*/}
-                                            <DateTime isValidDate={this._isValidDate} inputProps={ {'name': "preferred_time", 'readOnly': true} } ref="datetime" defaultValue={this.state.values.preferred_time} dateFormat="YYYY-MM-DD" timeFormat="HH:mm"/>
-                                            {this._getError('preferred_time')}
-                                        </div>
+                                    ?   <Field type="datetime" ref="datetime" name="datetime" defaultValue={this.state.values.preferred_time} label="Preferred Date and Time" error={this._getError('preferred_time')} 
+                                               custom={{
+                                                        isValidDate: this._isValidDate,
+                                                        inputProps: {'name': "preferred_time", 'readOnly': true},
+                                                        dateFormat: "YYYY-MM-DD",
+                                                        timeFormat: "HH:mm" 
+                                                }}  />
                                     :   null
                                 }
-                                <div className={cn('control_wrapper')}>
-                                    <label htmlFor={cn('order_notes')}>Notes</label>
-                                    <textarea id={cn('order_notes')} ref="notes" defaultValue={this.state.values.notes} />
-                                    {this._getError('notes')}
-                                </div>
+                                <Field type="textarea" name="notes" defaultValue={this.state.values.notes} ref="notes" label="Notes" error={this._getError('notes')} />
                             </fieldset>
 
                             <div className={cn(['sixcol', 'last', 'right', 'col_right', 'appointment_info'])}>
@@ -165,10 +153,12 @@ define([
             var text =  types[this.props.type].back.text;
             return <a href="#summary" onClick={this._handleBackClick} className={cn('back_link')}><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE5C4;' }} />{text}</a>
         },
+
         _getBtn: function() {
             var text = types[this.props.type].submit.text;
             return <button type="submit" className={cn('brand_btn')}><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE0BE;' }} /> {text}</button>
         },
+
         _getError: function(fieldName) {
             if (this.state.errors[fieldName]) {
                 return <span className={cn(['message', 'error', 'appointment_fields'])}>
@@ -178,6 +168,7 @@ define([
                 return null;
             }
         },
+
         _updateState: function(isInit) {
             var values = customerStore.getCustomer();
 
@@ -187,25 +178,28 @@ define([
                 options: vehicleStore.getAll(values.vehicle.year, values.vehicle.make, values.vehicle.model, values.vehicle.trim)
             });
         },
+
         _handleBackClick: function(event) {
             event.preventDefault();
             Act.Page.show(types[this.props.type].back.to);
         },
+
         _handleFormSubmit: function(event) {
             event.preventDefault();
             var values = {
-                name: this.refs.name.value,
-                email: this.refs.email.value,
-                phone: this.refs.phone.value,
-                notes: this.refs.notes.value,
+                name: this.refs.name.val(),
+                email: this.refs.email.val(),
+                phone: this.refs.phone.val(),
+                notes: this.refs.notes.val(),
                 vehicle_info: this._getVehicleInfo()
             };
             if (this.refs.datetime) {
-                values.preferred_time = this.refs.datetime.value();
+                values.preferred_time = this.refs.datetime.val();
             }
             if (this.refs.way_to_contact) {
                 values.way_to_contact = this.refs.way_to_contact.value;
             }
+            console.log(values);
 
             types[this.props.type].submit.action(values);
         },

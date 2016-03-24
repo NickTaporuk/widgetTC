@@ -630,6 +630,21 @@
 					color: $orangeLight;
 				}
 			}
+
+			&.tcwlw_in_stock {
+				a {
+					background: $green;
+
+					&[aria-selected="false"] {
+						border-color: $green;
+					}
+
+					&[aria-selected="true"] {
+						color: $green;
+						background: white;
+					}
+				}
+			}
 		}
 
 		.tcwlw_tab_cont.tcwlw_tab_cont {
@@ -666,6 +681,46 @@
 
 			.tcwlw_result_specs_list {
 				padding: 0;
+			}
+
+			.tcwlw_result_stock_info {
+				width: auto;
+				margin: 0;
+				@include font-size(1);
+
+				td {
+					text-align: left;
+					padding: 0;
+				}
+
+				ul, li {
+					list-style: none;
+					padding: 0;
+				}
+
+				td:first-child {
+					@include padding-right(0.5);
+					+ td {
+						a {
+							display: none;
+						}
+					}
+				}
+
+				@include tireconnect-width(tiny) {
+					&.tcwlw_with_branches {
+						td:first-child {
+							display: none;
+							padding: 0;
+
+							+ td {
+								a {
+									display: inline;
+								}	
+							}
+						}
+					}
+				}
 			}
 		}
 
@@ -729,9 +784,13 @@
 		// Stock tab
 		.tcwlw_stock_suppliers {
 			li {
+				a {
+					@include margin-right(1);
+				}
+
 				.tcwlw_btn_small {
 					@include padding(0.4);
-					@include margin-left(1);
+					margin-right: 0; 
 				}
 			}
 		}

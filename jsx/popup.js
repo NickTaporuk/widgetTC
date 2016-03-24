@@ -44,7 +44,6 @@ define([
                     if (this.state.props.image) {
                         content = <img src={this.state.props.image} />
                     } else {
-                        console.log(this.state.props.content);
                         content = this.state.props.content ? <p dangerouslySetInnerHTML={ {__html: this.state.props.content} } /> : null;
                     }
                     break;

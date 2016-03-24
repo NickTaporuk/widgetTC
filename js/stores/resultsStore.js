@@ -55,6 +55,8 @@ define([
             if (tire.category == 'Not Defined') {
                 tire.category = 'Undefined Category';
             }
+
+            tire.is_in_stock = (showInStock && tire.is_in_stock);
         });
     }
 
@@ -102,7 +104,7 @@ define([
                 case constants.LOAD_DEALER_CONFIG_SUCCESS:
                     var c = payload.config;
                     defaultSelectedQuantity = c.default_selected_quantity;
-                    // showInStock = c.show_in_stock;
+                    showInStock = c.show_in_stock;
                     change = true;
                     break;
                 case 'tire.select':

@@ -402,7 +402,7 @@ define([
                 });
             };
 
-            var validationErrors = validateParamsForQuote(data, data.name ? ['name', 'email', 'phone', 'vehicle_info'] : []);
+            var validationErrors = validateParamsForQuote(data, !config.sa && data.name !== undefined ? ['name', 'email', 'phone', 'vehicle_info'] : []);
             if (validationErrors) {
                 dispatchError(validationErrors);
             } else {
@@ -438,8 +438,8 @@ define([
                     errors: errors
                 });
             };
-
-            var validationErrors = validateParamsForQuote(data, data.name ? ['name', 'email', 'phone', 'vehicle_info'] : ['email']);
+            
+            var validationErrors = validateParamsForQuote(data, !config.sa && data.name !== undefined ? ['name', 'email', 'phone', 'vehicle_info'] : ['email']);
             if (validationErrors) {
                 dispatchError(validationErrors);
             } else {

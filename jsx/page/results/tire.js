@@ -66,7 +66,7 @@ define([
                         items.push(<li key={i}>{desc}</li>);
                     }
                 });
-                features = <div className={cn('tab_cont')} id={cn('features_result_1')} aria-hidden={!(tab == 'features')}><ul>{items}</ul></div>;
+                features = <div className={cn('tab_cont')} aria-hidden={!(tab == 'features')}><ul>{items}</ul></div>;
             }
 
             var quantityItems = [];
@@ -148,8 +148,8 @@ define([
                                     }
                                     {
                                         config.sa
-                                        ? <li className={cn(['tab', 'stock_tab'])} role="presentation">
-                                            <a href="#stock" onClick={this._handleTabClick.bind(this, 'stock')} aria-selected={(tab == 'stock')}>Stock</a>
+                                        ? <li className={cn({tab: true, stock_tab: true, in_stock: tire.is_in_stock})} role="presentation">
+                                            <a href="#stock" onClick={this._handleTabClick.bind(this, 'stock')} aria-selected={(tab == 'stock')}>{tire.is_in_stock ? 'In-Stock' : 'Stock'}</a>
                                         </li>
                                         : null
                                     }
@@ -218,32 +218,36 @@ define([
 
         _getStockInfo: function() {
             var info = [];
-            if (!this.state.stock.length) {
-                var info = [];
-                this.state.fullStock.map(function(supplierInfo, i) {
-                    info.push( 
-                        <li key={i}>
-                            <a href={'#'+ i} onClick={this._handleStockClick}>{supplierInfo.supplier.nice_name + ': ' + supplierInfo.quantity}</a>
-                            <a href={'#'+ i} className={cn(['btn_small', 'brand_btn'])} disabled={ supplierInfo.supplier.name == this.state.supplier } dangerouslySetInnerHTML={{ __html: supplierInfo.supplier.name == this.state.supplier ? 'Selected &#x2714;' : 'Select' }} onClick={this._handleSupplierViewClick} />
-                        </li> 
-                    );
-                }.bind(this));
+                
+            var info = [];
+            this.state.fullStock.map(function(supplierInfo, i) {
+                info.push( 
+                    <li key={i}>
+                        <a href={'#'+ i} onClick={this._handleStockClick}>{supplierInfo.supplier.nice_name + ': ' + supplierInfo.quantity}</a>
+                        <a href={'#'+ i} className={cn(['btn_small', 'brand_btn'])} disabled={ supplierInfo.supplier.name == this.state.supplier } dangerouslySetInnerHTML={{ __html: supplierInfo.supplier.name == this.state.supplier ? 'Selected &#x2714;' : 'Select' }} onClick={this._handleSupplierViewClick} />
+                    </li> 
+                );
+            }.bind(this));
 
-                return <div>
-                    <h5 className={cn('result_reviews_heading')}>Item: {this.props.tire.part_number}</h5>
-                    <ul className={cn('stock_suppliers')}>{info}</ul>
-                </div>
-            } else if (this.state.stock.length > 0) {
+            var suppliers = <td>
+                <h5 className={cn('result_reviews_heading')}>Item: {this.props.tire.part_number}</h5>
+                <ul className={cn('stock_suppliers')}>{info}</ul>
+            </td>;
+
+            var branches = null;
+            if (this.state.stock.length > 0) {
+                var info = [];
                 this.state.stock.map(function(branch, i) {
                     info.push(<li key={i}>{branch.branch + ': ' + branch.quantity}</li>);
                 });
 
-                return <div>
+                branches = <td className={cn('result_branches')}>
                     <h5 className={cn('result_reviews_heading')}>{this.state.stockFor.supplier.nice_name}</h5>
                     <ul>{info}</ul>
                     <a href="#stock_back" onClick={this._hangleStockBackClick}>Back</a>
-                </div>;
+                </td>;
             }
+            return <table className={cn({result_stock_info: true, with_branches: (this.state.stock.length > 0)})}><tr>{suppliers}{branches}</tr></table>;
         },
 
         _hangleStockBackClick: function(event) {
