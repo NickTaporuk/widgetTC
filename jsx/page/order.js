@@ -9,7 +9,7 @@ define([
     'load!components/page/common/mainPrices',
     'validate',
     'moment',
-    'components/datetime/DateTime',
+    'load!components/page/common/formField',
     'config'
 ], function(
     React,
@@ -22,7 +22,7 @@ define([
     MainPrices,
     validate,
     moment,
-    DateTime,
+    Field,
     config
 ) {
 
@@ -76,26 +76,19 @@ define([
                                 </div>
                             </fieldset>
                             <fieldset className={cn(['sixcol', 'col_left', 'order_fields'])}>
-                                <div className={cn('control_wrapper')}>
-                                    <label htmlFor={cn('order_your_name')}>Your Name <span className="req">*</span></label>
-                                    <input type="text" id={cn('order_your_name')} required ref="name" defaultValue={this.state.values.name} disabled={this.state.status == 'incomplete'} />
-                                    {this._getError('name')}
-                                </div>
-                                <div className={cn('control_wrapper')}>
-                                    <label htmlFor={cn('order_email')}>Email Address <span className="req">*</span></label>
-                                    <input type="email" id={cn('order_email')} required ref="email" defaultValue={this.state.values.email} disabled={this.state.status == 'incomplete'} />
-                                    {this._getError('email')}
-                                </div>
-                                <div className={cn('control_wrapper')}>
-                                    <label htmlFor={cn('order_phone')}>Phone Number <span className="req">*</span></label>
-                                    <input type="tel" id={cn('order_phone')} required ref="phone" defaultValue={this.state.values.phone} disabled={this.state.status == 'incomplete'} />
-                                    {this._getError('phone')}
-                                </div>
-                                <div className={cn('control_wrapper')}>
-                                    <label htmlFor={cn('order_date_time')}>Preferred Date and Time</label>
-                                    <DateTime isValidDate={this._isValidDate} inputProps={ {'name': "preferred_time", 'readOnly': true} } ref="datetime" defaultValue={this.state.values.preferred_time} dateFormat="YYYY-MM-DD" timeFormat="HH:mm"/>
-                                    {this._getError('preferred_time')}
-                                </div>
+
+                                <Field type="text" name="name" defaultValue={this.state.values.name} ref="name" label="Your Name" required={true} error={this._getError('name')} disabled={this.state.status == 'incomplete'} />
+                                <Field type="email" name="email" defaultValue={this.state.values.email} ref="email" label="Email Address" required={true} error={this._getError('email')} disabled={this.state.status == 'incomplete'} />
+                                <Field type="tel" name="phone" defaultValue={this.state.values.phone} ref="phone" label="Phone Number" required={true} error={this._getError('phone')} disabled={this.state.status == 'incomplete'} />
+                                <Field type="datetime" ref="datetime" name="datetime" defaultValue={this.state.values.preferred_time} label="Preferred Date and Time" error={this._getError('preferred_time')} 
+                                       custom={{
+                                                isValidDate: this._isValidDate,
+                                                inputProps: {'name': "preferred_time", 'readOnly': true},
+                                                dateFormat: "YYYY-MM-DD",
+                                                timeFormat: "HH:mm" 
+                                        }}
+                                />
+
                                 <div className={cn('control_wrapper')}>
                                     <label htmlFor={cn('vehicle_year')}>Vehicle Info <span className="req">*</span></label>
                                     <div className={cn(['sixcol', 'field'])}>
@@ -118,29 +111,28 @@ define([
                                     {this._getError('vehicle_info')}
                                 </div>
                                 
-                                <div className={cn('control_wrapper')}>
-                                    <label htmlFor={cn('order_notes')}>Notes</label>
-                                    <textarea id={cn('order_notes')} defaultValue={this.state.values.notes} ref="notes" disabled={this.state.status == 'incomplete'} />
-                                    {this._getError('notes')}
-                                </div>
+                                <Field type="textarea" name="notes" defaultValue={this.state.values.notes} ref="notes" label="Notes" error={this._getError('notes')} disabled={this.state.status == 'incomplete'} />
                             </fieldset>
                             <div className={cn(['sixcol', 'last', 'col_right', 'order_info'])}>
                                 
-                                {/*<div className={cn('control_wrapper')}>
-                                    <label htmlFor={cn('vehicle_info')}>Vehicle Info</label>
-                                    <textarea id={cn('vehicle_info')} defaultValue={this.state.values.vehicle_info ? this.state.values.vehicle_info : this.props.vehicleInfo} ref="vehicle_info" disabled={this.state.status == 'incomplete'} />
-                                </div>*/}
-                                <div className={cn('control_wrapper')}>
-                                    <label htmlFor={cn('order_card_number')}>Credit Card Number <span className="req">*</span></label>
-                                    <input type="text" id={cn('order_card_number')} autoComplete="off" pattern="\d*" required ref="card_number" defaultValue="4242424242424242" />
-                                    {this._getError('number')}
-                                </div>
-                                <div className={cn('control_wrapper')}>
-                                    <label htmlFor={cn('order_cvc_number')}>CVC Number <span className="req">*</span><small className={cn('label_note')}>(3 digit security code on the back of the card)</small></label>
-                                    <input type="text" id={cn('order_cvc_number')} className={cn('sixcol')} autoComplete="off" maxLength="4" pattern="\d*" required ref="cvc_number" defaultValue="123" />
-                                    <div style={{clear: 'both'}} />
-                                    {this._getError('cvc')}
-                                </div>
+                                <Field type="text" name="card_number" defaultValue="4242424242424242" ref="card_number" label="Credit Card Number" required={true} error={this._getError('number')} 
+                                    custom={{
+                                        autoComplete: 'off',
+                                        pattern: "\\d*",
+                                        maxLength: 16
+                                    }}
+                                />
+
+                                <Field type="text" name="cvc_number" defaultValue="123" ref="cvc_number" label="VC Number" required={true} error={this._getError('cvc')} 
+                                    note="(3 digit security code on the back of the card)"
+                                    custom={{
+                                        autoComplete: 'off',
+                                        pattern: "\\d*",
+                                        className: cn('sixcol'),
+                                        maxLength: 4
+                                    }}
+                                />
+
                                 <div className={cn(['control_wrapper', 'order_expiration'])}>
                                     <label htmlFor={cn('order_expiration_month')}>Expiration Date (MM/YYYY) <span className="req">*</span></label>
                                     <input type="text" id={cn('order_expiration_month')} className={cn('sixcol')} maxLength="2" pattern="\d*" required ref="exp_month" defaultValue="12" />
@@ -252,8 +244,8 @@ define([
             this.setState({'disabled': true});
 
             var stripeValues = {
-                number: this.refs.card_number.value,
-                cvc: this.refs.cvc_number.value,
+                number: this.refs.card_number.value(),
+                cvc: this.refs.cvc_number.value(),
                 exp_month: this.refs.exp_month.value,
                 exp_year: this.refs.exp_year.value 
             };
@@ -273,12 +265,12 @@ define([
                     } else {
                         var values = {
                             token: response.id,
-                            name: self.refs.name.value,
-                            email: self.refs.email.value,
-                            phone: self.refs.phone.value,
+                            name: self.refs.name.value(),
+                            email: self.refs.email.value(),
+                            phone: self.refs.phone.value(),
                             preferred_time: self.refs.datetime.value(),
-                            notes: self.refs.notes.value,
-                            vehicle_info: self._getVehicleInfo(),
+                            notes: self.refs.notes.value(),
+                            vehicle_info: self._getVehicleInfo()
                         };
 
                         Act.Order.payment(values); 

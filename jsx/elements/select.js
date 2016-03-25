@@ -9,7 +9,7 @@ define([
     return {
         getDefaultProps: function() {
             return {
-                require: false,
+                required: false,
                 emptyDesc: '- Select -',
                 disabled: false,
                 value: null,
@@ -22,10 +22,8 @@ define([
             var options = [];
             var disabled = this.props.disabled;
 
-            if (this.props.emptyDesc) {
-                options.push(<option key="-1" value="">{ this.props.emptyDesc }</option>);
-            } else if (this.props.options.length == 0) {
-                options.push(<option key="-1" value="">- Select -</option>);
+            if (this.props.emptyDesc || this.props.options.length == 0) {
+                options.push(<option key="-1" value="">{ this.props.emptyDesc ? this.props.emptyDesc : '- Select -' }</option>);
             }
 
             if (this.props.options.length == 0) {
@@ -39,11 +37,11 @@ define([
             var name = this.props.name;
 
             var req = null;
-            if (this.props.require) {
+            if (this.props.required) {
                 req = <span className="req">*</span>;
             }
 
-            var select = <select onChange={this._handleChange} value={this.props.value} ref={name} id={cn(name)} name={name} disabled={disabled} defaultValue={this.props.defaultValue}>
+            var select = <select onChange={this.props.onChange} value={this.props.value} ref={name} id={cn(name)} name={name} disabled={disabled} defaultValue={this.props.defaultValue}>
                             {options}
                         </select>;
 
@@ -59,10 +57,8 @@ define([
             }
         },
 
-        _handleChange: function(event) {
-            if (this.props.onChange) {
-                this.props.onChange(event);
-            }
+        value: function() {
+            return this.refs[this.props.name].value;
         }
     }
 

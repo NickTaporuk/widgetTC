@@ -9,7 +9,6 @@ define([
     'load!components/elements/select',
     'load!components/page/common/mainPrices',
     'load!components/page/common/formField',
-    'components/datetime/DateTime',
     'moment'
 ], function(
     React,
@@ -22,7 +21,6 @@ define([
     SelectField,
     MainPrices,
     Field,
-    DateTime,
     moment
 ) {
 
@@ -69,18 +67,16 @@ define([
                         <form action="appointment-confirmation.php" className={cn('appointment_form')} onSubmit={this._handleFormSubmit}>
                             
                             <fieldset className={cn(['sixcol', 'col_left', 'appointment_fields'])}>
-                                <Field type="text" name="name" defaultValue={this.state.values.name} ref="name" label="Your Name" required={true} error={this._getError('name')} />
-                                <Field type="email" name="email" defaultValue={this.state.values.email} ref="email" label="Email Address" required={true} error={this._getError('email')} />
-                                <Field type="tel" name="phone" defaultValue={this.state.values.phone} ref="phone" label="Phone Number" required={true} error={this._getError('phone')} />
+                                <Field type="text" name="name" defaultValue={this.state.values.name} ref="name" label="Your Name" required={!config.sa} error={this._getError('name')} />
+                                <Field type="email" name="email" defaultValue={this.state.values.email} ref="email" label="Email Address" required={!config.sa || this.props.type === 'email'} error={this._getError('email')} />
+                                <Field type="tel" name="phone" defaultValue={this.state.values.phone} ref="phone" label="Phone Number" required={!config.sa} error={this._getError('phone')} />
 
                                 { this.props.type === 'appointment'
-                                    ?   <div className={cn('control_wrapper')}>
-                                            <label htmlFor={cn('way_to_contact')}>Best way to contact</label>
-                                            <select id={cn('way_to_contact')} ref="way_to_contact" defaultValue={this.state.values.way_to_contact}>
-                                                <option value="phone">Phone</option>
-                                                <option value="email">Email</option>
-                                            </select>
-                                        </div>
+                                    ?   <Field type="select" name="way_to_contact" defaultValue={this.state.values.way_to_contact} ref="way_to_contact" label="Best way to contact" 
+                                            custom={{
+                                                options: [{value: 'phone', description: 'Phone'}, {value: 'email', description: 'Email'}]
+                                            }}
+                                        />
                                     :   null
                                 }
                                 { this.props.type === 'appointment'
@@ -90,7 +86,8 @@ define([
                                                         inputProps: {'name': "preferred_time", 'readOnly': true},
                                                         dateFormat: "YYYY-MM-DD",
                                                         timeFormat: "HH:mm" 
-                                                }}  />
+                                                }}
+                                        />
                                     :   null
                                 }
                                 <Field type="textarea" name="notes" defaultValue={this.state.values.notes} ref="notes" label="Notes" error={this._getError('notes')} />
@@ -99,7 +96,7 @@ define([
                             <div className={cn(['sixcol', 'last', 'right', 'col_right', 'appointment_info'])}>
 
                                 <div className={cn('control_wrapper')}>
-                                    <label htmlFor={cn('vehicle_year')}>Vehicle Info <span className="req">*</span></label>
+                                    <label htmlFor={cn('vehicle_year')}>Vehicle Info {config.sa ? null : <span className="req">*</span>}</label>
                                     <div className={cn(['sixcol', 'field'])}>
                                         <SelectField name="year" options={this.state.options.years} emptyDesc="- Year -" withWrapper={false} onChange={this._vehicleChange} value={this.state.values.vehicle.year} />
                                     </div>
@@ -187,19 +184,18 @@ define([
         _handleFormSubmit: function(event) {
             event.preventDefault();
             var values = {
-                name: this.refs.name.val(),
-                email: this.refs.email.val(),
-                phone: this.refs.phone.val(),
-                notes: this.refs.notes.val(),
+                name: this.refs.name.value(),
+                email: this.refs.email.value(),
+                phone: this.refs.phone.value(),
+                notes: this.refs.notes.value(),
                 vehicle_info: this._getVehicleInfo()
             };
             if (this.refs.datetime) {
-                values.preferred_time = this.refs.datetime.val();
+                values.preferred_time = this.refs.datetime.value();
             }
             if (this.refs.way_to_contact) {
-                values.way_to_contact = this.refs.way_to_contact.value;
+                values.way_to_contact = this.refs.way_to_contact.value();
             }
-            console.log(values);
 
             types[this.props.type].submit.action(values);
         },

@@ -109,29 +109,29 @@ define([
                                         options={this.state.fieldOptions.year}                                                                     
                                         value={this.state.fieldValues.vehicle.year} onChange={this._handleVehicleChange} 
                                         name="vehicle_year" label="Choose Year"
-                                        className={cn(['field'])} require={true} />
+                                        className={cn(['field'])} required={true} />
                             <SelectField 
                                         options={this.state.fieldOptions.make}          
                                         value={this.state.fieldValues.vehicle.make} onChange={this._handleVehicleChange}
-                                        name="vehicle_make" label="Choose Make" require={true}
-                                        className={cn(['last', 'field'])} disabled={this.state.fieldOptions.make.length <= 0} />
+                                        name="vehicle_make" label="Choose Make" required={true}
+                                        className={cn(['field'])} disabled={this.state.fieldOptions.make.length <= 0} />
                             <SelectField 
                                         options={this.state.fieldOptions.model}         
                                         value={this.state.fieldValues.vehicle.model} onChange={this._handleVehicleChange}
                                         name="vehicle_model" label="Choose Model"
-                                        className={cn(['field'])} disabled={this.state.fieldOptions.model.length <= 0} require="1" />
+                                        className={cn(['field'])} disabled={this.state.fieldOptions.model.length <= 0} required="1" />
                         </div>
                         <div className={cn(['sixcol', 'last', 'fields_wrapper_2'])}>
                             <SelectField 
                                         options={this.state.fieldOptions.trim}          
                                         value={this.state.fieldValues.vehicle.trim} onChange={this._handleVehicleChange}
                                         name="vehicle_trim" label="Choose Trim"
-                                        className={cn(['last', 'field'])} disabled={this.state.fieldOptions.trim.length <= 0} require="1" />
+                                        className={cn(['field'])} disabled={this.state.fieldOptions.trim.length <= 0} required="1" />
                             <SelectField 
                                         options={this.state.fieldOptions.car_tire_id}   
                                         value={this.state.fieldValues.vehicle.car_tire_id} onChange={this._handleFieldChange}
                                         name="vehicle_car_tire_id" label="Tire Size"    
-                                        className={cn(['last', 'field'])} disabled={this.state.fieldOptions.car_tire_id.length <= 0} require="1" emptyDesc={false}/>
+                                        className={cn(['field'])} disabled={this.state.fieldOptions.car_tire_id.length <= 0} required="1" emptyDesc={false}/>
                             <SelectField 
                                         options={this.state.fieldOptions.base_category}                                                            
                                         value={this.state.fieldValues.vehicle.base_category} onChange={this._handleFieldChange} 
@@ -149,17 +149,17 @@ define([
                                         options={this.state.fieldOptions.width}         
                                         value={this.state.fieldValues.size.width} onChange={this._handleFieldChange}          
                                         name="size_width" label="Choose Width"  
-                                        className={cn(['field'])} require="1" />
+                                        className={cn(['field'])} required="1" />
                             <SelectField 
                                         options={this.state.fieldOptions.height}        
                                         value={this.state.fieldValues.size.height} onChange={this._handleFieldChange}  
-                                        name="size_height" label="Choose Height" require="1" 
+                                        name="size_height" label="Choose Height" required="1" 
                                         className={cn(['last', 'field'])} />
                             <SelectField 
                                         options={this.state.fieldOptions.rim}           
                                         value={this.state.fieldValues.size.rim} onChange={this._handleFieldChange} 
                                         name="size_rim" label="Choose Rim"    
-                                        className={cn(['field'])} require="1" />
+                                        className={cn(['field'])} required="1" />
                         </div>
                         <div className={cn(['sixcol', 'last', 'fields_wrapper_2'])}>
                             <SelectField 

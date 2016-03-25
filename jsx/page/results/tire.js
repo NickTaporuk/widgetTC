@@ -6,7 +6,8 @@ define([
     'lib/helper',
     'moment',
     'load!stores/stockStore',
-    'load!stores/reviewsStore'
+    'load!components/page/results/tire/offerInfo',
+    'load!components/page/results/tire/reviews'
 ], function(
     React,
     config,
@@ -15,14 +16,16 @@ define([
     h,
     moment,
     stockStore,
-    reviewsStore
+    OfferInfo,
+    Reviews
 ) {
 
     return {
+        displayName: 'Tire',
+
         getInitialState: function() {
             return {
                 activeTab: 'specs',
-                showRebate: false,
 
                 fullStock: [],
                 stock: [],
@@ -37,17 +40,18 @@ define([
                 selQuantity: this.props.tire.selected_quantity,
                 quantity: this.props.tire.quantity,
                 price: this.props.tire.price,
+                isInStock: this.props.tire.is_in_stock,
                 supplier: this.props.tire.supplier
             });
             this._updateState();
         },
+
         componentDidMount: function() {
             stockStore.bind('change', this._updateState);
-            reviewsStore.bind('change', this._updateState);
         },
+
         componentWillUnmount: function() {
             stockStore.unbind('change', this._updateState);    
-            reviewsStore.unbind('change', this._updateState);    
         },
 
         render: function() {
@@ -101,7 +105,7 @@ define([
                                     :   null
                                 }
                             </div>
-                            {this._getRebateBlock()}
+                            <OfferInfo tire={this.props.tire} />
                             {this._getOemBlock()}
                             {this._getRatingBlock()}
                         </div>
@@ -165,8 +169,7 @@ define([
                                 </div>
                                 {features}
                                 <div className={cn('tab_cont')} aria-hidden={!(tab == 'reviews')}>
-                                    <h4 className={cn('result_reviews_heading')}><strong>{this.props.tire.external_info.rating.total_reviews}</strong> reviews:</h4>
-                                    {this._getReviewsBlock()}
+                                    <Reviews tireId={tire.id} />
                                 </div>
                                 <div className={cn('tab_cont')} aria-hidden={!(tab == 'stock')}>
                                     {this._getStockInfo()}
@@ -186,34 +189,8 @@ define([
             if (this.state.stockFor) {
                 state.stock = stockStore.getBranches(this.state.stockFor.tire_id);
             }
-            if (this.state.activeTab == 'reviews') {
-                state.reviews = reviewsStore.getReviews(this.props.tire.id);
-                state.totalReviews = reviewsStore.getTotalReviews(this.props.tire.id);
-            }
 
             this.setState(state);
-        },
-
-        _getReviewsBlock: function() {
-            var items = [];
-
-            this.state.reviews.map(function(review, i) {
-                items.push((
-                    <div key={i} className={cn('result_review')}>
-                        <h5 className={cn('result_review_title')}>{review.title}</h5>
-                        {this._getStars(review.rating)}
-                        <span className={cn('result_review_date')}>{moment(review.submitted_at).format('MMMM DD, YYYY')}</span>
-                        <div className={cn('result_review_content')}>
-                            <p dangerouslySetInnerHTML={{ __html: review.text }} />
-                        </div>
-                    </div>
-                ));
-            }.bind(this));
-
-            if (this.state.reviews.length < this.state.totalReviews) {
-                items.push(<a key="more" onClick={this._handleMoreReviews} href="#more">Show more reviews</a>);
-            }
-            return items;
         },
 
         _getStockInfo: function() {
@@ -306,64 +283,6 @@ define([
             );
         },
 
-        _getRebateBlock: function() {
-            var tire = this.props.tire,
-                block;
-
-            var offer = null;
-
-            var rebates = tire.rebates;
-            if (rebates && rebates[0] && rebates[0].valid_range) {
-                offer = rebates[0];
-            } else if (tire.discount) {
-                offer = tire.discount;
-                if (offer[0] !== undefined) { // needed as there are bug in response (if no discount we receive array. But it must be null)
-                    offer = null;
-                }
-            }
-
-            if (offer) {
-                var link;
-                if (offer.coupon_link && offer.coupon_line) {
-                    link = <a target="_blank" rel="nofollow" href={offer.coupon_link}>{offer.coupon_line}</a>          
-                }
-
-                var range;
-                if (!offer.valid_range.is_ongoing) {
-                    range = 'Valid from ' + moment(offer.valid_range.start_date).format('MMM. DD') + ' to ' + moment(offer.valid_range.end_date).format('MMM. DD, YYYY') + '*';
-                }
-
-                var legalLine;
-                if (offer.legal_link) {
-                    legalLine = <span>{ offer.valid_range.is_ongoing ? '' : '*' }<a target="_blank" rel="nofollow" href={offer.legal_link} style={{color: offer.color }} dangerouslySetInnerHTML={ {__html: offer.legal_line} } /></span>;
-                }
-                
-                block = (
-                    <span className={cn(['result_rebate', 'tooltip'])}>
-                        <a href="#show_rebate" onClick={this._showRebate} className={cn({toggle: true, toggle_open: this.state.showRebate})}>{offer.name} <i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE887;'}} /></a>
-
-                        <span className={cn(['tooltip_content', 'toggle_content']) + ' ' + cn({toggle_hidden: !this.state.showRebate})} id={cn('result_2_rebate')}>
-                            <p>
-                                {offer.description} {range ? <br /> : null}
-                                {range} <br />
-                                {link} {link ? <br /> : null}
-                                {legalLine}
-                            </p>
-                        </span>
-                    </span>
-                );
-            }
-
-            return block;
-        },
-
-        _showRebate: function(event) {
-            event.preventDefault();
-            this.setState({
-                showRebate: !this.state.showRebate
-            });
-        },
-
         _getOemBlock: function() {
             var tire = this.props.tire,
                 block;
@@ -392,10 +311,7 @@ define([
                 Act.Tire.loadRewiews(this.props.tire.id);   
             }
         },
-        _handleMoreReviews: function(event) {
-            event.preventDefault();
-            Act.Tire.loadRewiews(this.props.tire.id, this.state.reviews.length);
-        },
+
         _handleStockClick: function(event) {
             event.preventDefault();
             var index = event.target.href.replace(/^[^#]+#/, '');
@@ -407,6 +323,7 @@ define([
                 stockFor: supplier
             });
         },
+
         _handleSupplierViewClick: function(event) {
             event.preventDefault();
             var index = event.target.href.replace(/^[^#]+#/, '');
@@ -420,20 +337,24 @@ define([
                 supplier: supplier.supplier.name
             });
         },
+
         _handleQuantityChange: function() {
             this.setState({
                 selQuantity: parseInt(this.refs.quantity.value)
             });
         },
+
         _handleSelectClick: function(event) {
             event.preventDefault();
             var supplier = this.state.supplierIndex ? this.state.fullStock[this.state.supplierIndex] : null;
             Act.Tire.select(this.props.tire, this.state.selQuantity, supplier);
         },
+
         _handleGetQuoteClick: function(event) {
             event.preventDefault();
             Act.Quote.requestForm(this.props.tire.id, this.state.selQuantity);
         },
+
         _handleEnlargeClick: function(event) {
             event.preventDefault();
             Act.Tire.enlargeImage(this.props.tire.external_info.marketing.images[0], this.props.tire.model);
