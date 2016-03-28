@@ -26,6 +26,10 @@ define([
             }
         },
  
+        componentWillMount: function() {
+            this._updateState();
+        },
+
         componentDidMount: function() {
             reviewsStore.bind('change', this._updateState);
         },
@@ -34,12 +38,19 @@ define([
             reviewsStore.unbind('change', this._updateState);    
         },
 
+        componentDidUpdate: function() {
+            if (isMobile.any && this.reviews.length <= 5) {
+                h.scrollToTop( this.refs.reviews , true );
+                this._handleTabClick('reviews');
+            }
+        },
+
         shouldComponentUpdate: function(nextProps, nextState) {
             return nextState.reviews.length !== this.state.reviews.length;
         },
 
         render: function() {
-            if (this.state.totalReviews === 0) {
+            if (!this.state.totalReviews) {
                 return null;
             }
 

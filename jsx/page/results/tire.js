@@ -2,6 +2,7 @@ define([
     'react',
     'config',
     'classnames',
+    'isMobile',
     'load!actions/actions',
     'lib/helper',
     'load!components/page/results/tire/offerInfo',
@@ -12,6 +13,7 @@ define([
     React,
     config,
     cn,
+    isMobile,
     Act,
     h,
     OfferInfo,
@@ -124,15 +126,15 @@ define([
                             </div>
                             <div className={cn(['tabs', 'result_tabs'])}>
                                 <ul>
-                                    <li className={cn('tab')}><a href="#specs_result_1" onClick={this._handleTabClick.bind(this, 'specs')} className={cn('font_color')} aria-selected={(tab == 'specs')}>Specs</a></li>
+                                    <li className={cn('tab')}><a href="#specs" onClick={this._handleTabClick.bind(this, 'specs')} className={cn('font_color')} aria-selected={(tab == 'specs')}>Specs</a></li>
                                     {
                                         features
-                                        ? <li className={cn('tab')}><a href="#features_result_1" onClick={this._handleTabClick.bind(this, 'features')} className={cn('font_color')} aria-selected={(tab == 'features')}>Features</a></li>
+                                        ? <li className={cn('tab')}><a href="#features" onClick={this._handleTabClick.bind(this, 'features')} className={cn('font_color')} aria-selected={(tab == 'features')}>Features</a></li>
                                         : null
                                     }
                                     {   
                                         this.props.tire.external_info.rating.total_reviews
-                                        ? <li className={cn('tab')}><a href="#reviews_result_1" onClick={this._handleTabClick.bind(this, 'reviews')} className={cn('font_color')}  aria-selected={(tab == 'reviews')}>Reviews</a></li>
+                                        ? <li className={cn('tab')}><a href="#reviews" ref="reviews" onClick={this._handleTabClick.bind(this, 'reviews')} className={cn('font_color')}  aria-selected={(tab == 'reviews')}>Reviews</a></li>
                                         : null
                                     }
                                     {
@@ -186,6 +188,13 @@ define([
             );
         },
 
+        // _handleReviewsClick: function() {
+        //     if (isMobile.any) {
+        //         h.scrollToTop( this.refs.reviews , true );
+        //         this._handleTabClick('reviews');
+        //     }
+        // },
+
         _getOemBlock: function() {
             var tire = this.props.tire,
                 block;
@@ -202,7 +211,9 @@ define([
         },
 
         _handleTabClick: function(tab, event) {
-            event.preventDefault();
+            if (event) {
+                event.preventDefault();
+            }
 
             this.setState({
                 activeTab: tab

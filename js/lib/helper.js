@@ -90,11 +90,11 @@ define(['config'], function(config) {
 			 	return [sx, sy];
 			}
 		},
-		scrollToTop: function(el) {
+		scrollToTop: function(el, force) {
             var scrollPos = h.getScrollPos();
             var offset = h.getOffset(el);
 
-            if (scrollPos[1] > offset.top) {
+            if (scrollPos[1] > offset.top || force) {
                 var winHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
                 window.scrollTo(0, offset.top - winHeight/8);
             }

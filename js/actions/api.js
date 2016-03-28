@@ -6,6 +6,7 @@ define([
     'moment',
     'load!actions/constants',
     'load!stores/vehicleStore',
+    'load!stores/reviewsStore',
     'config'
 ], function(
     dispatcher,
@@ -15,6 +16,7 @@ define([
     moment,
     constants,
     vehicleStore,
+    reviewsStore,
     config
 ) {
 
@@ -598,17 +600,32 @@ define([
         },
 
         loadReviews: function(tireId, offset) {
-            ajax.make({
-                url: 'tire/' + tireId + '/reviews',
-                data: { offset: offset || 0, limit: 5 },
-                success: function(response) {
-                    dispatcher.dispatch({
-                        actionType: constants.LOAD_REVIEWS_SUCCESS,
-                        data: response.data,
-                        tireId: tireId
-                    }); 
-                }
-            })
+            offset = offset || 0;
+
+            var dispatch = function(data) {
+                dispatcher.dispatch({
+                    actionType: constants.LOAD_REVIEWS_SUCCESS,
+                    data: data,
+                    tireId: tireId,
+                    offset: offset
+                });
+            };
+
+            var loadedReviews = reviewsStore.getReviews(tireId);
+            if (loadedReviews.length > offset) {
+                dispatch({
+                    nb_results: reviewsStore.getTotalReviews(),
+                    reviews: loadedReviews
+                });
+            } else {
+                ajax.make({
+                    url: 'tire/' + tireId + '/reviews',
+                    data: { offset: offset, limit: 5 },
+                    success: function(response) {
+                        dispatch(response.data);
+                    }
+                })
+            }
         },
 
         setSession: function(callback) {
