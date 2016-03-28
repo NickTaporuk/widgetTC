@@ -4,12 +4,14 @@ define([
     'moment',
     'load!actions/actions',
     'load!stores/reviewsStore',
+    'load!components/page/results/tire/stars'
 ], function (
     React,
     cn,
     moment,
     Act,
-    reviewsStore
+    reviewsStore,
+    Stars
 ) {
 
     
@@ -37,7 +39,6 @@ define([
         },
 
         render: function() {
-            console.log(this.props.tireId);
             if (this.state.totalReviews === 0) {
                 return null;
             }
@@ -48,7 +49,7 @@ define([
                 items.push((
                     <div key={i} className={cn('result_review')}>
                         <h5 className={cn('result_review_title')}>{review.title}</h5>
-                        {/*this._getStars(review.rating) */}
+                        <Stars rating={review.rating} />
                         <span className={cn('result_review_date')}>{moment(review.submitted_at).format('MMMM DD, YYYY')}</span>
                         <div className={cn('result_review_content')}>
                             <p dangerouslySetInnerHTML={{ __html: review.text }} />
@@ -76,7 +77,7 @@ define([
             });
         },
 
-        _handleMoreClick: function() {
+        _handleMoreClick: function(event) {
             event.preventDefault();
             Act.Tire.loadRewiews(this.props.tireId, this.state.reviews.length);
         }

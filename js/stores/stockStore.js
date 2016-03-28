@@ -17,10 +17,10 @@ define([
 
     var store = {
         getFullStock: function(tireId) {
-            return fullStock[tireId] || [];
+            return fullStock[tireId] ? fullStock[tireId] : [];
         },
         getBranches: function(tireId) {
-            return branches[tireId] || [];
+            return branches[tireId] ? branches[tireId] : [];
         },
 
         dispatchToken: dispatcher.register(function(payload) {

@@ -4,20 +4,20 @@ define([
     'classnames',
     'load!actions/actions',
     'lib/helper',
-    'moment',
-    'load!stores/stockStore',
     'load!components/page/results/tire/offerInfo',
-    'load!components/page/results/tire/reviews'
+    'load!components/page/results/tire/reviews',
+    'load!components/page/results/tire/stock',
+    'load!components/page/results/tire/stars'
 ], function(
     React,
     config,
     cn,
     Act,
     h,
-    moment,
-    stockStore,
     OfferInfo,
-    Reviews
+    Reviews,
+    Stock,
+    Stars
 ) {
 
     return {
@@ -26,12 +26,7 @@ define([
         getInitialState: function() {
             return {
                 activeTab: 'specs',
-
-                fullStock: [],
-                stock: [],
-                stockFor: null,
-
-                reviews: []
+                supplier: null
             }
         },
 
@@ -40,18 +35,8 @@ define([
                 selQuantity: this.props.tire.selected_quantity,
                 quantity: this.props.tire.quantity,
                 price: this.props.tire.price,
-                isInStock: this.props.tire.is_in_stock,
-                supplier: this.props.tire.supplier
+                isInStock: this.props.tire.is_in_stock
             });
-            this._updateState();
-        },
-
-        componentDidMount: function() {
-            stockStore.bind('change', this._updateState);
-        },
-
-        componentWillUnmount: function() {
-            stockStore.unbind('change', this._updateState);    
         },
 
         render: function() {
@@ -152,8 +137,8 @@ define([
                                     }
                                     {
                                         config.sa
-                                        ? <li className={cn({tab: true, stock_tab: true, in_stock: tire.is_in_stock})} role="presentation">
-                                            <a href="#stock" onClick={this._handleTabClick.bind(this, 'stock')} aria-selected={(tab == 'stock')}>{tire.is_in_stock ? 'In-Stock' : 'Stock'}</a>
+                                        ? <li className={cn({tab: true, stock_tab: true, in_stock: this.state.isInStock})} role="presentation">
+                                            <a href="#stock" onClick={this._handleTabClick.bind(this, 'stock')} aria-selected={(tab == 'stock')}>{this.state.isInStock ? 'In-Stock' : 'Stock'}</a>
                                         </li>
                                         : null
                                     }
@@ -172,66 +157,13 @@ define([
                                     <Reviews tireId={tire.id} />
                                 </div>
                                 <div className={cn('tab_cont')} aria-hidden={!(tab == 'stock')}>
-                                    {this._getStockInfo()}
+                                    <Stock tire={tire} onSupplierChange={this._onSupplierChange} />
                                 </div>
                             </div>
                         </div>
                     </div>
                 </li>
             );
-        },
-
-        _updateState: function() {
-            var state = this.state;
-            if (this.state.fullStock.length == 0) {
-                state.fullStock = stockStore.getFullStock(this.props.tire.id);
-            }
-            if (this.state.stockFor) {
-                state.stock = stockStore.getBranches(this.state.stockFor.tire_id);
-            }
-
-            this.setState(state);
-        },
-
-        _getStockInfo: function() {
-            var info = [];
-                
-            var info = [];
-            this.state.fullStock.map(function(supplierInfo, i) {
-                info.push( 
-                    <li key={i}>
-                        <a href={'#'+ i} onClick={this._handleStockClick}>{supplierInfo.supplier.nice_name + ': ' + supplierInfo.quantity}</a>
-                        <a href={'#'+ i} className={cn(['btn_small', 'brand_btn'])} disabled={ supplierInfo.supplier.name == this.state.supplier } dangerouslySetInnerHTML={{ __html: supplierInfo.supplier.name == this.state.supplier ? 'Selected &#x2714;' : 'Select' }} onClick={this._handleSupplierViewClick} />
-                    </li> 
-                );
-            }.bind(this));
-
-            var suppliers = <td>
-                <h5 className={cn('result_reviews_heading')}>Item: {this.props.tire.part_number}</h5>
-                <ul className={cn('stock_suppliers')}>{info}</ul>
-            </td>;
-
-            var branches = null;
-            if (this.state.stock.length > 0) {
-                var info = [];
-                this.state.stock.map(function(branch, i) {
-                    info.push(<li key={i}>{branch.branch + ': ' + branch.quantity}</li>);
-                });
-
-                branches = <td className={cn('result_branches')}>
-                    <h5 className={cn('result_reviews_heading')}>{this.state.stockFor.supplier.nice_name}</h5>
-                    <ul>{info}</ul>
-                    <a href="#stock_back" onClick={this._hangleStockBackClick}>Back</a>
-                </td>;
-            }
-            return <table className={cn({result_stock_info: true, with_branches: (this.state.stock.length > 0)})}><tr>{suppliers}{branches}</tr></table>;
-        },
-
-        _hangleStockBackClick: function(event) {
-            event.preventDefault();
-            this.setState({
-                stock: []
-            });
         },
 
         _getRatingBlock: function(rating, totalRevuew) {
@@ -241,44 +173,15 @@ define([
                 return null;
             }
 
-            var stars = this._getStars(rating);
-
             var totalReviews = null
             if (info.rating.total_reviews) {
                 totalReviews = info.rating.total_reviews;
             }
 
-            return this._getStars(rating, totalReviews);
-        },
-
-        _getStars: function(rating, totalReviews) {
-            var fullStars = parseInt(rating);
-            var halfStars = rating - fullStars > 0 ? 1 : 0;
-            var emptyStars = 5 - fullStars - halfStars;
-
-            var stars = [];
-            for (var i = 1; i <= 5; i++) {
-                var star;
-                if ( i <= fullStars ) {
-                    star = '&#xE838;';
-                } else if ( halfStars ) {
-                    star = '&#xE839;';
-                    halfStars = 0;
-                } else {
-                    star = '&#xE83A;';
-                }
-                stars.push(<i key={i} className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: star }} />);
-            }
-
-            var rewiewsLink = null
-            if (totalReviews) {
-                rewiewsLink = <a href="#reviews" onClick={this._handleTabClick.bind(this, 'reviews')} className={cn('result_rating_link')}>{totalReviews + ' Reviews'}</a>
-            }
-
             return (
-                <div className={cn('result_rating')} aria-label="Tire rating:  stars">
-                    {stars}
-                    {rewiewsLink}
+                <div>
+                    <Stars rating={rating} />
+                    <a href="#reviews" onClick={this._handleTabClick.bind(this, 'reviews')}>{totalReviews + ' Reviews'}</a>
                 </div>
             );
         },
@@ -304,37 +207,25 @@ define([
             this.setState({
                 activeTab: tab
             });
-            if (tab == 'stock' && this.state.fullStock.length <= 0) {
+            if (tab == 'stock') {
                 Act.Tire.loadFullStock(this.props.tire.id);
+                //&& this.state.fullStock.length <= 0
             }
-            if (tab == 'reviews' && this.state.reviews.length <= 0) {
+            if (tab == 'reviews') {
                 Act.Tire.loadRewiews(this.props.tire.id);   
+                //&& this.state.reviews.length <= 0
             }
         },
-
-        _handleStockClick: function(event) {
-            event.preventDefault();
+        
+        _onSupplierChange: function(supplier, event) {
             var index = event.target.href.replace(/^[^#]+#/, '');
-            var supplier = this.state.fullStock[index];
-            
-            Act.Tire.loadStock(supplier.tire_id);
-
-            this.setState({
-                stockFor: supplier
-            });
-        },
-
-        _handleSupplierViewClick: function(event) {
-            event.preventDefault();
-            var index = event.target.href.replace(/^[^#]+#/, '');
-            var supplier = this.state.fullStock[index];
 
             this.setState({
                 price:  supplier.price,
                 quantity: supplier.quantity,
                 selQuantity: supplier.quantity < this.state.selQuantity ? parseInt(supplier.quantity) : this.state.selQuantity,
-                supplierIndex: index,
-                supplier: supplier.supplier.name
+                isInStock: supplier.is_in_stock,
+                supplier: supplier
             });
         },
 
@@ -346,8 +237,7 @@ define([
 
         _handleSelectClick: function(event) {
             event.preventDefault();
-            var supplier = this.state.supplierIndex ? this.state.fullStock[this.state.supplierIndex] : null;
-            Act.Tire.select(this.props.tire, this.state.selQuantity, supplier);
+            Act.Tire.select(this.props.tire, this.state.selQuantity, this.state.supplier);
         },
 
         _handleGetQuoteClick: function(event) {

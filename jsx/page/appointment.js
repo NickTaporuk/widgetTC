@@ -96,7 +96,7 @@ define([
                             <div className={cn(['sixcol', 'last', 'right', 'col_right', 'appointment_info'])}>
 
                                 <div className={cn('control_wrapper')}>
-                                    <label htmlFor={cn('vehicle_year')}>Vehicle Info {config.sa ? null : <span className="req">*</span>}</label>
+                                    <label htmlFor={cn('vehicle_year')}>Vehicle Info</label>
                                     <div className={cn(['sixcol', 'field'])}>
                                         <SelectField name="year" options={this.state.options.years} emptyDesc="- Year -" withWrapper={false} onChange={this._vehicleChange} value={this.state.values.vehicle.year} />
                                     </div>

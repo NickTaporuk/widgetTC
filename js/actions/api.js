@@ -368,7 +368,7 @@ define([
                 });
             };
 
-            var validationErrors = validateParamsForQuote(data, ['name', 'email', 'phone', 'vehicle_info']);  
+            var validationErrors = validateParamsForQuote(data, ['name', 'email', 'phone']);  
             if (validationErrors) {
                 dispatchError(validationErrors);
             } else {
@@ -402,7 +402,7 @@ define([
                 });
             };
 
-            var validationErrors = validateParamsForQuote(data, !config.sa && data.name !== undefined ? ['name', 'email', 'phone', 'vehicle_info'] : []);
+            var validationErrors = validateParamsForQuote(data, !config.sa && data.name !== undefined ? ['name', 'email', 'phone'] : []);
             if (validationErrors) {
                 dispatchError(validationErrors);
             } else {
@@ -439,7 +439,7 @@ define([
                 });
             };
             
-            var validationErrors = validateParamsForQuote(data, !config.sa && data.name !== undefined ? ['name', 'email', 'phone', 'vehicle_info'] : ['email']);
+            var validationErrors = validateParamsForQuote(data, !config.sa && data.name !== undefined ? ['name', 'email', 'phone'] : ['email']);
             if (validationErrors) {
                 dispatchError(validationErrors);
             } else {
@@ -473,7 +473,7 @@ define([
                 });
             };
 
-            var validationErrors = validateParamsForQuote(data, ['name', 'email', 'phone', 'vehicle_info']);
+            var validationErrors = validateParamsForQuote(data, ['name', 'email', 'phone']);
             if (validationErrors) {
                 dispatchError(validationErrors);
             } else {

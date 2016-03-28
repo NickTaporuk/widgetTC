@@ -1,9 +1,11 @@
 define([
     'react',
-    'classnames'
+    'classnames',
+    'moment'
 ], function (
     React,
-    cn
+    cn,
+    moment
 ) {
     
     return {
@@ -18,8 +20,6 @@ define([
         render: function() {
             var tire = this.props.tire,
                 block;
-
-            console.log(tire.model);
 
             var offer = null;
 

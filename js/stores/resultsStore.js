@@ -66,6 +66,7 @@ define([
         tire.quantity = supplier.quantity;
         tire.price = supplier.price;
         tire.supplier = supplier.supplier.name;
+        tire.is_in_stock = supplier.is_in_stock;
         // tire.selected_quantity = supplier.quantity < tire.selected_quantity ? 1 : tire.selected_quantity;
 
         tiresIndexes[supplier.tire_id] = tiresIndexes[tireId];
