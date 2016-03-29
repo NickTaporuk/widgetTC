@@ -1,14 +1,20 @@
 define([
     'react',
+    'reactDOM',
     'classnames',
+    'lib/helper',
     'moment',
+    'isMobile',
     'load!actions/actions',
     'load!stores/reviewsStore',
     'load!components/page/results/tire/stars'
 ], function (
     React,
+    ReactDOM,
     cn,
+    h,
     moment,
+    isMobile,
     Act,
     reviewsStore,
     Stars
@@ -27,26 +33,36 @@ define([
         },
  
         componentWillMount: function() {
+            this._updateStateBaseOnProps(this.props);
             this._updateState();
         },
 
         componentDidMount: function() {
             reviewsStore.bind('change', this._updateState);
+            this._load(this.props.load);
         },
 
         componentWillUnmount: function() {
             reviewsStore.unbind('change', this._updateState);    
         },
 
+        componentWillReceiveProps: function(nextProps) {
+            this._updateStateBaseOnProps(nextProps);
+            this._load(nextProps.load);
+        },
+
         componentDidUpdate: function() {
-            if (isMobile.any && this.reviews.length <= 5) {
-                h.scrollToTop( this.refs.reviews , true );
-                this._handleTabClick('reviews');
+            if (isMobile.any && this.state.scrollToTop && this.state.totalReviews) {
+                // scroll to top of the component
+                h.scrollToTop( ReactDOM.findDOMNode(this).parentNode , true );
+                this.setState({
+                    scrollToTop: false
+                });
             }
         },
 
         shouldComponentUpdate: function(nextProps, nextState) {
-            return nextState.reviews.length !== this.state.reviews.length;
+            return nextState.reviews.length !== this.state.reviews.length || nextState.scrollToTop;
         },
 
         render: function() {
@@ -79,6 +95,20 @@ define([
                     {items}
                 </div>
             );
+        },
+
+        _load: function(need) {
+            if (need && !this.state.totalReviews) {
+                Act.Tire.loadRewiews(this.props.tireId);
+            }
+        },
+
+        _updateStateBaseOnProps: function(props) {
+            this.setState({
+                scrollToTop: props.scrollToTop
+            });
+
+
         },
 
         _updateState: function() {

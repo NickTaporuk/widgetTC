@@ -69,6 +69,7 @@ define([
                     break;
 
                 case 'quote.request.form.show':
+                    dispatcher.waitFor([resultsStore.dispatchToken]);
                     payload.type = 'request';
                 case 'quote.appointment.form.show':
                     dispatcher.waitFor([customerStore.dispatchToken]);

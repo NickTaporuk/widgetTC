@@ -115,7 +115,7 @@ define([
                 dispatcher.dispatch({
                     actionType: 'tire.select',
                     tireId: tire.id,
-                    selQuantity: selQuantity,
+                    quantity: selQuantity,
                     supplier: supplier
                 });
 
@@ -140,11 +140,12 @@ define([
                     customDiscount || null
                 );
             },
-            requestForm: function(tireId, quantity) {
+            requestForm: function(tireId, quantity, supplier) {
                 dispatcher.dispatch({
                     actionType: 'quote.request.form.show',
                     tireId: tireId,
-                    quantity: quantity
+                    quantity: quantity,
+                    supplier: supplier
                 });
             },
             appointmentForm: function(type, values) {

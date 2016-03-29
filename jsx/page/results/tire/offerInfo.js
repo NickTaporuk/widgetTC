@@ -19,9 +19,8 @@ define([
 
         render: function() {
             var tire = this.props.tire,
-                block;
-
-            var offer = null;
+                block = null,
+                offer = null;
 
             var rebates = tire.rebates;
             if (rebates && rebates[0] && rebates[0].valid_range) {

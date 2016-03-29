@@ -108,11 +108,12 @@ define([
                     showInStock = c.show_in_stock;
                     change = true;
                     break;
+                case 'quote.request.form.show':
                 case 'tire.select':
                     if (payload.supplier) {
                         changeSupplier(payload.tireId, payload.supplier);
                     }
-                    changeSelectedQuantity(payload.tireId, payload.selQuantity);
+                    changeSelectedQuantity(payload.tireId, payload.quantity);
                     change = true;
                     break;
             }

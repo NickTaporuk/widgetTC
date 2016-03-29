@@ -2,7 +2,6 @@ define([
     'react',
     'config',
     'classnames',
-    'isMobile',
     'load!actions/actions',
     'lib/helper',
     'load!components/page/results/tire/offerInfo',
@@ -13,7 +12,6 @@ define([
     React,
     config,
     cn,
-    isMobile,
     Act,
     h,
     OfferInfo,
@@ -155,12 +153,20 @@ define([
                                     </ul>
                                 </div>
                                 {features}
-                                <div className={cn('tab_cont')} aria-hidden={!(tab == 'reviews')}>
-                                    <Reviews tireId={tire.id} />
-                                </div>
-                                <div className={cn('tab_cont')} aria-hidden={!(tab == 'stock')}>
-                                    <Stock tire={tire} onSupplierChange={this._onSupplierChange} />
-                                </div>
+                                { 
+                                    this.props.tire.external_info.rating.total_reviews 
+                                    ? <div className={cn('tab_cont')} aria-hidden={!(tab == 'reviews')}>
+                                        <Reviews tireId={tire.id} scrollToTop={tab == 'reviews'} load={tab == 'reviews'} />
+                                    </div>
+                                    : null
+                                }
+                                {
+                                    config.sa
+                                    ? <div className={cn('tab_cont')} aria-hidden={!(tab == 'stock')}>
+                                        <Stock tire={tire} onSupplierChange={this._onSupplierChange} load={tab == 'stock'} />
+                                    </div>
+                                    : null
+                                }
                             </div>
                         </div>
                     </div>
@@ -188,13 +194,6 @@ define([
             );
         },
 
-        // _handleReviewsClick: function() {
-        //     if (isMobile.any) {
-        //         h.scrollToTop( this.refs.reviews , true );
-        //         this._handleTabClick('reviews');
-        //     }
-        // },
-
         _getOemBlock: function() {
             var tire = this.props.tire,
                 block;
@@ -218,14 +217,6 @@ define([
             this.setState({
                 activeTab: tab
             });
-            if (tab == 'stock') {
-                Act.Tire.loadFullStock(this.props.tire.id);
-                //&& this.state.fullStock.length <= 0
-            }
-            if (tab == 'reviews') {
-                Act.Tire.loadRewiews(this.props.tire.id);   
-                //&& this.state.reviews.length <= 0
-            }
         },
         
         _onSupplierChange: function(supplier, event) {
@@ -253,7 +244,7 @@ define([
 
         _handleGetQuoteClick: function(event) {
             event.preventDefault();
-            Act.Quote.requestForm(this.props.tire.id, this.state.selQuantity);
+            Act.Quote.requestForm(this.props.tire.id, this.state.selQuantity, this.state.supplier);
         },
 
         _handleEnlargeClick: function(event) {

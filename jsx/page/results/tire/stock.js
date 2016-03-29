@@ -32,10 +32,15 @@ define([
  
         componentDidMount: function() {
             stockStore.bind('change', this._updateState);
+            this._load(this.props.load);
         },
 
         componentWillUnmount: function() {
             stockStore.unbind('change', this._updateState);    
+        },
+
+        componentWillReceiveProps: function(nextProps) {
+            this._load(nextProps.load);
         },
 
         shouldComponentUpdate: function(nextProps, nextState) {
@@ -72,6 +77,12 @@ define([
                 </td>;
             }
             return <table className={cn({result_stock_info: true, with_branches: (this.state.branches.length > 0)})}><tr>{suppliers}{branches}</tr></table>;
+        },
+
+        _load: function(need) {
+            if (need && this.state.suppliers.length == 0) {
+                Act.Tire.loadFullStock(this.props.tire.id);
+            }
         },
 
          _updateState: function() {

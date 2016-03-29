@@ -84,10 +84,10 @@ define([
 
     var store = {
         getSelectedTireId: function() {
-            return quote.tire_id;
+            return selectedTire;
         },
         getSelectedTire: function() {
-            return resultsStore.getTire(quote.tire_id);
+            return resultsStore.getTire(selectedTire);
         },
         getSelectedQuantity: function() {
             return selectedQuantity;
