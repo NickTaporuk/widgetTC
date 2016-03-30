@@ -67,7 +67,7 @@ define([
                         <form action="appointment-confirmation.php" className={cn('appointment_form')} onSubmit={this._handleFormSubmit}>
                             
                             <fieldset className={cn(['sixcol', 'col_left', 'appointment_fields'])}>
-                                <Field type="text" name="name" defaultValue={this.state.values.name} ref="name" label="Your Name" required={!config.sa} error={this._getError('name')} />
+                                <Field type="text" name="name" defaultValue={this.state.values.name} ref="name" label={ config.sa ? 'Customer Name' : 'Your Name' } required={!config.sa} error={this._getError('name')} />
                                 <Field type="email" name="email" defaultValue={this.state.values.email} ref="email" label="Email Address" required={!config.sa || this.props.type === 'email'} error={this._getError('email')} />
                                 <Field type="tel" name="phone" defaultValue={this.state.values.phone} ref="phone" label="Phone Number" required={!config.sa} error={this._getError('phone')} />
 
