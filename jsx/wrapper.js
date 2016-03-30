@@ -6,7 +6,8 @@ define([
     'load!components/top',
     'load!components/header', 
     'load!components/page',
-    'load!stores/dealerStore'
+    'load!components/preloader',
+    'load!stores/widgetStore'
 ], function(
     React,
     ReactDOM,
@@ -15,11 +16,16 @@ define([
     Top,
     Header, 
     Page,
-    dealerStore
+    Preloader,
+    widgetStore
 ) {
 
     return {
         displayName: 'Wrapper',
+
+        componentWillMount: function() {
+            this._updateState();
+        },
 
         componentDidMount: function() {
             this._checkContainerWidth();
@@ -28,18 +34,34 @@ define([
             } else {
               window.attachEvent('onresize', this._checkContainerWidth);
             }
+
+            widgetStore.bind('change', this._updateState);
+        },
+
+        componentWillUnmount: function() {
+            widgetStore.unbind('change', this._updateState);
         },
 
         render: function() {
-            return (
-                <div id={cn('widget')}>
-                    <Top />
-                    <div className={cn('wrapper')}>
-                        <Header />
-                        <Page />
+            if (!this.state.ready) {
+                return <Preloader />
+            } else {
+                return (
+                    <div id={cn('widget')}>
+                        <Top />
+                        <div className={cn('wrapper')}>
+                            <Header />
+                            <Page />
+                        </div>
                     </div>
-                </div>
-            );
+                );
+            }
+        },
+
+        _updateState: function() {
+            this.setState({
+                ready: widgetStore.getIsReady()
+            });
         },
 
         _checkContainerWidth: function() {

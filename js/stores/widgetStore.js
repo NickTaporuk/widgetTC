@@ -28,7 +28,7 @@ define([
                 case constants.LOAD_LOCATION_CONFIG_SUCCESS:
                     count++;
                     
-                    change = true;
+                    change = store.getIsReady();
                     break;
             }
 

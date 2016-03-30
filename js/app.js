@@ -60,7 +60,7 @@ window.TCWidget = {
             function(React, ReactDOM, Wrapper, Act, Overlay, cn, widgetStore, Api) {
                 
                 var render = function() {
-                    if (widgetStore.getIsReady()) {
+                    // if (widgetStore.getIsReady()) {
                         var container = document.getElementById(params.container);
 
                         if (!self.overlayNode) {
@@ -84,11 +84,12 @@ window.TCWidget = {
                             self.overlayNode
                         );
 
-                        widgetStore.unbind('change', render);
-                    }
+                        // widgetStore.unbind('change', render);
+                    // }
                 };
 
-                widgetStore.bind('change', render);
+                render();
+                // widgetStore.bind('change', render);
 
                 if (!config.sessionId) {
                     Api.setSession(function(sessionId) {

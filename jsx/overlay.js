@@ -2,6 +2,7 @@ define([
     'react',
     'classnames', 
     'load!stores/ajaxStore',
+    'load!stores/widgetStore',
     'load!components/popup',
     'load!components/loading',
     'config'
@@ -9,6 +10,7 @@ define([
     React,
     cn,
     ajaxStore,
+    widgetStore,
     Popup,
     Loading,
     config
@@ -23,27 +25,34 @@ define([
         },
 
         componentWillMount: function() {
-            this._updateStatus();
+            this._updateState();
         },
         componentDidMount: function() {
-            ajaxStore.bind('change', this._updateStatus);
+            ajaxStore.bind('change', this._updateState);
+            widgetStore.bind('change', this._updateState);
         },
         componentWillUnmount: function() {
-            ajaxStore.unbind('change', this._updateStatus);    
+            ajaxStore.unbind('change', this._updateState);    
+            widgetStore.bind('change', this._updateState);
         },
 
         render: function() {
-            return (
-                <div>
-                    <Loading />
-                    <Popup />
-                </div>
-            )
+            if (!this.state.ready) {
+                return null
+            } else {
+                return (
+                    <div>
+                        <Loading />
+                        <Popup />
+                    </div>
+                )
+            }
         },
 
-        _updateStatus: function() {
+        _updateState: function() {
             this.setState({
-                loader: ajaxStore.isInProcess()
+                loader: ajaxStore.isInProcess(),
+                ready: widgetStore.getIsReady()
             });
         }
 
