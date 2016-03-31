@@ -72,8 +72,8 @@ define([
                 <div className={cn('filters_wrapper')} onMouseDown={this._handleMouseDown} onMouseUp={this._handleMouseUp}>
                     <h4 className={cn('filters_title')} onMouseDown={this._handleToggleBtnMouseDown}>
                         <span>{ 'Filter by ' + this.props.by + ':'}</span>
-                        <a href="javascript:;" className={cn(['toggle', 'filters_toggle']) + ' ' + cn({'toggle_open': this.state.isShown})}>
-                            <i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE145;' }} />{'Toggle ' + this.props.by}
+                        <a href="javascript:;" className={cn(['toggle', 'filters_toggle'])}>
+                            <i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: this.state.isShown ? '&#xE15B;' : '&#xE145;' }} />{'Toggle ' + this.props.by}
                         </a>
                     </h4>
                     <ul className={cn(['inputs_list', 'filters_list']) + ' ' + cn({'toggle_hidden': !this.state.isShown})}>

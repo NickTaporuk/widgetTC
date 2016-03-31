@@ -47,10 +47,10 @@ define([
                 if (offer.legal_link) {
                     legalLine = <span>{ offer.valid_range.is_ongoing ? '' : '*' }<a target="_blank" rel="nofollow" href={offer.legal_link} style={{color: offer.color }} dangerouslySetInnerHTML={ {__html: offer.legal_line} } /></span>;
                 }
-                
+              
                 block = (
                     <span className={cn(['result_rebate', 'tooltip'])}>
-                        <a href="#show_rebate" onClick={this._handleShowClick} className={cn({toggle: true, toggle_open: this.state.show})}>{offer.name} <i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE887;'}} /></a>
+                        <a href="#show_rebate" onClick={this._handleShowClick} className={cn('toggle')}>{offer.name} <i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: this.state.show ? '&#xE15C;' : '&#xE887;'}} /></a>
 
                         <span className={cn(['tooltip_content', 'toggle_content']) + ' ' + cn({toggle_hidden: !this.state.show})}>
                             <p>

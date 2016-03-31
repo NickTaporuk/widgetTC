@@ -84,28 +84,6 @@
 
 	// Toggles
 
-	.tcwlw_toggle {
-		i {
-			background: white;
-			position: relative;
-		}
-
-		&.tcwlw_toggle_open {
-			i {
-				&:before {
-					content: 'remove';
-					background: inherit;
-					font-family: inherit;
-					@include font-size(1);
-					position: absolute;
-					@include top(-0.1);
-					@include left(-0.1);
-					@include padding(0.1);
-				}
-			}
-		}
-	}
-
 	.tcwlw_toggle_hidden {
 		display: none;
 	}

@@ -146,6 +146,15 @@
     input[type="radio"] {
         box-sizing: border-box;
         padding: 0;
+
+        display: inline-block;
+        width: auto;
+        background: none;
+        border-radius: 0;
+        transition: initial;
+        border: 0 none;
+        height: auto;
+        vertical-align: baseline;
     }
 
     input[type="number"]::-webkit-inner-spin-button,
