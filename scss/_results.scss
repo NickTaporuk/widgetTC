@@ -531,7 +531,7 @@
 		.tcwlw_result_title {
 			@include font-size(1.25);
 			font-weight: bold;
-			width: 65%;
+			// width: 65%;
 			@include margin-top(-0.2);
 			@include padding-right(1);
 		}
@@ -552,6 +552,7 @@
 
 		.tcwlw_warranty {
 			white-space: nowrap;
+			display: inline-block;
 		}
 
 		.tcwlw_result_compare {
