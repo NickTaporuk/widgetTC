@@ -41,7 +41,8 @@ body {
 		background: white;
 		@include padding($baseSpacing, $baseSpacing/1.5);
 		border: 1px solid $grayLighter;
-		overflow: hidden;
+		// overflow: hidden;
+		@include clearfix();
 	}
 
 	.tcwlw_powered_by {

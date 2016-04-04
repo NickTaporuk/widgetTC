@@ -4,14 +4,16 @@ define([
     'load!stores/searchStore',
     'load!stores/locationsStore',
     'load!stores/customerStore',
-    'actions/api'
+    'actions/api',
+    'page'
 ], function(
     dispatcher,
     resultsStore,
     searchStore,
     locationsStore,
     customerStore,
-    Api
+    Api,
+    page
 ) {
 
     var Actions = {
