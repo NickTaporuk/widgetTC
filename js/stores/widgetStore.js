@@ -14,7 +14,7 @@ define([
 
     var store = {
         getIsReady: function() {
-            return count == eventsForReady;
+            return count >= eventsForReady;
         },
 
         dispatchToken: dispatcher.register(function(payload) {
