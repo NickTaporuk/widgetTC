@@ -168,6 +168,11 @@
 			li {
 				display: block;
 			}
+
+			&.tcwlw_top_direction {
+				top: auto;
+				bottom: 70%;
+			}
 		}
 
 		.tcwlw_filters_all {
