@@ -115,7 +115,7 @@ define([
                             </fieldset>
                             <div className={cn(['sixcol', 'last', 'col_right', 'order_info'])}>
                                 
-                                <Field type="text" name="card_number" defaultValue="4242424242424242" ref="card_number" label="Credit Card Number" required={true} error={this._getError('number')} 
+                                <Field type="text" name="card_number" ref="card_number" label="Credit Card Number" required={true} error={this._getError('number')} 
                                     custom={{
                                         autoComplete: 'off',
                                         pattern: "\\d*",
@@ -123,7 +123,7 @@ define([
                                     }}
                                 />
 
-                                <Field type="text" name="cvc_number" defaultValue="123" ref="cvc_number" label="VC Number" required={true} error={this._getError('cvc')} 
+                                <Field type="text" name="cvc_number" ref="cvc_number" label="VC Number" required={true} error={this._getError('cvc')} 
                                     note="(3 digit security code on the back of the card)"
                                     custom={{
                                         autoComplete: 'off',
@@ -135,8 +135,8 @@ define([
 
                                 <div className={cn(['control_wrapper', 'order_expiration'])}>
                                     <label htmlFor={cn('order_expiration_month')}>Expiration Date (MM/YYYY) <span className="req">*</span></label>
-                                    <input type="text" id={cn('order_expiration_month')} className={cn('sixcol')} maxLength="2" pattern="\d*" required ref="exp_month" defaultValue="12" />
-                                    <input type="text" id={cn('order_expiration_year')} className={cn(['sixcol', 'last'])} maxLength="4" pattern="\d*" required ref="exp_year" defaultValue="2016" />
+                                    <input type="text" id={cn('order_expiration_month')} className={cn('sixcol')} maxLength="2" pattern="\d*" required ref="exp_month" />
+                                    <input type="text" id={cn('order_expiration_year')} className={cn(['sixcol', 'last'])} maxLength="4" pattern="\d*" required ref="exp_year" />
                                     <div style={{clear: 'both'}} />
                                     {this._getError('exp_month')}
                                     {this._getError('exp_year')}
