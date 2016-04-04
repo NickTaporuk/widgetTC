@@ -96,7 +96,7 @@ define([
         );
 
         addCSSRule(
-            '#widget .steps_list .steps_list_item.active',
+            '#widget ul.steps_list .steps_list_item.active',
                 'background-color: ' + color1 +'; ' +
                 'border-color: ' + color1 +';'
         );
@@ -119,7 +119,7 @@ define([
 
     
         addCSSRule(
-            '#widget .steps_list .steps_list_item',
+            '#widget ul.steps_list .steps_list_item',
                 'background-color: ' + color2 +'; ' +
                 'border-color: ' + color2 +';'
         );

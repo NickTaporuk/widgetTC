@@ -37,7 +37,7 @@ window.TCWidget = {
 
             h.loadCss(config.mainCss);
             h.loadCss('https://fonts.googleapis.com/icon?family=Material+Icons');
-            h.loadCss('https://fonts.googleapis.com/css?family=Lato:400,400italic,900');
+            // h.loadCss('https://fonts.googleapis.com/css?family=Lato:400,400italic,900');
 
             requirejs.config({
                 baseUrl: './js/', 

@@ -51,7 +51,8 @@
     input[type="tel"],
     input[type="color"] {
     	background: #f0f0f0;
-        @include font-size($baseFontSize);
+        // @include font-size($baseFontSize);
+        font-size: 1.6em !important;
         line-height: 1.2;
         color: $grayDarkest;
         width: 100%;
@@ -149,7 +150,8 @@
     }
 
     label select {
-        @include font-size(0.8889);
+        // @include font-size(0.8889);
+        font-size: 0.8889em !important;
         font-weight: normal;
     }
 
