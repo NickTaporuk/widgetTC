@@ -5,37 +5,53 @@ define([
     dispatcher,
     page
 ) {
+    
 
-    page('/search/:searchBy', function(ctx) {
-        // console.log('home');
-    });
+
 
     var actions = {
         init: function(params) {
             dispatcher.dispatch({
-                actionType: 'page.search.init',
+                actionType: 'search.init',
                 params: params || {}
             });
         },
 
-        changeSearchBy: function() {
-
+        changeSearchBy: function(searchBy) {
+            dispatcher.dispatch({
+                actionType: 'search.search_by.change',
+                searchBy: searchBy
+            });
         },
 
-        changeVehicleParam: function() {
-
+        changeVehicleParam: function(values) {
+            dispatcher.dispatch({
+                actionType: 'search.vehicle.change',
+                values: values
+            });
         },
 
-        changeSizeParam: function() {
-
+        changeSizeParam: function(values) {
+            dispatcher.dispatch({
+                actionType: 'search.size.change',
+                values: values
+            });
         },
 
-        changePartNumber: function() {
-
+        changePartNumber: function(partNumber) {
+            dispatcher.dispatch({
+                actionType: 'search.part_number.change',
+                partNumber: partNumber
+            });
         },
 
-        search: function() {
+        search: function(values) {
+            dispatcher.dispatch({
+                actionType: 'search.start',
+                values: values
+            });
 
+            Api.searchTires(values);
         }
     };
 

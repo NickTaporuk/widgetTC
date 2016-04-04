@@ -5,7 +5,10 @@ define([
     'load!stores/locationsStore',
     'load!stores/customerStore',
     'actions/api',
-    'page'
+    'actions/searchPage',
+    'page',
+    'lib/helper',
+    'lodash'
 ], function(
     dispatcher,
     resultsStore,
@@ -13,8 +16,32 @@ define([
     locationsStore,
     customerStore,
     Api,
-    page
+    searchPage,
+    page,
+    h,
+    _
 ) {
+
+    page('', function(ctx) {
+        console.log('home');
+    });
+
+    page('search/:searchBy', function(ctx) {
+        var params = _.merge(h.queryToObj(ctx.querystring), ctx.params);
+        
+        dispatcher.dispatch({
+            actionType: 'page.search.init',
+            params: params || {}
+        });
+    });
+
+    page.base(window.location.pathname + window.location.search);
+
+    page.start({
+        hashbang: true
+        // dispatch: false
+    });
+
 
     var Actions = {
         init: function() {

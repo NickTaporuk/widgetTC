@@ -98,6 +98,14 @@ define(['config'], function(config) {
                 var winHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
                 window.scrollTo(0, offset.top - winHeight/8);
             }
+        },
+        queryToObj: function(query) {
+        	var obj = {};
+			query.replace(
+			    new RegExp("([^?=&]+)(=([^&]*))?", "g"),
+			    function($0, $1, $2, $3) { obj[$1] = $3; }
+			);
+			return obj;
         }
 	}
 
