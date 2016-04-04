@@ -38,9 +38,9 @@ define([
 
     var fieldValues = {
         size: {
-            width: '195',
-            height: '65',
-            rim: '15',
+            width: '',
+            height: '',
+            rim: '',
             speed_rating: '',
             load_index: '',
             base_category: ''
@@ -127,7 +127,17 @@ define([
             return fieldValues[section][field];
         },
         getOptions: function(field) {
-            return _.cloneDeep(fieldOptions[field]);
+            var options = _.cloneDeep(fieldOptions[field]);
+            if (field == 'display' && activeSection !== 'vehicle' ) {
+                // Remove oem parameter from display options. Only search by vehicle need this one.
+                for (var l = options.length, i = 0; i <= l; i++ ) {
+                    if (options[i]['value'] == 'oem') {
+                        options.splice(i, 1);
+                        break;
+                    }
+                }
+            }
+            return options;
         },
         getValueDesc: function(section, field) {
             var options = fieldOptions[field],

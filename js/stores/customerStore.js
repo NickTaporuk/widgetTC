@@ -24,9 +24,9 @@ define([
         quote = {};
 
     var customer = {
-        name: 'test',
-        email: 'test@not.ru',
-        phone: '2342342345',
+        name: '',
+        email: '',
+        phone: '',
         preferred_time: moment().add(1, 'd').minutes(00).hour(13).format('YYYY-MM-DD HH:mm'),
         way_to_contact: 'phone',
         vehicle_info: '',
