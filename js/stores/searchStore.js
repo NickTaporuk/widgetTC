@@ -203,11 +203,20 @@ define([
         },
         dispatchToken: dispatcher.register(function(payload) {
             var change = false;
-            switch (payload.actionType) {
+            switch (payload.actionType) {                    
                 case constants.LOAD_TIRE_PARAMETERS_SUCCESS:
                 case 'search.options.update':
                     Object.keys(payload.options).map(function(fieldName) {
                         setOptions(fieldName, payload.options[fieldName]);
+                    });
+                    change = true;
+                    break;
+                case 'page.search.show':
+                    activeSection = payload.params.searchBy.replace('by_', '');
+                    Object.keys(fieldValues[activeSection]).map(function(field) {
+                        if (payload.params[field]) {
+                            fieldValues[activeSection][field] = payload.params[field];
+                        }
                     });
                     change = true;
                     break;

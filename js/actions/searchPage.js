@@ -1,12 +1,55 @@
 define([
     'dispatcher',
-    'page'
+    'page',
+    'lib/helper',
+    'lodash',
+    'actions/api'
 ], function(
     dispatcher,
-    page
+    page,
+    h,
+    _,
+    Api
 ) {
-    
 
+    page('', function(ctx) {
+        console.log('home');
+    });
+
+    page('search/:searchBy', function(ctx) {
+        console.log('dfdf');
+
+        var params = _.merge(h.queryToObj(ctx.querystring), ctx.params);
+        
+        // console.log(params);
+
+        dispatcher.dispatch({
+            actionType: 'page.search.show',
+            params: params || {}
+        });
+
+
+        if (params.searchBy == 'by_vehicle') {
+            var values = params;
+
+            if (values.trim) {
+                Api.getVehicleTireSizes(values.year, values.make, values.model, values.trim);
+            } 
+            if (values.model) {
+                Api.getVehicleTrims(values.year, values.make, values.model);
+            } 
+            if (values.make) {
+                Api.getVehicleModels(values.year, values.make);
+            } 
+            if (values.year) {
+                Api.getVehicleMakes(values.year);
+            }
+        }
+    });
+
+
+
+    page.base(window.location.pathname + window.location.search);
 
 
     var actions = {
@@ -24,11 +67,13 @@ define([
             });
         },
 
-        changeVehicleParam: function(values) {
+        changeVehicleParam: function(values, changedField) {
             dispatcher.dispatch({
                 actionType: 'search.vehicle.change',
                 values: values
             });
+
+            Api.getVehicleOptions(values, changedField);
         },
 
         changeSizeParam: function(values) {
