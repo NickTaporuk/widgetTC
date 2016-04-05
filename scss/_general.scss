@@ -85,7 +85,7 @@ body {
 
 	// Steps list
 
-	.tcwlw_steps_list {
+	ul.tcwlw_steps_list {
 		clear: both;
 		width: 103%;
 		@include margin-bottom($baseSpacing/2);

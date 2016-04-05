@@ -25,7 +25,8 @@ define([
         getDefaultProps: function() {
             return {
                 allDesc: 'All',
-                defaultValue: []
+                defaultValue: [],
+                topDirection: false
             }
         },
 
@@ -40,9 +41,9 @@ define([
                 allValues: allValues
             });
         },
-
+ 
         shouldComponentUpdate: function(nextProps, nextState) {
-            return this.state.checkedValues.length !== nextState.checkedValues.length || this.state.isShown !== nextState.isShown;
+            return this.state.checkedValues.length !== nextState.checkedValues.length || this.state.isShown !== nextState.isShown || nextProps.topDirection !== this.props.topDirection;
         },
 
         render: function() {
@@ -76,7 +77,7 @@ define([
                             <i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: this.state.isShown ? '&#xE15B;' : '&#xE145;' }} />{'Toggle ' + this.props.by}
                         </a>
                     </h4>
-                    <ul className={cn(['inputs_list', 'filters_list']) + ' ' + cn({'toggle_hidden': !this.state.isShown})}>
+                    <ul className={cn(['inputs_list', 'filters_list']) + ' ' + cn({toggle_hidden: !this.state.isShown, top_direction: this.props.topDirection})}>
                         {allCheckbox}
                         {list}
                     </ul>

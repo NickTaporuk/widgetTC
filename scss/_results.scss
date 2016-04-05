@@ -168,6 +168,11 @@
 			li {
 				display: block;
 			}
+
+			&.tcwlw_top_direction {
+				top: auto;
+				bottom: 70%;
+			}
 		}
 
 		.tcwlw_filters_all {
@@ -261,7 +266,7 @@
 
 	// Various tire items
 
-	.tcwlw_result_specs_list {
+	ul.tcwlw_result_specs_list {
 		padding: 0;
 		list-style: none;
 
@@ -488,6 +493,7 @@
 		.tcwlw_results_list {
 			padding: 0;
 			list-style: none;
+			margin: inherit;
 		}
 
 		.tcwlw_result {
@@ -659,6 +665,9 @@
 			p,
 			li {
 				@include font-size(0.875);
+				@include line-height(1.6);
+				margin-bottom: 0;
+    			list-style-position: inherit;
 			}
 
 			p,
@@ -667,6 +676,7 @@
 				@include margin-bottom($baseSpacing/2);
 
 				&:last-child {
+					margin: inherit;
 					margin-bottom: 0;
 				}
 			}
@@ -680,7 +690,7 @@
 				list-style: disc;
 			}
 
-			.tcwlw_result_specs_list {
+			ul.tcwlw_result_specs_list {
 				padding: 0;
 			}
 
@@ -1203,7 +1213,7 @@
 			min-height: 60px;
 		}
 
-		.tcwlw_result_specs_list {
+		ul.tcwlw_result_specs_list {
 			@include margin-bottom($baseSpacing/2);
 
 			&:last-child {

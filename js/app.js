@@ -37,6 +37,7 @@ window.TCWidget = {
 
             h.loadCss(config.mainCss);
             h.loadCss('https://fonts.googleapis.com/icon?family=Material+Icons');
+            // h.loadCss('https://fonts.googleapis.com/css?family=Lato:400,400italic,900');
 
             requirejs.config({
                 baseUrl: './js/', 
@@ -46,7 +47,6 @@ window.TCWidget = {
                     validate: 'bower_components/validate/validate',
                     moment: 'bower_components/moment/moment',
                     page: 'bower_components/page/page',
-                    query_: 'bower_components/query/query',
                     dispatcher: 'lib/dispatcher',
                     ajax: 'lib/ajax',
                     react: 'bower_components/react/react',

@@ -74,7 +74,7 @@ define([
                 filtersInfo.forEach(function(info, i) {
                     if (this.state.filters[info.key].parameters.length > 1) {
                         filters.push((
-                            <FilterBlock key={i} by={info.desc} name={info.key} allDesc={info.all} defaultValue={ this.props.fieldValues[info.key] } params={ this.state.filters[info.key].parameters } onChange={this._handleFilterChange} />
+                            <FilterBlock key={i} by={info.desc} topDirection={ !this.state.totalCount } name={info.key} allDesc={info.all} defaultValue={ this.props.fieldValues[info.key] } params={ this.state.filters[info.key].parameters } onChange={this._handleFilterChange} />
                         ));
                     }
                 }, this);
