@@ -56,9 +56,12 @@ define([
 
         render: function() {
             var tires = [];
+
+            var curTime = new Date().getTime();
             this.state.tires.map(function(tire, i) {
+                var tKey = i + curTime; // i + tire.part_number + this.state.totalCount;
                 tires.push((
-                    <Tire key={i + tire.part_number} tire={tire} isInMile={this.props.isInMile} isTop={(i < 3 && this.state.page == 1)} />
+                    <Tire key={tKey} tire={tire} isInMile={this.props.isInMile} isTop={(i < 3 && this.state.page == 1)} />
                 ));
             }.bind(this));
 
@@ -148,13 +151,6 @@ define([
         _handleBackClick: function(event) {
             event.preventDefault();
             Act.Page.show('search');
-        },
-
-        _handleToggleBrandsClick: function(event) {
-            event.preventDefault();
-            this.setState({
-                isBrandsShown: !this.state.isBrandsShown
-            });
         },
 
         _handleFieldChange: function(event) {

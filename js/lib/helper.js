@@ -94,9 +94,13 @@ define(['config'], function(config) {
             var scrollPos = h.getScrollPos();
             var offset = h.getOffset(el);
 
-            if (scrollPos[1] > offset.top || force) {
+            if (window['scrollParentPageTo']) {
+            	// if widget in iframe
+            	window.scrollParentPageTo(offset.top);           	
+            } else if (scrollPos[1] > offset.top || force) {
                 var winHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
-                window.scrollTo(0, offset.top - winHeight/8);
+                var scrollToY = offset.top - winHeight/8;
+                window.scrollTo(0, scrollToY);
             }
         },
         queryToObj: function(query) {
