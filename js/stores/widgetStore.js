@@ -39,6 +39,8 @@ define([
                 store.trigger('change');
 
                 setTimeout(function() {
+                    page.base(window.location.pathname + window.location.search);
+                    
                     page.start({
                         hashbang: true
                         // dispatch: false

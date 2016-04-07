@@ -74,6 +74,11 @@ define([
                     lockr.set('location_id', currectLocationId);
                     change = true;
                     break;
+
+                case 'page.search.show':
+                    currectLocationId = payload.params.location_id || null;
+                    change = true;
+                    break;
             }
             
             if (change) {

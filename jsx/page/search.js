@@ -4,7 +4,6 @@ define([
     'config',
     'load!actions/actions',
     'load!stores/searchStore',
-    // 'load!stores/locationsStore',
     'load!components/elements/select'
 ], function(
     React,
@@ -12,7 +11,6 @@ define([
     config,
     Act,
     searchStore,
-    // locationsStore,
     SelectField
 ) {
 
@@ -24,7 +22,6 @@ define([
                 activeTab: 'size',
                 fieldOptions: {},
                 fieldValues: {}
-                // currentLocId: null
             }
         },
 
@@ -34,32 +31,12 @@ define([
 
         componentDidMount: function() {
             searchStore.bind('change', this._updateStatus);
-            // locationsStore.bind('change', this._updateStatus);
         },
 
         componentWillUnmount: function() {
             searchStore.unbind('change', this._updateStatus);
-            // locationsStore.unbind('change', this._updateStatus);
         },
-
-        shouldComponentUpdate: function(nextProps, nextState) {
-            return true;
-            // var isTabChanged = (nextState.activeTab !== this.state.activeTab);
-            // var isFieldsInited = (this.state.fieldOptions.width.length == 0 && nextState.fieldOptions.width.length > 0);
-            // var should = isTabChanged || isFieldsInited;
-            // if (!should) {
-            //     var vehicleFields = ['year', 'make', 'model', 'trim'];
-            //     for (var i = 0; i < 4; i++) {
-            //         var fieldName = vehicleFields[i];
-            //         if (this.state.fieldValues.vehicle && nextState.fieldValues.vehicle[fieldName] !== this.state.fieldValues.vehicle[fieldName]) {
-            //             should = true;
-            //             break;
-            //         }
-            //     }
-            // }
-            // return should;
-        },
-
+        
         render: function() {
             return (
                 <div className={cn('search_wrapper')} id={cn('search_wrapper')}>

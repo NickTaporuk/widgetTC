@@ -12,52 +12,49 @@ define([
     Api
 ) {
 
-    page('', function(ctx) {
-        console.log('home');
-    });
-
+    //start page
     page('search/:searchBy', function(ctx) {
-        console.log('dfdf');
-
         var params = _.merge(h.queryToObj(ctx.querystring), ctx.params);
+        actions.index(params);
         
-        // console.log(params);
-
-        dispatcher.dispatch({
-            actionType: 'page.search.show',
-            params: params || {}
-        });
-
-
-        if (params.searchBy == 'by_vehicle') {
-            var values = params;
-
-            if (values.trim) {
-                Api.getVehicleTireSizes(values.year, values.make, values.model, values.trim);
-            } 
-            if (values.model) {
-                Api.getVehicleTrims(values.year, values.make, values.model);
-            } 
-            if (values.make) {
-                Api.getVehicleModels(values.year, values.make);
-            } 
-            if (values.year) {
-                Api.getVehicleMakes(values.year);
-            }
-        }
+        // actions.changeSearchBy(params.searchBy);
+        // delete params.searchBy;
+        // actions.changeLocation(params.location_id);
+        // delete params.location_id;
+        // // if vehicle
+        // actions.changeVehicleParam(params);
+        // // if size
+        // actions.changeSizeParam(params);
+        // // if part number
+        // actions.changePartNumber(params.part_number || '');
     });
 
+    page('results', function(ctx) {  //results?width=_&height=_&rim=_&display=_&page=_&order_by=_&filter[brand]=Brand|Brand2&filter[category]=Cat1|Cat2
+        var params = _.merge(h.queryToObj(ctx.querystring), ctx.params);
+        // make search
+        // show page
+    });
 
+    page('quote', function(ctx) {    //quote?tire_id=_&with_discount=_&quantity=_&custom_discount=_&optional_services[]=_&optional_services[]=_
+        // load quote
+        // show page
+    });
 
-    page.base(window.location.pathname + window.location.search);
+    //appointment and any quote page:
+    page('appointment', function() {  //appointment?tire_id=_&with_discount=_&quantity=_&custom_discount=_&optional_services[]=_&optional_services[]=_
+        // load quote
+        // show page
+    });
 
 
     var actions = {
-        init: function(params) {
+        index: function(params) {
             dispatcher.dispatch({
-                actionType: 'search.init',
+                actionType: 'page.search.show',
                 params: params || {}
             });
+
+            Api.getVehicleOptions(params);
         },
 
         changeSearchBy: function(searchBy) {
@@ -67,26 +64,44 @@ define([
             });
         },
 
+        showLocations: function() {
+            dispatcher.dispatch({
+                actionType: 'popup.show',
+                popup: 'locations' 
+            });
+        },
+
+        changeLocation: function(locationId) {
+            dispatcher.dispatch({
+                actionType: 'search.location.change',
+                locationId: locationId
+            });
+        },
+
         changeVehicleParam: function(values, changedField) {
             dispatcher.dispatch({
-                actionType: 'search.vehicle.change',
-                values: values
+                actionType: 'search.params.change',
+                values: values,
+                section: 'vehicle'
             });
 
-            Api.getVehicleOptions(values, changedField);
+            Api.getVehicleOptions(values, updatedField);
         },
 
         changeSizeParam: function(values) {
             dispatcher.dispatch({
-                actionType: 'search.size.change',
-                values: values
+                actionType: 'search.params.change',
+                values: values,
+                section: 'size'
             });
         },
 
         changePartNumber: function(partNumber) {
             dispatcher.dispatch({
-                actionType: 'search.part_number.change',
-                partNumber: partNumber
+                actionType: 'search.params.change',
+                values: {part_number: partNumber},
+                section: 'part_number'
+                //partNumber: partNumber
             });
         },
 

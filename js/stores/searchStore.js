@@ -92,20 +92,23 @@ define([
     }
 
     function setOptions(field, options) {
-        if (options.length === 0) {
-            // if no options set value of field to empty
-            var sectionsCount = sections.length;
-            for (var i = 0; i < sectionsCount; i++) {
-                if (fieldValues[sections[i]][field]) {
-                    setValue(sections[i], field, '');
-                    break;
-                }
-            }
-            fieldOptions[field] = [];
-        } else {
+        // if (options.length === 0) {
+        //     // if no options set value of field to empty
+        //     var sectionsCount = sections.length;
+        //     for (var i = 0; i < sectionsCount; i++) {
+        //         if (fieldValues[sections[i]][field]) {
+        //             setValue(sections[i], field, '');
+        //             break;
+        //         }
+        //     }
+        //     fieldOptions[field] = [];
+        // } else {
+
             fieldOptions[field] = options;
-            setDefaultValue(field);
-        }
+            if (options.length > 0) {
+                setDefaultValue(field);
+            }
+        // }
     }
 
     function setValue(section, field, value) {
@@ -274,6 +277,14 @@ define([
                     
                 case 'search.active_section.update':
                     activeSection = payload.section;
+                    change = true;
+                    break;
+
+                case constants.GET_VEHICLE_OPTIONS_SUCCESS:
+                    Object.keys(payload.options).map(function(field, i) {
+                        setOptions(field, payload.options[field]);
+                        setValue('vehicle', field, payload.values[field]);
+                    });
                     change = true;
                     break;
 

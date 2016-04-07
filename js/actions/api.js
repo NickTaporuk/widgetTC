@@ -7,6 +7,7 @@ define([
     'load!actions/constants',
     'load!stores/vehicleStore',
     'load!stores/reviewsStore',
+    'load!stores/searchStore',
     'config'
 ], function(
     dispatcher,
@@ -17,6 +18,7 @@ define([
     constants,
     vehicleStore,
     reviewsStore,
+    searchStore,
     config
 ) {
 
@@ -182,6 +184,93 @@ define([
                         filters: results.filters,
                         page: results.page
                     });
+                }
+            });
+        },
+
+        getVehicleOptions: function(values, updateField) {
+            var fields = ['year', 'make', 'model', 'trim'];
+            var index = updateField ? fields.indexOf(updateField) : 3;
+            var allOptions = {};   
+            
+            for (var i = 0; i < 4; i++) {
+                var field = fields[i];
+                values[field] = index < i || !values[field] ? '' : values[field];
+                allOptions[field] = [];
+                if (!updateField && !values[field]) {
+                    index = i-1;
+                    updateField = fields[index];
+                }
+            }
+
+            var readySteps = 0;
+            var dispatch = function(options) {
+                if (readySteps > index) {
+                    dispatcher.dispatch({
+                        actionType: constants.GET_VEHICLE_OPTIONS_SUCCESS,
+                        options: allOptions,
+                        values: values
+                    });
+                }
+                readySteps++;
+            }
+
+            if (values.trim) {
+                ajax.make({
+                    url: 'vehicle/tireSizes',
+                    data: values,
+                    success: function(response) {
+                        var options = [];
+                        response.data.values.map(function(option) {
+                            options.push({
+                                value: option.cartireid,
+                                description: option.fitment + ' ' + option.size_description
+                            });
+                        });
+                        allOptions.car_tire_id = options;
+                        dispatch();
+                    }
+                });
+            }
+
+            if (values.model) {
+                ajax.make({
+                    url: 'vehicle/trims',
+                    data: values,
+                    success: function(response) {
+                        allOptions.trim = prepareVehicleResponse(response);
+                        dispatch();
+                    }
+                });
+            }
+
+            if (values.make) {
+                ajax.make({
+                    url: 'vehicle/models',
+                    data: values,
+                    success: function(response) {
+                        allOptions.model = prepareVehicleResponse(response);
+                        dispatch();
+                    }
+                });
+            }
+
+            if (values.year) {
+                ajax.make({
+                    url: 'vehicle/makes',
+                    data: values,
+                    success: function(response) {
+                        allOptions.make = prepareVehicleResponse(response);
+                        dispatch();
+                    }
+                });
+            } 
+
+            ajax.make({
+                url: 'vehicle/years',
+                success: function(response) {
+                    allOptions.year = prepareVehicleResponse(response);
+                    dispatch();
                 }
             });
         },
