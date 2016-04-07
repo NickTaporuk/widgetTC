@@ -36,6 +36,9 @@ define([
 
                     <div className={cn('summary_wrapper')}>
                         <form action="" className={cn('appointment_form')} onSubmit={this._handleFormSubmit}>
+                            <div className={cn(['sixcol', 'col_left', 'appointment_info'])}>
+                                <MainPrices quote={this.props.quote} />
+                            </div>
                             <fieldset className={cn(['sixcol', 'last', 'right', 'col_right', 'appointment_fields'])}>
                                 <div className={cn('control_wrapper')}>
                                     <label htmlFor={cn('order_email')}>Email Address <span className="req">*</span></label>
@@ -44,9 +47,6 @@ define([
                                 </div>
                                 {this._getBtn()}
                             </fieldset>
-                            <div className={cn(['sixcol', 'col_left', 'appointment_info'])}>
-                                <MainPrices quote={this.props.quote} />
-                            </div>
                         </form>
                     </div>
                 </div>

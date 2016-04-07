@@ -48,7 +48,8 @@ body {
 		@include font-size($baseFontSize*0.875);
 		color: $gray;
 		max-width: none;
-		@include margin($baseSpacing/4);
+		@include padding($baseSpacing/4);
+		margin: 0;
 		text-align: right;
 
 		img {
