@@ -35,6 +35,7 @@ define([
     };
 
     ajax.error = function(error) {
+        console.log('df2');
         dispatcher.dispatch({
             actionType: constants.ERROR_RESPONSE,
             error: error
@@ -105,14 +106,13 @@ define([
 
     Api = {
         loadLocations: function() {
-            ajax.make({
-                url: 'location/list',
-                success: function(response) {
-                    dispatcher.dispatch({
-                        actionType: constants.LOAD_LOCATIONS_SUCCESS,
-                        locations: response.data.locations
-                    });
-                }
+            return ajax.make({
+                url: 'location/list2'
+            }).then(function(response) {
+                dispatcher.dispatch({
+                    actionType: constants.LOAD_LOCATIONS_SUCCESS,
+                    locations: response.data.locations
+                });
             });
         },
 
@@ -299,7 +299,7 @@ define([
 
         getVehicleMakes: function(year) {
             var values = {year: year, make: '', model: '', trim: ''};
-            var options = vehicleStore.getMakes(year);
+            // var options = vehicleStore.getMakes(year);
             var dispatch = function(response) {
                 dispatcher.dispatch({
                     actionType: constants.GET_VEHICLE_MAKES_SUCCESS,
@@ -307,17 +307,18 @@ define([
                     values: values
                 });
             }
-            if (options.length > 0) {
-                dispatch(options);
-            } else if (year) {
+            // if (options.length > 0) {
+            //     dispatch(options);
+            // } else if (year) {
                 ajax.make({
                     url: 'vehicle/makes',
                     data: {year: year},
+                    cache: true,
                     success: function(response) {
                         dispatch(prepareVehicleResponse(response));
                     }
                 });
-            }
+            // }
         },
 
         getVehicleModels: function(year, make) {
@@ -422,6 +423,16 @@ define([
         },
 
         loadQuote: function(tireId, quantity, services, withDiscount, customDiscount, track) {
+            // var callbacks = {
+            //     success: function(){}
+            // };
+            // var callAfter = function(response) {
+            //     callbacks.success(response);
+            // };
+            // callAfter.done = function(success) {
+            //     callbacks.success = success;
+            // }
+
             ajax.make({
                 url: 'quote/display',
                 method: 'post',
@@ -441,6 +452,9 @@ define([
                         quote.discount.tried_to_apply = withDiscount;
                         quote.discount.is_custom = customDiscount ? true : false;
                     }
+
+                    // callAfter(response);
+
                     dispatcher.dispatch({
                         actionType: constants.LOAD_QUOTE_SUCCESS,
                         tireId: tireId,
@@ -449,6 +463,8 @@ define([
                     });
                 }
             });
+
+            // return callAfter;
         },
 
         sendAppointment: function(data) {

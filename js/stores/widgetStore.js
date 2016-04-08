@@ -21,7 +21,6 @@ define([
 
         dispatchToken: dispatcher.register(function(payload) {
             change = false;
-            console.log(payload.actionType);
             switch (payload.actionType) {
                 case constants.LOAD_LOCATIONS_SUCCESS:
                 case constants.LOAD_DEALER_CONFIG_SUCCESS:
@@ -45,6 +44,8 @@ define([
                         hashbang: true
                         // dispatch: false
                     });
+
+                    page.stop();
                 }, 500);
 
             }

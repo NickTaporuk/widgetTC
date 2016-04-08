@@ -37,7 +37,6 @@ window.TCWidget = {
 
             h.loadCss(config.mainCss);
             h.loadCss('https://fonts.googleapis.com/icon?family=Material+Icons');
-            // h.loadCss('https://fonts.googleapis.com/css?family=Lato:400,400italic,900');
 
             requirejs.config({
                 baseUrl: './js/', 
@@ -61,36 +60,31 @@ window.TCWidget = {
             function(React, ReactDOM, Wrapper, Act, Overlay, cn, widgetStore, Api) {
                 
                 var render = function() {
-                    // if (widgetStore.getIsReady()) {
-                        var container = document.getElementById(params.container);
+                    var container = document.getElementById(params.container);
 
-                        if (!self.overlayNode) {
-                            // append overlays (popup/message/loading/shadow) to the end of body
-                            var body = document.getElementsByTagName('body')[0];
-                            self.overlayNode = document.createElement("div");
-                            self.overlayNode.id = cn('widget_outer');
-                            body.appendChild(self.overlayNode);
-                        }
+                    if (!self.overlayNode) {
+                        // append overlays (popup/message/loading/shadow) to the end of body
+                        var body = document.getElementsByTagName('body')[0];
+                        self.overlayNode = document.createElement("div");
+                        self.overlayNode.id = cn('widget_outer');
+                        body.appendChild(self.overlayNode);
+                    }
 
-                        ReactDOM.unmountComponentAtNode(container); // needed if init has been called again
-                        ReactDOM.unmountComponentAtNode(self.overlayNode); // needed if init has been called again
+                    ReactDOM.unmountComponentAtNode(container); // needed if init has been called again
+                    ReactDOM.unmountComponentAtNode(self.overlayNode); // needed if init has been called again
 
-                        ReactDOM.render(
-                            React.createElement(Wrapper),
-                            container
-                        );
+                    ReactDOM.render(
+                        React.createElement(Wrapper),
+                        container
+                    );
 
-                        ReactDOM.render(
-                            React.createElement(Overlay),
-                            self.overlayNode
-                        );
-
-                        // widgetStore.unbind('change', render);
-                    // }
+                    ReactDOM.render(
+                        React.createElement(Overlay),
+                        self.overlayNode
+                    );
                 };
 
                 render();
-                // widgetStore.bind('change', render);
 
                 if (!config.sessionId) {
                     Api.setSession(function(sessionId) {

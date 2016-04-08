@@ -5,8 +5,8 @@ define([
     'load!stores/locationsStore',
     'load!stores/customerStore',
     'actions/api',
+    'actions/routing',
     'actions/searchPage',
-    'page',
     'lib/helper',
     'lodash'
 ], function(
@@ -16,8 +16,8 @@ define([
     locationsStore,
     customerStore,
     Api,
+    Routing,
     searchPage,
-    page,
     h,
     _
 ) {

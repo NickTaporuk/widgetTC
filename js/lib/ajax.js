@@ -1,6 +1,4 @@
 define(['config'], function(config) {
-	var instance = null;
-
 	function Ajax() {
 		var $public = {};
 		var $private = {};
@@ -131,16 +129,35 @@ define(['config'], function(config) {
 	var isIE = function () {
 	  var myNav = navigator.userAgent.toLowerCase();
 	  return (myNav.indexOf('msie') != -1) ? parseInt(myNav.split('msie')[1]) : false;
-	}
+	};
 
-	var ajax2 = function() {
+	var widgetAjax = function() {
 		var self = this;
 
-		this.beforeSend = function(){};
-		this.error = function(e){};
-		this.complete = function(){};
+		// ---- cache ----
+		var cache = {};
+
+		var getKeyForCache = function(url, data) {
+			return (url + JSON.stringify(data)).replace(/[^a-zA-Z0-9]/g, '');
+		};
+
+		var addToCache = function(url, data, response) {
+			cache[getKeyForCache(url, data)] = response;
+		};
+
+		var getFromCache = function(url, data) {
+			var response = cache[getKeyForCache(url, data)]; 
+			return response || null;
+		};
+		// ---- END cache ----
 
 		var ajaxCounter = 0;
+
+		this.beforeSend = function(){};
+		this.error = function(e){};  
+		this.complete = function(){};
+
+	
 		this.isBusy = function() {
 			return ajaxCounter > 0;
 		};
@@ -153,34 +170,60 @@ define(['config'], function(config) {
 			ajaxCounter++;
 
 			var ajax_a = new Ajax();
-			var data = params.data || {}
-			switch (params.method || 'get') {
-				case 'get':
-					a = ajax_a.get( url, data );
-					break;
-				case 'post':
-					a =ajax_a.post( url, data );
-					break;
-			}
-			a.done(function(response, xhr) {
-				params.success(response);
-			});
-			a.error(function(response, xhrObject) {
+
+			var useGlobalError = params.useGlobalError !== undefined ? params.useGlobalError : true;
+
+			var error = function(response, xhrObject) {
 				params.error ? params.error(response, xhrObject) : self.error(response, xhrObject);
-			});
-			a.always(function(response, xhrObject) {
+			};
+
+			var always = function(response, xhrObject) {
 				ajaxCounter--;
 				params.complete ? params.complete(response, xhrObject) : self.complete(response, xhrObject);
+			};
+
+			return new Promise(function(resolve, reject) {
+				
+				var data = params.data || {}
+				if (params.cache) {
+
+					var response = getFromCache(url, data); 
+					if (response) {
+						resolve(response);
+						always(response);
+						return;
+					}
+				}
+
+				switch (params.method || 'get') {
+					case 'get':
+						a = ajax_a.get( url, data );
+						break;
+					case 'post':
+						a =ajax_a.post( url, data );
+						break;
+				}
+
+				a.done(function(response, xhr) {
+					if (params.cache) {
+						addToCache(url, data, response);
+					}
+					resolve(response, xhr);
+				});
+
+				a.error(function(response, xhrObject) {
+					if (useGlobalError) {
+						error(response, xhrObject);
+					} else {
+						reject(response, xhrObject);
+					}
+				})
+
+				a.always(always);
+
 			});
 		}
 	}
 
-	ajax2.getInstance = function(){
-        if(instance === null){
-            instance = new ajax2();
-        }
-        return instance;
-    };
-
-	return ajax2.getInstance();
+	return new widgetAjax();
 });

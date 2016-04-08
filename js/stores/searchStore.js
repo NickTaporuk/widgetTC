@@ -163,8 +163,8 @@ define([
         getAllValues: function() {
             return _.cloneDeep(fieldValues);
         },
-        getParamsForSearch: function() {
-            if (!searchStore.isReadyForSearch()) {
+        getParamsForSearch: function(force) {
+            if (!searchStore.isReadyForSearch() && !force) {
                 return null;
             }
 
@@ -214,11 +214,16 @@ define([
                     });
                     change = true;
                     break;
-                case 'page.search.show':
+                case 'search.params.update':
                     activeSection = payload.params.searchBy.replace('by_', '');
                     Object.keys(fieldValues[activeSection]).map(function(field) {
                         if (payload.params[field]) {
                             fieldValues[activeSection][field] = payload.params[field];
+                        }
+                    });
+                    Object.keys(fieldValues['common']).map(function(field) {
+                        if (payload.params[field]) {
+                            fieldValues['common'][field] = payload.params[field];
                         }
                     });
                     change = true;

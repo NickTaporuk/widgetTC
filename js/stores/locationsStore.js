@@ -75,7 +75,7 @@ define([
                     change = true;
                     break;
 
-                case 'page.search.show':
+                case 'search.params.update':
                     currectLocationId = payload.params.location_id || null;
                     change = true;
                     break;
