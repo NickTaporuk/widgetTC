@@ -5,9 +5,6 @@ define([
     'validate',
     'moment',
     'load!actions/constants',
-    'load!stores/vehicleStore',
-    'load!stores/reviewsStore',
-    'load!stores/searchStore',
     'config'
 ], function(
     dispatcher,
@@ -16,9 +13,6 @@ define([
     validate,
     moment,
     constants,
-    vehicleStore,
-    reviewsStore,
-    searchStore,
     config
 ) {
 
@@ -107,7 +101,8 @@ define([
     Api = {
         loadLocations: function() {
             return ajax.make({
-                url: 'location/list2'
+                url: 'location/list',
+                cache: true
             }).then(function(response) {
                 dispatcher.dispatch({
                     actionType: constants.LOAD_LOCATIONS_SUCCESS,
@@ -128,9 +123,9 @@ define([
             if (isMobile.any) {
                 ajax.make({
                     url: 'location/' + locationId + '/config',
-                    success: function(response) {
-                        dispatch(response.data);
-                    }
+                    cache: true
+                }).then(function(response) {
+                    dispatch(response.data);
                 });
             } else {
                 dispatch({
@@ -142,12 +137,12 @@ define([
         loadTireParameters: function() {
             ajax.make({
                 url: 'tire/parameters',
-                success: function(response) {
-                    dispatcher.dispatch({
-                        actionType: constants.LOAD_TIRE_PARAMETERS_SUCCESS,
-                        options: response.data
-                    });
-                }
+                cache: true
+            }).then(function(response) {
+                dispatcher.dispatch({
+                    actionType: constants.LOAD_TIRE_PARAMETERS_SUCCESS,
+                    options: response.data
+                });
             });
         },
 
@@ -174,17 +169,16 @@ define([
             ajax.make({
                 url: 'tire/' + method,
                 data: searchParams,
-                method: 'post',
-                success: function(response) {
-                    var results = response.data;
-                    dispatcher.dispatch({
-                        actionType: constants.SEARCH_TIRES_SUCCESS,
-                        tires: results.tires,
-                        totalCount: results.nb_results,
-                        filters: results.filters,
-                        page: results.page
-                    });
-                }
+                method: 'post'
+            }).then(function(response) {
+                var results = response.data;
+                dispatcher.dispatch({
+                    actionType: constants.SEARCH_TIRES_SUCCESS,
+                    tires: results.tires,
+                    totalCount: results.nb_results,
+                    filters: results.filters,
+                    page: results.page
+                });
             });
         },
 
@@ -219,17 +213,17 @@ define([
                 ajax.make({
                     url: 'vehicle/tireSizes',
                     data: values,
-                    success: function(response) {
-                        var options = [];
-                        response.data.values.map(function(option) {
-                            options.push({
-                                value: option.cartireid,
-                                description: option.fitment + ' ' + option.size_description
-                            });
+                    cache: true
+                }).then(function(response) {
+                    var options = [];
+                    response.data.values.map(function(option) {
+                        options.push({
+                            value: option.cartireid,
+                            description: option.fitment + ' ' + option.size_description
                         });
-                        allOptions.car_tire_id = options;
-                        dispatch();
-                    }
+                    });
+                    allOptions.car_tire_id = options;
+                    dispatch();
                 });
             }
 
@@ -237,10 +231,10 @@ define([
                 ajax.make({
                     url: 'vehicle/trims',
                     data: values,
-                    success: function(response) {
-                        allOptions.trim = prepareVehicleResponse(response);
-                        dispatch();
-                    }
+                    cache: true
+                }).then(function(response) {
+                    allOptions.trim = prepareVehicleResponse(response);
+                    dispatch();
                 });
             }
 
@@ -248,10 +242,10 @@ define([
                 ajax.make({
                     url: 'vehicle/models',
                     data: values,
-                    success: function(response) {
-                        allOptions.model = prepareVehicleResponse(response);
-                        dispatch();
-                    }
+                    cache: true
+                }).then(function(response) {
+                    allOptions.model = prepareVehicleResponse(response);
+                    dispatch();
                 });
             }
 
@@ -259,140 +253,110 @@ define([
                 ajax.make({
                     url: 'vehicle/makes',
                     data: values,
-                    success: function(response) {
-                        allOptions.make = prepareVehicleResponse(response);
-                        dispatch();
-                    }
+                    cache: true
+                }).then(function(response) {
+                    allOptions.make = prepareVehicleResponse(response);
+                    dispatch();
                 });
-            } 
+            }
 
             ajax.make({
                 url: 'vehicle/years',
-                success: function(response) {
-                    allOptions.year = prepareVehicleResponse(response);
-                    dispatch();
-                }
+                cache: true
+            }).then(function(response) {
+                allOptions.year = prepareVehicleResponse(response);
+                dispatch();
             });
         },
 
         getVehicleYears: function() {
             var values = {year: '', make: '', model: '', trim: ''};
-            var options = vehicleStore.getYears();
-            var dispatch = function(response) {
+
+            ajax.make({
+                url: 'vehicle/years',
+                cache: true
+            }).then(function(response) {
                 dispatcher.dispatch({
                     actionType: constants.GET_VEHICLE_YEARS_SUCCESS,
-                    options: response,
+                    options: prepareVehicleResponse(response),
                     values: values
                 });
-            }
-            if (options.length > 0) {
-                dispatch(options);
-            } else {
-                ajax.make({
-                    url: 'vehicle/years',
-                    success: function(response) {
-                        dispatch(prepareVehicleResponse(response));
-                    }
-                });
-            }
+            });
         },
 
         getVehicleMakes: function(year) {
             var values = {year: year, make: '', model: '', trim: ''};
-            // var options = vehicleStore.getMakes(year);
-            var dispatch = function(response) {
+
+            ajax.make({
+                url: 'vehicle/makes',
+                data: {year: year},
+                cache: true
+            }).then(function(response) {
                 dispatcher.dispatch({
                     actionType: constants.GET_VEHICLE_MAKES_SUCCESS,
-                    options: response,
+                    options: prepareVehicleResponse(response),
                     values: values
                 });
-            }
-            // if (options.length > 0) {
-            //     dispatch(options);
-            // } else if (year) {
-                ajax.make({
-                    url: 'vehicle/makes',
-                    data: {year: year},
-                    cache: true,
-                    success: function(response) {
-                        dispatch(prepareVehicleResponse(response));
-                    }
-                });
-            // }
+            });
         },
 
         getVehicleModels: function(year, make) {
             var values = {year: year, make: make, model: '', trim: ''};
-            var options = vehicleStore.getModels(year, make);
-            var dispatch = function(response) {
-                dispatcher.dispatch({
-                    actionType: constants.GET_VEHICLE_MODELS_SUCCESS,
-                    options: response,
-                    values: values
-                });
-            }
-            if (options.length > 0) {
-                dispatch(options);
-            } else if (make) {
+
+            if (make) {
                 ajax.make({
                     url: 'vehicle/models',
                     data: {year: year, make: make},
-                    success: function(response) {
-                        dispatch(prepareVehicleResponse(response));
-                    }
+                    cache: true
+                }).then(function(response) {
+                    dispatcher.dispatch({
+                        actionType: constants.GET_VEHICLE_MODELS_SUCCESS,
+                        options: prepareVehicleResponse(response),
+                        values: values
+                    });
                 });
             }
         },
 
         getVehicleTrims: function(year, make, model) {
             var values = {year: year, make: make, model: model, trim: ''};
-            var options = vehicleStore.getTrims(year, make, model);
-            var dispatch = function(response) {
-                dispatcher.dispatch({
-                    actionType: constants.GET_VEHICLE_TRIMS_SUCCESS,
-                    options: response,
-                    values: values
-                });
-            }
-            if (options.length > 0) {
-                dispatch(options);
-            } else if (model) {
+
+            if (model) {
                 ajax.make({
                     url: 'vehicle/trims',
                     data: values,
-                    success: function(response) {
-                        dispatch(prepareVehicleResponse(response));
-                    }
+                    cache: true
+                }).then(function(response) {
+                    dispatcher.dispatch({
+                        actionType: constants.GET_VEHICLE_TRIMS_SUCCESS,
+                        options: prepareVehicleResponse(response),
+                        values: values
+                    });
                 });
             }
         },
 
         getVehicleTireSizes: function(year, make, model, trim) {
             var values = {year: year, make: make, model: model, trim: trim};
-            var options = vehicleStore.getTireSizes(year, make, model, trim);
-            var dispatch = function(response) {
-                dispatcher.dispatch({
-                    actionType: constants.GET_VEHICLE_TIRES_SUCCESS,
-                    options: response,
-                    values: values
-                });
-            }
-            if (options.length > 0) {
-                dispatch(options);
-            } else if (trim) {
+
+            if (trim) {
                 ajax.make({
                     url: 'vehicle/tireSizes',
                     data: values,
-                    success: function(response) {
-                        var options = [];
-                        response.data.values.map(function(option) {
-                            options.push({
-                                value: option.cartireid,
-                                description: option.fitment + ' ' + option.size_description
-                            });
+                    cache: true
+                }).then(function(response) {
+                    var options = [];
+                    response.data.values.map(function(option) {
+                        options.push({
+                            value: option.cartireid,
+                            description: option.fitment + ' ' + option.size_description
                         });
-                        dispatch(options);
-                    }
+                    });
+                    dispatcher.dispatch({
+                        actionType: constants.GET_VEHICLE_TIRES_SUCCESS,
+                        options: options,
+                        values: values
+                    });
                 });
             }
         },
@@ -400,12 +364,12 @@ define([
         loadDealerInfo: function() {
             ajax.make({
                 url: 'dealer/list',
-                success: function(response) {
-                    dispatcher.dispatch({
-                        actionType: constants.LOAD_DEALER_INFO_SUCCESS,
-                        info: response.data.dealers[0]
-                    });
-                }
+                cache: true
+            }).then(function(response) {
+                dispatcher.dispatch({
+                    actionType: constants.LOAD_DEALER_INFO_SUCCESS,
+                    info: response.data.dealers[0]
+                });
             });
         },
 
@@ -413,26 +377,16 @@ define([
             ajax.make({
                 url: 'dealer/config',
                 data: {wdg:true},
-                success: function(response) {
-                    dispatcher.dispatch({
-                        actionType: constants.LOAD_DEALER_CONFIG_SUCCESS,
-                        config: response.data
-                    });
-                }
+                cache: true
+            }).then(function(response) {
+                dispatcher.dispatch({
+                    actionType: constants.LOAD_DEALER_CONFIG_SUCCESS,
+                    config: response.data
+                });
             });
         },
 
         loadQuote: function(tireId, quantity, services, withDiscount, customDiscount, track) {
-            // var callbacks = {
-            //     success: function(){}
-            // };
-            // var callAfter = function(response) {
-            //     callbacks.success(response);
-            // };
-            // callAfter.done = function(success) {
-            //     callbacks.success = success;
-            // }
-
             ajax.make({
                 url: 'quote/display',
                 method: 'post',
@@ -443,28 +397,25 @@ define([
                     with_discount: withDiscount || false,
                     custom_discount: customDiscount || null,
                     track: track || null
-                },
-                success: function(response) {
-                    var quote = response.data;
-                    quote.tire_id = tireId;
-                    quote.tires_count = quantity;
-                    if (quote.discount) {
-                        quote.discount.tried_to_apply = withDiscount;
-                        quote.discount.is_custom = customDiscount ? true : false;
-                    }
-
-                    // callAfter(response);
-
-                    dispatcher.dispatch({
-                        actionType: constants.LOAD_QUOTE_SUCCESS,
-                        tireId: tireId,
-                        quantity: quantity,
-                        quote: quote
-                    });
                 }
-            });
+            }).then(function(response) {
+                var quote = response.data;
+                quote.tire_id = tireId;
+                quote.tires_count = quantity;
+                if (quote.discount) {
+                    quote.discount.tried_to_apply = withDiscount;
+                    quote.discount.is_custom = customDiscount ? true : false;
+                }
 
-            // return callAfter;
+                // callAfter(response);
+
+                dispatcher.dispatch({
+                    actionType: constants.LOAD_QUOTE_SUCCESS,
+                    tireId: tireId,
+                    quantity: quantity,
+                    quote: quote
+                });
+            });
         },
 
         sendAppointment: function(data) {
@@ -483,19 +434,18 @@ define([
                     url: 'quote/appointment',
                     method: 'post',
                     data: data,
-                    success: function(response) {
-                        dispatcher.dispatch({
-                            actionType: constants.SEND_APPOINTMENT_SUCCESS,
-                            title: 'Thank you!', 
-                            content: response.notice
-                        });
-                    },
-                    error: function(response) {
-                        if (response.error_code == 400001) {
-                            dispatchError(response.errors);
-                        } else {
-                            ajax.error(response);
-                        }
+                    useGlobalError: false
+                }).then(function(response) {
+                    dispatcher.dispatch({
+                        actionType: constants.SEND_APPOINTMENT_SUCCESS,
+                        title: 'Thank you!', 
+                        content: response.notice
+                    });
+                }).catch(function(response) {
+                    if (response.error_code == 400001) {
+                        dispatchError(response.errors);
+                    } else {
+                        ajax.error(response);
                     }
                 });
             }
@@ -518,21 +468,20 @@ define([
                     url: 'quote/print',
                     method: 'post',
                     data: data,
-                    success: function(response) {
-                        WinPrint.focus();
-                        WinPrint.document.write(response.data.html);
-                        WinPrint.document.close();
-                        dispatcher.dispatch({
-                            actionType: constants.PRINT_QUOTE_SUCCESS
-                        });
-                    },
-                    error: function(response) {
-                        WinPrint.close();
-                        if (response.error_code == 400001) {
-                            dispatchError(response.errors);
-                        } else {
-                            ajax.error(response);
-                        }
+                    useGlobalError: false
+                }).then(function(response) {
+                    WinPrint.focus();
+                    WinPrint.document.write(response.data.html);
+                    WinPrint.document.close();
+                    dispatcher.dispatch({
+                        actionType: constants.PRINT_QUOTE_SUCCESS
+                    });
+                }).catch(function(response) {
+                    WinPrint.close();
+                    if (response.error_code == 400001) {
+                        dispatchError(response.errors);
+                    } else {
+                        ajax.error(response);
                     }
                 });
             }
@@ -554,19 +503,18 @@ define([
                     url: 'quote/email',
                     method: 'post',
                     data: data,
-                    success: function(response) {
-                        dispatcher.dispatch({
-                            actionType: constants.EMAIL_QUOTE_SUCCESS,
-                            title: response.notice,
-                            content: ''
-                        });
-                    },
-                    error: function(response) {
-                        if (response.error_code == 400001) {
-                            dispatchError(response.errors);
-                        } else {
-                            ajax.error(response);
-                        }
+                    useGlobalError: false
+                }).then(function(response) {
+                    dispatcher.dispatch({
+                        actionType: constants.EMAIL_QUOTE_SUCCESS,
+                        title: response.notice,
+                        content: ''
+                    });
+                }).catch(function(response) {
+                    if (response.error_code == 400001) {
+                        dispatchError(response.errors);
+                    } else {
+                        ajax.error(response);
                     }
                 });
             }
@@ -588,19 +536,18 @@ define([
                     url: 'quote/request',
                     method: 'post',
                     data: data,
-                    success: function(response) {
-                        dispatcher.dispatch({
-                            actionType: constants.REQUEST_QUOTE_SUCCESS,
-                            title: 'Thank you!',
-                            content: response.notice
-                        });
-                    },
-                    error: function(response) {
-                        if (response.error_code == 400001) {
-                            dispatchError(response.errors);
-                        } else {
-                            ajax.error(response);
-                        }
+                    useGlobalError: false
+                }).then(function(response) {
+                    dispatcher.dispatch({
+                        actionType: constants.REQUEST_QUOTE_SUCCESS,
+                        title: 'Thank you!',
+                        content: response.notice
+                    });
+                }).catch(function(response) {
+                    if (response.error_code == 400001) {
+                        dispatchError(response.errors);
+                    } else {
+                        ajax.error(response);
                     }
                 });
             }
@@ -610,13 +557,12 @@ define([
             ajax.make({
                 url: 'order',
                 method: 'post',
-                data: data,
-                success: function(response) {
-                    var orderInfo = response.data;
-                    orderInfo.actionType = constants.ORDER_CREATE_SUCCESS;
+                data: data
+            }).then(function(response) {
+                var orderInfo = response.data;
+                orderInfo.actionType = constants.ORDER_CREATE_SUCCESS;
 
-                    dispatcher.dispatch(orderInfo);
-                }
+                dispatcher.dispatch(orderInfo);
             });
         },
 
@@ -636,19 +582,18 @@ define([
                     url: 'order/' + orderId + '/checkout',
                     method: 'post',
                     data: data,
-                    success: function(response) {
-                        var orderInfo = response.data;
-                        orderInfo.actionType = constants.ORDER_CHECKOUT_SUCCESS;
-                        dispatcher.dispatch(orderInfo);
+                    useGlobalError: false
+                }).then(function(response) {
+                    var orderInfo = response.data;
+                    orderInfo.actionType = constants.ORDER_CHECKOUT_SUCCESS;
+                    dispatcher.dispatch(orderInfo);
 
-                        Api.orderPayment(orderId, data.token); // auto payment if success
-                    }, 
-                    error: function(response) {
-                        if (response.error_code == 400001) {
-                            dispatchError(response.errors);
-                        } else {
-                            ajax.error(response);
-                        }
+                    Api.orderPayment(orderId, data.token); // auto payment if success
+                }).catch(function(response) {
+                    if (response.error_code == 400001) {
+                        dispatchError(response.errors);
+                    } else {
+                        ajax.error(response);
                     }
                 });
             }
@@ -659,88 +604,72 @@ define([
                 url: 'order/' + orderId + '/payment',
                 method: 'post',
                 data: {token: token},
-                success: function(response) {
-                    var info = response.data;
-                    info.notice = response.notice;
-                    info.actionType = constants.ORDER_PAYMENT_SUCCESS;
-                    dispatcher.dispatch(info);
-                },
-                error: function(response) {
-                    if (response.error_code == 400001) {
-                        dispatcher.dispatch({
-                            actionType: constants.ORDER_PAYMENT_ERROR,
-                            errors: {number: response.errors.token}
-                        });
-                    } else {
-                        ajax.error(response);
-                    }
+                useGlobalError: false
+            }).then(function(response) {
+                var info = response.data;
+                info.notice = response.notice;
+                info.actionType = constants.ORDER_PAYMENT_SUCCESS;
+                dispatcher.dispatch(info);
+            }).catch(function(response) {
+                if (response.error_code == 400001) {
+                    dispatcher.dispatch({
+                        actionType: constants.ORDER_PAYMENT_ERROR,
+                        errors: {number: response.errors.token}
+                    });
+                } else {
+                    ajax.error(response);
                 }
             });
         },
 
         loadFullStock: function(tireId) {
             ajax.make({
-                url: 'tire/' + tireId + '/fullStock',
-                success: function(response) {
-                    dispatcher.dispatch({
-                        actionType: constants.LOAD_FULL_STOCK_SUCCESS,
-                        stock: response.data.stock,
-                        tireId: tireId
-                    });
-                }
+                url: 'tire/' + tireId + '/fullStock'
+            }).then(function(response) {
+                dispatcher.dispatch({
+                    actionType: constants.LOAD_FULL_STOCK_SUCCESS,
+                    stock: response.data.stock,
+                    tireId: tireId
+                });
             });
         },
 
         loadStock: function(tireId) {
             ajax.make({
-                url: 'tire/' + tireId + '/stock',
-                success: function(response) {
-                    dispatcher.dispatch({
-                        actionType: constants.LOAD_STOCK_SUCCESS,
-                        branches: response.data.branches,
-                        tireId: tireId
-                    }); 
-                }
+                url: 'tire/' + tireId + '/stock'
+            }).then(function(response) {
+                dispatcher.dispatch({
+                    actionType: constants.LOAD_STOCK_SUCCESS,
+                    branches: response.data.branches,
+                    tireId: tireId
+                }); 
             });
         },
 
         loadReviews: function(tireId, offset) {
             offset = offset || 0;
 
-            var dispatch = function(data) {
+            ajax.make({
+                url: 'tire/' + tireId + '/reviews',
+                data: { offset: offset, limit: 5 },
+                cache: true
+            }).then(function(response) {
                 dispatcher.dispatch({
                     actionType: constants.LOAD_REVIEWS_SUCCESS,
-                    data: data,
+                    data: response.data,
                     tireId: tireId,
                     offset: offset
                 });
-            };
-
-            var loadedReviews = reviewsStore.getReviews(tireId);
-            if (loadedReviews.length > offset) {
-                dispatch({
-                    nb_results: reviewsStore.getTotalReviews(),
-                    reviews: loadedReviews
-                });
-            } else {
-                ajax.make({
-                    url: 'tire/' + tireId + '/reviews',
-                    data: { offset: offset, limit: 5 },
-                    success: function(response) {
-                        dispatch(response.data);
-                    }
-                })
-            }
+            });
         },
 
         setSession: function(callback) {
             ajax.make({
                 url: 'session',
                 method: 'post',
-                data: {is_returned: config.isReturnedUser, source: (config.sa ? 'instore' : 'website') },
-                success: function(response) {
-                    callback(response.data.session_id);
-                }
+                data: {is_returned: config.isReturnedUser, source: (config.sa ? 'instore' : 'website') }
+            }).then(function(response) {
+                callback(response.data.session_id);
             });
         }
     };
