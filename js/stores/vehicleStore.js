@@ -53,20 +53,22 @@ define([
             var values = payload.values || {};
             var key = getKey(values.year, values.make, values.model, values.trim);
             switch (payload.actionType) {
-                case constants.GET_VEHICLE_YEARS_SUCCESS:
-                    years = payload.options;
-                    break;
-                case constants.GET_VEHICLE_MAKES_SUCCESS:
-                    makes[key] = payload.options;
-                    break;
-                case constants.GET_VEHICLE_MODELS_SUCCESS:
-                    models[key] = payload.options;
-                    break;
-                case constants.GET_VEHICLE_TRIMS_SUCCESS:
-                    trims[key] = payload.options;
-                    break;
-                case constants.GET_VEHICLE_TIRES_SUCCESS:
-                    tireSizes[key] = payload.options;
+                case constants.GET_VEHICLE_OPTIONS_SUCCESS:
+                    if (years.length == 0) {
+                        years = payload.options.year;
+                    }
+                    if (values.year && !makes[key]) {
+                        makes[key] = payload.options.make;
+                    } 
+                    if (values.make && !models[key]) {
+                        models[key] = payload.options.model;
+                    }
+                    if (values.model && !trims[key]) {
+                        trims[key] = payload.options.trim;
+                    }
+                    if (values.trim && !tireSizes[key]) {
+                        tireSizes[key] = payload.options.car_tire_id;
+                    }
                     break;
             }
 

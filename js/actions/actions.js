@@ -29,7 +29,7 @@ define([
             // action 2
             Api.loadTireParameters();
             // action 3
-            Api.getVehicleYears();
+            Api.getVehicleOptions();
             // action 4
             Api.loadDealerConfig();
             // action 5
@@ -250,17 +250,7 @@ define([
                     values: values
                 });
 
-                if (values.trim) {
-                    Api.getVehicleTireSizes(values.year, values.make, values.model, values.trim);
-                } else if (values.model) {
-                    Api.getVehicleTrims(values.year, values.make, values.model);
-                } else if (values.make) {
-                    Api.getVehicleModels(values.year, values.make);
-                } else if (values.year) {
-                    Api.getVehicleMakes(values.year);
-                } else {
-                    Api.getVehicleYears();
-                }
+                Api.getVehicleOptions(values);
             }
         }
     };

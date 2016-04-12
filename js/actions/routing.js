@@ -16,18 +16,6 @@ define([
     searchStore
 ) {
 
-    // page('search/:searchBy', function(ctx) {
-    //     var params = _.merge(h.queryToObj(ctx.querystring), ctx.params);
-        
-    //     dispatcher.dispatch({
-    //         actionType: 'search.params.update',
-    //         params: params || {}
-    //     });
-
-    //     Api.getVehicleOptions(params);
-    // });
-
-
     page('results/:searchBy', function(ctx) {  //results?width=_&height=_&rim=_&display=_&page=_&order_by=_&filter[brand]=Brand|Brand2&filter[category]=Cat1|Cat2
         var params = _.merge(h.queryToObj(ctx.querystring), ctx.params);
 
@@ -42,33 +30,27 @@ define([
     });
 
 
-    page('quote/:tireId', function(ctx) {  //results?width=_&height=_&rim=_&display=_&page=_&order_by=_&filter[brand]=Brand|Brand2&filter[category]=Cat1|Cat2
+    page('quote', function(ctx) {  //results?width=_&height=_&rim=_&display=_&page=_&order_by=_&filter[brand]=Brand|Brand2&filter[category]=Cat1|Cat2
         var params = _.merge(h.queryToObj(ctx.querystring), ctx.params);
 
-        // get tire first
+        Api.loadTire(params.tire_id).then(function(response) {
 
-        // get quote
-        Api.loadQuote(
-            params.tireId,
-            params.quantity,
-            params.services || 'use_default',
-            params.withDiscount || false,
-            params.customDiscount || null
-        );
-        // .done(function() {
-        //     console.log('dfdfdf');
-        // });
+            Api.loadQuote(
+                params.tire_id,
+                params.quantity,
+                params.services || 'use_default',
+                params.with_discount || false,
+                params.customDiscount || null
+            );
+
+        });
+
     });
 
+    page('search', function(ctx) {});  // first page
 
-    // page('quote', function(ctx) {    //quote?tire_id=_&with_discount=_&quantity=_&custom_discount=_&optional_services[]=_&optional_services[]=_
-    //     // load quote
-    //     // show page
-    // });
-
-    // //appointment and any quote page:
-    // page('appointment', function() {  //appointment?tire_id=_&with_discount=_&quantity=_&custom_discount=_&optional_services[]=_&optional_services[]=_
-    //     // load quote
-    //     // show page
-    // });
+    //if url not found
+    page('*', function(ctx) {
+        window.location.hash = '#!search';
+    });
 });

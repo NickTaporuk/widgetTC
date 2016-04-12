@@ -26,11 +26,13 @@ define([
                 case constants.LOAD_DEALER_CONFIG_SUCCESS:
                 case constants.LOAD_TIRE_PARAMETERS_SUCCESS:
                 case constants.LOAD_DEALER_INFO_SUCCESS:
-                case constants.GET_VEHICLE_YEARS_SUCCESS:
+                case constants.GET_VEHICLE_OPTIONS_SUCCESS:
                 case constants.LOAD_LOCATION_CONFIG_SUCCESS:
-                    count++;
+                    if (!store.getIsReady()) {
+                        count++;
 
-                    change = store.getIsReady();
+                        change = store.getIsReady();
+                    }
                     break;
             }
 

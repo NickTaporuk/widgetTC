@@ -72,6 +72,9 @@ define([
 
         _getContent: function() {
             var content = null;
+
+            var url = this.state.name;
+
             switch (this.state.name) {
                 case 'search':
                     var props = {
@@ -169,6 +172,10 @@ define([
                     };
                     content = <Email {...props} />
                     break;
+            }
+
+            if (config.allowUrl) {
+                window.location.hash = '#!' + url;
             }
 
             return content;

@@ -18,18 +18,29 @@ define([
     var props = {};
 
     var lastScrollPos = {};
-    // var pagesToSavePos = ['results'];
+
+    function objToQuery(obj, prefix) {
+        var str = [];
+        for(var p in obj) {
+            if (obj.hasOwnProperty(p)) {
+                var k = prefix ? prefix + "[" + p + "]" : p, v = obj[p];
+                var param = typeof v == "object" ?
+                    objToQuery(v, k) :
+                    encodeURIComponent(k) + "=" + encodeURIComponent(v)
+                if (param) {
+                    str.push(param);
+                }
+            }
+        }
+        return str.join("&");
+    }
 
     function setPage(_name, _props) {
         if (_name !== name) {
 
-            // save scroll pos before leave current page
-            // lastScrollPos[name] = h.getScrollPos()[1];
-
             name = _name || 'search';
             props = _props || {};
 
-            // if (pagesToSavePos.indexOf(name) !== -1 && lastScrollPos[name]) {
             if (lastScrollPos[name]) {
                 props.lastScrollPos = lastScrollPos[name];
                 delete lastScrollPos[name];

@@ -78,10 +78,12 @@ define([
 
     function setDefaultValue(field) {
         var options;
+        /*
         if (field == 'car_tire_id') {
             options = fieldOptions.car_tire_id;
             setValue('vehicle', 'car_tire_id', options[0].value);
-        } else if (field == 'display') {
+        } else */
+        if (field == 'display') {
             options = fieldOptions.display;
             setValue('common', 'display', options[0].value);
         } else if (fieldValues.filters[field]) {
@@ -286,26 +288,19 @@ define([
                     break;
 
                 case constants.GET_VEHICLE_OPTIONS_SUCCESS:
-                    Object.keys(payload.options).map(function(field, i) {
-                        setOptions(field, payload.options[field]);
-                        setValue('vehicle', field, payload.values[field]);
-                    });
-                    change = true;
-                    break;
-
-                case constants.GET_VEHICLE_YEARS_SUCCESS:
-                case constants.GET_VEHICLE_MAKES_SUCCESS:
-                case constants.GET_VEHICLE_MODELS_SUCCESS:
-                case constants.GET_VEHICLE_TRIMS_SUCCESS:
-                case constants.GET_VEHICLE_TIRES_SUCCESS:
-                    dispatcher.waitFor([vehicleStore.dispatchToken]);
-                    
-                    setOptions('year', vehicleStore.getYears());
-                    setOptions('make', vehicleStore.getMakes(fieldValues.vehicle.year));
-                    setOptions('model', vehicleStore.getModels(fieldValues.vehicle.year, fieldValues.vehicle.make));
-                    setOptions('trim', vehicleStore.getTrims(fieldValues.vehicle.year, fieldValues.vehicle.make, fieldValues.vehicle.model));
-                    setOptions('car_tire_id', vehicleStore.getTireSizes(fieldValues.vehicle.year, fieldValues.vehicle.make, fieldValues.vehicle.model, fieldValues.vehicle.trim));
-                    change = true;
+                    var pageStore = require('load!stores/pageStore');
+                    if (pageStore.getPageName() === 'search')
+                    {
+                        Object.keys(payload.options).map(function(field, i) {
+                            setOptions(field, payload.options[field]);
+                            var val = payload.values[field] || "";
+                            if (field == 'car_tire_id' && payload.options[field][0]) {
+                                val = payload.options[field][0].value;
+                            }
+                            setValue('vehicle', field, val);
+                        });
+                        change = true;
+                    }
                     break;
             }
 

@@ -1,3 +1,7 @@
+/**
+ * Selecting params for search tires and send selected params to search action after submit.
+ */
+
 define([
     'react',
     'classnames',
@@ -26,15 +30,15 @@ define([
         },
 
         componentWillMount: function() {
-            this._updateStatus();
+            this._updateState();
         },
 
         componentDidMount: function() {
-            searchStore.bind('change', this._updateStatus);
+            searchStore.bind('change', this._updateState);
         },
 
         componentWillUnmount: function() {
-            searchStore.unbind('change', this._updateStatus);
+            searchStore.unbind('change', this._updateState);
         },
         
         render: function() {
@@ -183,13 +187,13 @@ define([
             return searchStore.isReadyForSearch();
         },
 
-        _updateStatus: function() {
+        _updateState: function() {
             var fieldValues = searchStore.getAllValues();
             var options = searchStore.getAllOptions();
             this.setState({
-                'activeTab': searchStore.getActiveSection(),
-                'fieldOptions': options,
-                'fieldValues': fieldValues
+                activeTab: searchStore.getActiveSection(),
+                fieldOptions: options,
+                fieldValues: fieldValues
             });
         },
 

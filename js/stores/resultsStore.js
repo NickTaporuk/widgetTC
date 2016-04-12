@@ -20,7 +20,6 @@ define([
     function changeSelectedQuantity(tireId, quantity) {
         var tire = tires[tiresIndexes[tireId]];
         tire.selected_quantity = quantity <= tire.quantity ? quantity : tire.quantity;
-        // tire.calculated_price = tire.selected_quantity * tire.price;
     }
 
     function addTires(_tires) {
@@ -67,7 +66,6 @@ define([
         tire.price = supplier.price;
         tire.supplier = supplier.supplier.name;
         tire.is_in_stock = supplier.is_in_stock;
-        // tire.selected_quantity = supplier.quantity < tire.selected_quantity ? 1 : tire.selected_quantity;
 
         tiresIndexes[supplier.tire_id] = tiresIndexes[tireId];
     }
@@ -88,9 +86,6 @@ define([
         getTire: function(id) {
             return _.cloneDeep(tires[tiresIndexes[id]]);
         },
-        // getShowInStock: function() {
-        //     return showInStock;
-        // },
 
         dispatchToken: dispatcher.register(function(payload) {
             var change = false;
@@ -100,6 +95,10 @@ define([
                     totalCount = payload.totalCount;
                     filters = payload.filters;
                     page = payload.page;                
+                    change = true;
+                    break;
+                case constants.LOAD_TIRE_SUCCESS:
+                    addTires([payload.tire]);
                     change = true;
                     break;
                 case constants.LOAD_DEALER_CONFIG_SUCCESS:

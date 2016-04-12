@@ -6,15 +6,21 @@ define([
     'dispatcher',
     'lodash',
     'page',
+    'load!stores/pageStore',
     'load!stores/vehicleStore',
     'load!stores/searchStore',
+    'load!stores/resultsStore',
+    'load!stores/customerStore',
     'load!actions/constants'
 ], function(
     dispatcher,
     _,
     page,
+    pageStore,
     vehicleStore,
     searchStore,
+    resultsStore,
+    customerStore,
     constants
 ) {
 
@@ -37,6 +43,7 @@ define([
 
     var store = {
         dispatchToken: dispatcher.register(function(payload) {
+            /*
             switch (payload.actionType) {               
                 // results page
                 case 'tire.search':
@@ -52,26 +59,22 @@ define([
 
                     break;
 
-                // search page
-                // case 'search.vehicle.change':
-                // case 'search.active_section.update':
-                // case 'search.field.update':
-                //     var params = searchStore.getParamsForSearch(true);
-                //     params.base_category = searchStore.getValue(searchStore.getActiveSection(), 'base_category');
-                //     delete params.filters;
+                case constants.LOAD_QUOTE_SUCCESS: // 'tire.select':
+                    dispatcher.waitFor([customerStore.dispatchToken]);
 
-                //     var queryString = objToQuery(params);
+                    var params = customerStore.getParamsForQuote('display');
 
-                //     var searchBy = 'by_' + searchStore.getActiveSection();
+                    window.location.hash = '#!quote?' + objToQuery(params);
 
-                //     window.location.hash = '#!search/' + searchBy + '?' + queryString;
+                    break;
 
-                //     break;
+                default:
+                    window.location.hash = '#!' + pageStore.getPageName();
+                    break;
 
                 // summary page
-            }
+            } */
         })
-        // store.trigger('change');
     };
 
 

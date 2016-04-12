@@ -182,10 +182,23 @@ define([
             });
         },
 
+        loadTire: function(tireId) {
+            console.log('dfdf');
+            return ajax.make({
+                url: 'tire/' + tireId
+            }).then(function(response){
+                dispatcher.dispatch({
+                    actionType: constants.LOAD_TIRE_SUCCESS,
+                    tire: response.data
+                });
+            });
+        },
+
         getVehicleOptions: function(values, updateField) {
             var fields = ['year', 'make', 'model', 'trim'];
             var index = updateField ? fields.indexOf(updateField) : 3;
             var allOptions = {};   
+            values = values || {};
             
             for (var i = 0; i < 4; i++) {
                 var field = fields[i];
@@ -198,8 +211,11 @@ define([
             }
 
             var readySteps = 0;
-            var dispatch = function(options) {
+            var dispatch = function() {
                 if (readySteps > index) {
+                    if (!allOptions.car_tire_id) {
+                        allOptions.car_tire_id = [];
+                    }
                     dispatcher.dispatch({
                         actionType: constants.GET_VEHICLE_OPTIONS_SUCCESS,
                         options: allOptions,
@@ -258,6 +274,9 @@ define([
                     allOptions.make = prepareVehicleResponse(response);
                     dispatch();
                 });
+            } else {
+                // if year is not selected
+                dispatch();
             }
 
             ajax.make({
@@ -267,98 +286,6 @@ define([
                 allOptions.year = prepareVehicleResponse(response);
                 dispatch();
             });
-        },
-
-        getVehicleYears: function() {
-            var values = {year: '', make: '', model: '', trim: ''};
-
-            ajax.make({
-                url: 'vehicle/years',
-                cache: true
-            }).then(function(response) {
-                dispatcher.dispatch({
-                    actionType: constants.GET_VEHICLE_YEARS_SUCCESS,
-                    options: prepareVehicleResponse(response),
-                    values: values
-                });
-            });
-        },
-
-        getVehicleMakes: function(year) {
-            var values = {year: year, make: '', model: '', trim: ''};
-
-            ajax.make({
-                url: 'vehicle/makes',
-                data: {year: year},
-                cache: true
-            }).then(function(response) {
-                dispatcher.dispatch({
-                    actionType: constants.GET_VEHICLE_MAKES_SUCCESS,
-                    options: prepareVehicleResponse(response),
-                    values: values
-                });
-            });
-        },
-
-        getVehicleModels: function(year, make) {
-            var values = {year: year, make: make, model: '', trim: ''};
-
-            if (make) {
-                ajax.make({
-                    url: 'vehicle/models',
-                    data: {year: year, make: make},
-                    cache: true
-                }).then(function(response) {
-                    dispatcher.dispatch({
-                        actionType: constants.GET_VEHICLE_MODELS_SUCCESS,
-                        options: prepareVehicleResponse(response),
-                        values: values
-                    });
-                });
-            }
-        },
-
-        getVehicleTrims: function(year, make, model) {
-            var values = {year: year, make: make, model: model, trim: ''};
-
-            if (model) {
-                ajax.make({
-                    url: 'vehicle/trims',
-                    data: values,
-                    cache: true
-                }).then(function(response) {
-                    dispatcher.dispatch({
-                        actionType: constants.GET_VEHICLE_TRIMS_SUCCESS,
-                        options: prepareVehicleResponse(response),
-                        values: values
-                    });
-                });
-            }
-        },
-
-        getVehicleTireSizes: function(year, make, model, trim) {
-            var values = {year: year, make: make, model: model, trim: trim};
-
-            if (trim) {
-                ajax.make({
-                    url: 'vehicle/tireSizes',
-                    data: values,
-                    cache: true
-                }).then(function(response) {
-                    var options = [];
-                    response.data.values.map(function(option) {
-                        options.push({
-                            value: option.cartireid,
-                            description: option.fitment + ' ' + option.size_description
-                        });
-                    });
-                    dispatcher.dispatch({
-                        actionType: constants.GET_VEHICLE_TIRES_SUCCESS,
-                        options: options,
-                        values: values
-                    });
-                });
-            }
         },
 
         loadDealerInfo: function() {
@@ -406,8 +333,6 @@ define([
                     quote.discount.tried_to_apply = withDiscount;
                     quote.discount.is_custom = customDiscount ? true : false;
                 }
-
-                // callAfter(response);
 
                 dispatcher.dispatch({
                     actionType: constants.LOAD_QUOTE_SUCCESS,
@@ -624,7 +549,8 @@ define([
 
         loadFullStock: function(tireId) {
             ajax.make({
-                url: 'tire/' + tireId + '/fullStock'
+                url: 'tire/' + tireId + '/fullStock',
+                cache: true
             }).then(function(response) {
                 dispatcher.dispatch({
                     actionType: constants.LOAD_FULL_STOCK_SUCCESS,

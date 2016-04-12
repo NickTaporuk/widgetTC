@@ -116,11 +116,13 @@ define([
         },
         getParamsForQuote: function(type) {
             var values = {};
-            if (type == 'appointment' || customer.follow_up || config.sa) {
-                values = store.getCustomer();
-                delete values.vehicle;
-            } else if (type == 'email') {
-                values.email = customer.email;
+            if (type !== 'display') {
+                if (type == 'appointment' || customer.follow_up || config.sa) {
+                    values = store.getCustomer();
+                    delete values.vehicle;
+                } else if (type == 'email') {
+                    values.email = customer.email;
+                }
             }
             values.tire_id = selectedTire;
             values.quantity = selectedQuantity;

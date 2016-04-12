@@ -17,6 +17,7 @@ define([
     
     var config = {
         prefix: 'tcwlw_',
+        allowUrl: true,
         apikey: null,
         sessionId: null,
         isReturnedUser: null,
