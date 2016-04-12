@@ -44,6 +44,10 @@ define([
                 tire.description = tire.external_info.marketing.features;
             }
 
+            if (!tire.external_info.marketing.images) {
+                tire.external_info.marketing.images = [];
+            }
+
             if (!tire.external_info.rating) {
                 tire.external_info.rating = {
                     total_reviews: null,
