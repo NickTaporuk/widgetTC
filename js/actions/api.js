@@ -17,19 +17,18 @@ define([
 ) {
 
     ajax.beforeSend = function() {
-        dispatcher.dispatch({
+        dispatcher.sub.dispatch({
             actionType: constants.BEFORE_REQUEST
         });
     };
 
     ajax.complete = function() {
-        dispatcher.dispatch({
+        dispatcher.sub.dispatch({
             actionType: constants.RESPONSE_RECEIVED
         });
     };
 
     ajax.error = function(error) {
-        console.log('df2');
         dispatcher.dispatch({
             actionType: constants.ERROR_RESPONSE,
             error: error
@@ -166,7 +165,7 @@ define([
 
             searchParams.needed_filters = ['brand', 'run_flat', 'light_truck', 'category'];
 
-            ajax.make({
+            return ajax.make({
                 url: 'tire/' + method,
                 data: searchParams,
                 method: 'post'
@@ -183,7 +182,6 @@ define([
         },
 
         loadTire: function(tireId) {
-            console.log('dfdf');
             return ajax.make({
                 url: 'tire/' + tireId
             }).then(function(response){
@@ -314,7 +312,7 @@ define([
         },
 
         loadQuote: function(tireId, quantity, services, withDiscount, customDiscount, track) {
-            ajax.make({
+            return ajax.make({
                 url: 'quote/display',
                 method: 'post',
                 data: {

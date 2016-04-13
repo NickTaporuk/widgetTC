@@ -5,8 +5,6 @@ define([
     'load!stores/locationsStore',
     'load!stores/customerStore',
     'actions/api',
-    'actions/routing',
-    'actions/searchPage',
     'lib/helper',
     'lodash'
 ], function(
@@ -16,8 +14,6 @@ define([
     locationsStore,
     customerStore,
     Api,
-    Routing,
-    searchPage,
     h,
     _
 ) {
@@ -94,14 +90,13 @@ define([
         },
         Tire: {
             search: function(values, step) {
-                dispatcher.dispatch({
-                    actionType: 'tire.search',
-                    step: step || 2,
-                    values: values
-                });
-
                 var location = locationsStore.getCurrentLocation();
                 if (location) {
+                    dispatcher.dispatch({
+                        actionType: 'tire.search',
+                        step: step || 2,
+                        values: values
+                    });
                     Api.searchTires(searchStore.getParamsForSearch());
                 } else {
                     dispatcher.dispatch({

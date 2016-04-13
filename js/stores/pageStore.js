@@ -1,17 +1,25 @@
 define([
     'dispatcher',
+    'page',
+    'lodash',
     'load!stores/resultsStore',
+    'load!stores/searchStore',
     'load!stores/customerStore',
     'load!actions/constants',
     'classnames',
-    'lib/helper'
+    'lib/helper',
+    'config'
 ], function(
     dispatcher,
+    page,
+    _,
     resultsStore,
+    searchStore,
     customerStore,
     constants,
     cn,
-    h
+    h,
+    config
 ) {
 
     var name = 'search';
@@ -19,24 +27,8 @@ define([
 
     var lastScrollPos = {};
 
-    function objToQuery(obj, prefix) {
-        var str = [];
-        for(var p in obj) {
-            if (obj.hasOwnProperty(p)) {
-                var k = prefix ? prefix + "[" + p + "]" : p, v = obj[p];
-                var param = typeof v == "object" ?
-                    objToQuery(v, k) :
-                    encodeURIComponent(k) + "=" + encodeURIComponent(v)
-                if (param) {
-                    str.push(param);
-                }
-            }
-        }
-        return str.join("&");
-    }
-
     function setPage(_name, _props) {
-        if (_name !== name) {
+        if (_name !== name || !_.isEqual(_props, props)) {
 
             name = _name || 'search';
             props = _props || {};
@@ -73,6 +65,16 @@ define([
                     change = setPage(payload.name, payload.props);
                     break;
 
+                case 'summary.page.update':
+                    change = setPage('summary', {entryParams: payload.entryParams});
+                    break;
+                case 'search.page.update':
+                    change = setPage('search', {entryParams: payload.entryParams});
+                    break;
+                case 'results.page.update':
+                    dispatcher.waitFor([searchStore.dispatchToken]);
+                    change = setPage('results', {entryParams: payload.entryParams});
+                    break;
                 case constants.SEARCH_TIRES_SUCCESS:
                     dispatcher.waitFor([resultsStore.dispatchToken]);
                 case constants.REQUEST_QUOTE_SUCCESS:

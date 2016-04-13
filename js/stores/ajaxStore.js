@@ -13,7 +13,7 @@ define([
             return ajaxCount > 0;
         },
 
-        dispatchToken: dispatcher.register(function(payload) {
+        dispatchToken: dispatcher.sub.register(function(payload) {
             change = false;
             switch (payload.actionType) {
                 case constants.BEFORE_REQUEST:

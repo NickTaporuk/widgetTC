@@ -38,9 +38,9 @@ define([
 
     var fieldValues = {
         size: {
-            width: '',
-            height: '',
-            rim: '',
+            width: '195',
+            height: '65',
+            rim: '15',
             speed_rating: '',
             load_index: '',
             base_category: ''
@@ -214,6 +214,17 @@ define([
                     Object.keys(payload.options).map(function(fieldName) {
                         setOptions(fieldName, payload.options[fieldName]);
                     });
+                    change = true;
+                    break;
+                case 'results.page.update':
+                    Object.keys(fieldValues).map(function(section) {
+                        Object.keys(fieldValues[section]).map(function(fieldName) {
+                            if (payload.entryParams[fieldName]) {
+                                setValue(section, fieldName, payload.entryParams[fieldName]);
+                            }
+                        });
+                    });
+
                     change = true;
                     break;
                 case 'search.params.update':

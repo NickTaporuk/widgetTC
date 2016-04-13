@@ -7,6 +7,7 @@ define([
     'classnames',
     'config',
     'load!actions/actions',
+    'load!actions/act',
     'load!stores/searchStore',
     'load!components/elements/select'
 ], function(
@@ -14,6 +15,7 @@ define([
     cn,
     config,
     Act,
+    A,
     searchStore,
     SelectField
 ) {
@@ -206,7 +208,11 @@ define([
             if (event) {
                 event.preventDefault();
             }
-            Act.Tire.search(null, 1);
+
+            var params = this.state.fieldValues[this.state.activeTab];
+            params.location_id = 1;
+            A.resultsPage.update(params);
+            // Act.Tire.search(null, 1);
         },
 
         _handleFieldChange: function(event) {

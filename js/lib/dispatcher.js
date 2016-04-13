@@ -284,6 +284,9 @@ define([], function(){
     this.$Dispatcher_isDispatching = false;
   };
 
-  return new Dispatcher();
+  var dispatcher = new Dispatcher();
+  dispatcher.sub = new Dispatcher();
+
+  return dispatcher;
   
 });

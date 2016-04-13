@@ -1,11 +1,9 @@
 define([
     'dispatcher',
-    'page',
     'load!actions/constants',
     'load!stores/locationsStore',
 ], function(
     dispatcher,
-    page,
     constants,
     locationsStore
 ) {
@@ -37,19 +35,9 @@ define([
             }
 
             if (change) {
-                store.trigger('change');
-
                 setTimeout(function() {
-                    page.base(window.location.pathname + window.location.search);
-                    
-                    page.start({
-                        hashbang: true
-                        // dispatch: false
-                    });
-
-                    page.stop();
-                }, 500);
-
+                    store.trigger('change');
+                }, 1);
             }
         })
     };

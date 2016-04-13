@@ -17,7 +17,8 @@ define([
     'load!stores/customerStore',
     'load!stores/dealerStore',
     'classnames',
-    'config'
+    'config',
+    'lodash'
 ], function(
     ReactDOM,
     h,
@@ -37,7 +38,8 @@ define([
     customerStore,
     dealerStore,
     cn,
-    config
+    config,
+    _
 ) {
 
     var Page = {
@@ -73,8 +75,6 @@ define([
         _getContent: function() {
             var content = null;
 
-            var url = this.state.name;
-
             switch (this.state.name) {
                 case 'search':
                     var props = {
@@ -103,12 +103,24 @@ define([
                             break;
 
                         case 'part_number':
-                             queryParams = {
+                            queryParams = {
                                 first: searchStore.getValue(tab, 'part_number')
-                             }
-                             break;
+                            }
+                            break;
                     }
                     var props = {
+                        // Props for search tires (located in pageStore props):
+                        entryParams: {
+                            page: searchStore.getValue('common', 'page'),
+                            display: searchStore.getValue('common', 'display'),
+                            order_by: searchStore.getValue('common', 'order_by'),
+                            filters: {
+                                brand: searchStore.getValue('filters', 'brand'),
+                                run_flat: searchStore.getValue('filters', 'run_flat'),
+                                light_truck: searchStore.getValue('filters', 'light_truck'),
+                                category: searchStore.getValue('filters', 'category')
+                            }
+                        },
                         fieldOptions: {
                             display: searchStore.getOptions('display'),  
                             order_by: searchStore.getOptions('order_by'),
@@ -116,18 +128,12 @@ define([
                             run_flat: searchStore.getOptions('run_flat'),
                             light_truck: searchStore.getOptions('light_truck')
                         },
-                        fieldValues: {
-                            display: searchStore.getValue('common', 'display'),
-                            order_by: searchStore.getValue('common', 'order_by'),
-                            brand: searchStore.getValue('filters', 'brand'),
-                            run_flat: searchStore.getValue('filters', 'run_flat'),
-                            light_truck: searchStore.getValue('filters', 'light_truck'),
-                            category: searchStore.getValue('filters', 'category')
-                        },
                         queryParams: queryParams,
                         isInMile: locationsStore.getCurrentLocation().country !== 'Canada',
                         itemsOnPage: searchStore.getValue('common', 'items_per_page')
                     };
+                    props = _.merge(props, this.state.props);
+
                     content = <Results {...props} />
                     break;
                 case 'summary':
@@ -136,6 +142,7 @@ define([
                         withOrderBtn: dealerStore.getStripeKey() !== null && !config.sa,
                         callNumber:   locationsStore.getCurLocConfig().call_number
                     };
+                    props = _.merge(props, this.state.props);
                     content = <Summary {...props} />
                     break;
                 case 'appointment':
@@ -172,10 +179,6 @@ define([
                     };
                     content = <Email {...props} />
                     break;
-            }
-
-            if (config.allowUrl) {
-                window.location.hash = '#!' + url;
             }
 
             return content;

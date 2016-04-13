@@ -110,6 +110,22 @@ define(['config'], function(config) {
 			    function($0, $1, $2, $3) { obj[$1] = $3; }
 			);
 			return obj;
+        },
+        objToQuery: function(obj, prefix) {
+            var str = [];
+            for(var p in obj) {
+                if (obj.hasOwnProperty(p)) {
+                    var k = prefix ? prefix + "[" + p + "]" : p, v = obj[p];
+                    var param = typeof v == "object" ?
+                        h.objToQuery(v, k) :
+                        encodeURIComponent(k) + "=" + encodeURIComponent(v)
+                    if (param) {
+                        str.push(param);
+                    }
+                }
+            }
+
+            return str.join("&");
         }
 	}
 

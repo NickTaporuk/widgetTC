@@ -3,6 +3,7 @@ define([
     'config',
     'classnames',
     'load!actions/actions',
+    'load!actions/act',
     'lib/helper',
     'load!components/page/results/tire/offerInfo',
     'load!components/page/results/tire/reviews',
@@ -13,6 +14,7 @@ define([
     config,
     cn,
     Act,
+    A,
     h,
     OfferInfo,
     Reviews,
@@ -239,7 +241,11 @@ define([
 
         _handleSelectClick: function(event) {
             event.preventDefault();
-            Act.Tire.select(this.props.tire, this.state.selQuantity, this.state.supplier);
+            A.summaryPage.update({
+                quantity: this.state.selQuantity,
+                tire_id: this.state.supplier ? this.state.supplier.tire_id : this.props.tire.id
+            });
+            // Act.Tire.select(this.props.tire, this.state.selQuantity, this.state.supplier);
         },
 
         _handleGetQuoteClick: function(event) {
