@@ -4,6 +4,7 @@ define([
     'config',
     'load!actions/actions',
     'lib/helper',
+    'lodash',
     'load!stores/customerStore',
     'load!components/page/summary/offerLine',
     'isMobile'
@@ -13,6 +14,7 @@ define([
     config,
     Act,
     h,
+    _,
     customerStore,
     OfferLine,
     isMobile
