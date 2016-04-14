@@ -9,6 +9,7 @@ define([
     'load!components/elements/select',
     'load!components/page/common/mainPrices',
     'load!components/page/common/formField',
+    'load!components/page/common/back',
     'moment'
 ], function(
     React,
@@ -21,6 +22,7 @@ define([
     SelectField,
     MainPrices,
     Field,
+    Back,
     moment
 ) {
 
@@ -61,7 +63,8 @@ define([
 
             return (
                 <div>
-                    {this._getBackLink()}
+                    <Back />
+                    {/* this._getBackLink() */}
 
                     <div className={cn('summary_wrapper')}>
                         <form action="appointment-confirmation.php" className={cn('appointment_form')} onSubmit={this._handleFormSubmit}>
@@ -145,11 +148,11 @@ define([
         _isValidDate: function( current ) {
             return current.isAfter( moment().add(1, 'd').subtract(1,'day') );
         },
-
+/*
         _getBackLink: function() {
             var text =  types[this.props.type].back.text;
             return <a href="#summary" onClick={this._handleBackClick} className={cn('back_link')}><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE5C4;' }} />{text}</a>
-        },
+        }, */
 
         _getBtn: function() {
             var text = types[this.props.type].submit.text;
@@ -175,11 +178,12 @@ define([
                 options: vehicleStore.getAll(values.vehicle.year, values.vehicle.make, values.vehicle.model, values.vehicle.trim)
             });
         },
-
+/*
         _handleBackClick: function(event) {
             event.preventDefault();
             Act.Page.show(types[this.props.type].back.to);
         },
+        */
 
         _handleFormSubmit: function(event) {
             event.preventDefault();

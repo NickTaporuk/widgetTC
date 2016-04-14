@@ -47,9 +47,13 @@ define([
 
         getInitialState: function() {
             return {
-                name: 'search',
+                name: '',
                 props: {}
             }
+        },
+
+        componentWillMount: function() {
+            this._changeState();
         },
 
         componentDidMount: function() {
@@ -74,6 +78,8 @@ define([
 
         _getContent: function() {
             var content = null;
+
+            // console.log(this.state.name);
 
             switch (this.state.name) {
                 case 'search':
@@ -110,7 +116,7 @@ define([
                     }
                     var props = {
                         // Props for search tires (located in pageStore props):
-                        entryParams: {
+                        fieldValues: {
                             page: searchStore.getValue('common', 'page'),
                             display: searchStore.getValue('common', 'display'),
                             order_by: searchStore.getValue('common', 'order_by'),
@@ -132,7 +138,7 @@ define([
                         isInMile: locationsStore.getCurrentLocation().country !== 'Canada',
                         itemsOnPage: searchStore.getValue('common', 'items_per_page')
                     };
-                    props = _.merge(props, this.state.props);
+                    // props = _.merge(props, this.state.props);
 
                     content = <Results {...props} />
                     break;

@@ -65,6 +65,23 @@ define([
                     change = setPage(payload.name, payload.props);
                     break;
 
+
+
+                case 'get_a_quote.page.update':
+                    change = setPage('quote');
+                    break;
+                case 'email_only.page.update':
+                    change = setPage('email');
+                    break;
+                case 'email.page.update':
+                    change = setPage('appointment', {type: 'email'});
+                    break;
+                case 'print.page.update':
+                    change = setPage('appointment', {type: 'print'});
+                    break;
+                case 'appointment.page.update':
+                    change = setPage('appointment', {type: 'appointment'});
+                    break;
                 case 'summary.page.update':
                     change = setPage('summary', {entryParams: payload.entryParams});
                     break;
@@ -75,6 +92,9 @@ define([
                     dispatcher.waitFor([searchStore.dispatchToken]);
                     change = setPage('results', {entryParams: payload.entryParams});
                     break;
+
+
+
                 case constants.SEARCH_TIRES_SUCCESS:
                     dispatcher.waitFor([resultsStore.dispatchToken]);
                 case constants.REQUEST_QUOTE_SUCCESS:

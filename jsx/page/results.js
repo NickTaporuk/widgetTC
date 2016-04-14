@@ -7,6 +7,7 @@ define([
     'load!actions/act',
     'load!stores/searchStore',
     'load!stores/resultsStore',
+    'load!stores/locationsStore',
     'load!components/elements/select',
     'load!components/page/results/tire',
     'load!components/page/results/pagination',
@@ -21,6 +22,7 @@ define([
     Act,
     searchStore,
     resultsStore,
+    locationsStore,
     SelectField,
     Tire,
     Pagination,
@@ -33,18 +35,7 @@ define([
 
         getInitialState: function() {
             return {
-                entry: {
-                    page: 1,
-                    display: 'full',
-                    order_by: 'best_match',
-                    filters: {
-                        brand: [],
-                        category: [],
-                        run_flat: [],
-                        light_truck: []
-                    }
-                },
-                
+                page: 1,
                 tires: [],
                 totalCount: 0,
                 filters: []
@@ -52,15 +43,11 @@ define([
         },
 
         componentWillMount: function() {
-            var entry = _.merge(this.state.entry, this.props.entryParams);
-            this.setState({entry: entry});
-
             this._updateState();
         },
 
         componentDidMount: function() {
             resultsStore.bind('change', this._updateState);
-            this._loadResults();
         },
 
         componentWillUnmount: function() {
@@ -68,12 +55,8 @@ define([
         },
 
         componentDidUpdate: function(prevProps, prevState) {
-            if (this.state.entry.page !== prevState.entry.page) {
+            if (this.state.page !== prevState.page) {
                 this._scrollToTop();
-            }
-
-            if (!_.isEqual(this.state.entry, prevState.entry)) {
-                this._loadResults();
             }
         },
 
@@ -83,13 +66,15 @@ define([
         },
 
         render: function() {
+            // console.log(this.props.fieldValues.filters);
+
             var tires = [];
 
             var curTime = new Date().getTime();
             this.state.tires.map(function(tire, i) {
                 var tKey = i + curTime;
                 tires.push((
-                    <Tire key={tKey} tire={tire} isInMile={this.props.isInMile} isTop={(i < 3 && this.state.entry.page == 1)} />
+                    <Tire key={tKey} tire={tire} isInMile={this.props.isInMile} isTop={(i < 3 && this.state.page == 1)} />
                 ));
             }.bind(this));
 
@@ -105,7 +90,7 @@ define([
                 filtersInfo.forEach(function(info, i) {
                     if (this.state.filters[info.key].parameters.length > 1) {
                         filters.push((
-                            <FilterBlock key={i} by={info.desc} topDirection={ !this.state.totalCount } name={info.key} allDesc={info.all} defaultValue={ this.state.entry.filters[info.key] } params={ this.state.filters[info.key].parameters } onChange={this._handleFilterChange} />
+                            <FilterBlock key={i} by={info.desc} topDirection={ !this.state.totalCount } name={info.key} allDesc={info.all} defaultValue={ this.props.fieldValues.filters[info.key] } params={ this.state.filters[info.key].parameters } onChange={this._handleFilterChange} />
                         ));
                     }
                 }, this);
@@ -114,8 +99,9 @@ define([
             return (
                 <div>
                     <Back />
+                    {/*
                     <a href="#search" onClick={this._handleBackClick} className={cn('back_link')}><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE5C4;' }} />Back to search</a>
-                    
+                    */}
                     <div className={cn('results_wrapper')}>
                         <div className={cn('results_title')}>
                             <p className={cn('results_query')}>
@@ -126,8 +112,8 @@ define([
                             </p>
                         </div>
                         <div id={cn('optional_fields')} className={cn(['box', 'results_filters'])}>
-                            <SelectField onChange={this._handleFieldChange} options={this.props.fieldOptions.display}  label="Display:" name="display"  className={cn('filter_field')} emptyDesc={false} value={this.state.entry.display} />
-                            <SelectField onChange={this._handleFieldChange} options={this.props.fieldOptions.order_by} label="Sort by:" name="order_by" className={cn('filter_field')} emptyDesc={false} value={this.state.entry.order_by} />
+                            <SelectField onChange={this._handleFieldChange} options={this.props.fieldOptions.display}  label="Display:" name="display"  className={cn('filter_field')} emptyDesc={false} defaultValue={this.props.fieldValues.display} />
+                            <SelectField onChange={this._handleFieldChange} options={this.props.fieldOptions.order_by} label="Sort by:" name="order_by" className={cn('filter_field')} emptyDesc={false} defaultValue={this.props.fieldValues.order_by} />
                         </div>
                         {
                             tires.length > 0 ? null : <h3 className={cn('message')}><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE000;' }} /> We did not find any tires based on your search criteria. Please try searching again later as inventory changes frequently.</h3>
@@ -137,7 +123,7 @@ define([
                         </div>
                         <div className={cn('results')}>
                             <div className={cn('twelvecol')}>
-                                <Pagination activePage={this.state.entry.page} itemsOnPage={this.props.itemsOnPage} totalItems={this.state.totalCount} onPageClick={this._handlePageClick} />
+                                <Pagination activePage={this.state.page} itemsOnPage={this.props.itemsOnPage} totalItems={this.state.totalCount} onPageClick={this._handlePageClick} />
                                 {/*<div className={cn('compare_btn_wrapper')}>
                                     <span className={cn(['font_color', 'compare_number'])}>2</span>
                                     <a href="#compare" className={cn(['brand_btn_light', 'btn_small', 'compare_btn'])}><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE915;' }} /> Compare Selected Tires</a>
@@ -155,7 +141,7 @@ define([
                                 }
                             </div>
                             <div className={cn('twelvecol')}>
-                                <Pagination activePage={this.state.entry.page} itemsOnPage={this.props.itemsOnPage} totalItems={this.state.totalCount} onPageClick={this._handlePageClick} />
+                                <Pagination activePage={this.state.page} itemsOnPage={this.props.itemsOnPage} totalItems={this.state.totalCount} onPageClick={this._handlePageClick} />
                             </div>
                         </div>
                     </div>
@@ -163,13 +149,9 @@ define([
             );
         },
 
-        _loadResults: function() {
-            var params = this._getEntry();
-            Act.resultsPage.update(params);
-        },
- 
         _updateState: function() {
             this.setState({
+                page: searchStore.getValue('common', 'page'),
                 tires: resultsStore.getTires(),
                 totalCount: resultsStore.getTotalCount(),
                 filters: resultsStore.getFilters()
@@ -187,7 +169,22 @@ define([
         },
 
         _getEntry: function() {
-            return _.cloneDeep(this.state.entry);
+            var params = {
+                page: searchStore.getValue('common', 'page'),
+                display: searchStore.getValue('common', 'display'),
+                order_by: searchStore.getValue('common', 'order_by'),
+                filters: {
+                    brand: searchStore.getValue('filters', 'brand'),
+                    run_flat: searchStore.getValue('filters', 'run_flat'),
+                    light_truck: searchStore.getValue('filters', 'light_truck'),
+                    category: searchStore.getValue('filters', 'category')
+                },
+                location_id: locationsStore.getCurrentLocation().id
+            };
+            var searchParams = searchStore.getSectionValues(searchStore.getActiveSection());
+
+            return _.merge(params, searchParams);
+            // return _.cloneDeep(this.state.entry);
         },
 
         _handleFieldChange: function(event) {
@@ -195,9 +192,8 @@ define([
             var entry = this._getEntry();
             entry[fieldName] = event.target.value;
             entry.page = 1;
-            this.setState({entry: entry});
+            Act.resultsPage.update(entry);
 
-            // Act.resultsPage.update(entry);
             // var fieldName = event.target.name.replace('filter_', '');
             // Act.Search.updateField('common', fieldName, event.target.value);
             // Act.Tire.search({page: 1});
@@ -207,9 +203,8 @@ define([
             var entry = this._getEntry();
             entry.filters[name] = values;
             entry.page = 1;
-            this.setState({entry: entry});
+            Act.resultsPage.update(entry);
 
-            //Act.resultsPage.update(entry);
             //Act.Search.updateField('filters', name, values);
             //Act.Tire.search({page: 1});
         },
@@ -218,9 +213,8 @@ define([
             event.preventDefault();
             var entry = this._getEntry();
             entry.page = page;
-            this.setState({entry: entry});
+            Act.resultsPage.update(entry);
 
-            //Act.resultsPage.update(entry);
             //Act.Tire.search({page: page});
         }
     }

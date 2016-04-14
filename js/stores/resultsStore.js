@@ -88,7 +88,7 @@ define([
             return _.cloneDeep(tires);
         },
         getTire: function(id) {
-            return _.cloneDeep(tires[tiresIndexes[id]]);
+            return tiresIndexes[id] !== undefined ? _.cloneDeep(tires[tiresIndexes[id]]) : null;
         },
 
         dispatchToken: dispatcher.register(function(payload) {
@@ -111,8 +111,15 @@ define([
                     showInStock = c.show_in_stock;
                     change = true;
                     break;
+                case 'summary.page.update':
+                    if (payload.entryParams.supplier) {
+                        changeSupplier(payload.entryParams.tire_id, payload.entryParams.supplier);
+                    }
+                    changeSelectedQuantity(payload.entryParams.tire_id, payload.entryParams.quantity);
+                    change = true;
+                    break;
                 case 'quote.request.form.show':
-                case 'tire.select':
+                // case 'tire.select':
                     if (payload.supplier) {
                         changeSupplier(payload.tireId, payload.supplier);
                     }

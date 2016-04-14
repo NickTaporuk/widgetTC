@@ -6,7 +6,7 @@ define(['config'], function(config) {
 
 		  var separator = (typeof(_separator) != 'undefined') ? _separator : '';
 
-		  var r = parseFloat(_number)
+		  var r = parseFloat(_number);
 
 		  var exp10 = Math.pow(10, decimal);
 		  r = Math.round(r * exp10) / exp10;
@@ -60,28 +60,28 @@ define(['config'], function(config) {
         },
         getOffset: function(elem) {
 	    	// (1)
-		    var box = elem.getBoundingClientRect()
+		    var box = elem.getBoundingClientRect();
 		    
 		    // (2)
-		    var body = document.body
-		    var docElem = document.documentElement
+		    var body = document.body;
+		    var docElem = document.documentElement;
 		    
 		    // (3)
-		    var scrollTop = window.pageYOffset || docElem.scrollTop || body.scrollTop
-		    var scrollLeft = window.pageXOffset || docElem.scrollLeft || body.scrollLeft
+		    var scrollTop = window.pageYOffset || docElem.scrollTop || body.scrollTop;
+		    var scrollLeft = window.pageXOffset || docElem.scrollLeft || body.scrollLeft;
 		    
 		    // (4)
-		    var clientTop = docElem.clientTop || body.clientTop || 0
-		    var clientLeft = docElem.clientLeft || body.clientLeft || 0
+		    var clientTop = docElem.clientTop || body.clientTop || 0;
+		    var clientLeft = docElem.clientLeft || body.clientLeft || 0;
 		    
 		    // (5)
-		    var top  = box.top +  scrollTop - clientTop
-		    var left = box.left + scrollLeft - clientLeft
+		    var top  = box.top +  scrollTop - clientTop;
+		    var left = box.left + scrollLeft - clientLeft;
 		    
-		    return { top: Math.round(top), left: Math.round(left) }
+		    return { top: Math.round(top), left: Math.round(left) };
 		},
 		getScrollPos: function() {
-			if(window.pageYOffset != undefined) {
+			if(window.pageYOffset !== undefined) {
 			 	return [pageXOffset, pageYOffset];
 			} else {
 			 	var sx, sy, d= document, r= d.documentElement, b= d.body;
@@ -94,7 +94,7 @@ define(['config'], function(config) {
             var scrollPos = h.getScrollPos();
             var offset = h.getOffset(el);
 
-            if (window['scrollParentPageTo']) {
+            if (window.scrollParentPageTo) {
             	// if widget in iframe
             	window.scrollParentPageTo(offset.top);           	
             } else if (scrollPos[1] > offset.top || force) {
@@ -104,12 +104,43 @@ define(['config'], function(config) {
             }
         },
         queryToObj: function(query) {
-        	var obj = {};
-			query.replace(
-			    new RegExp("([^?=&]+)(=([^&]*))?", "g"),
-			    function($0, $1, $2, $3) { obj[$1] = $3; }
-			);
-			return obj;
+            var paramFromString = function(string, val, obj) {
+                if (!obj) {
+                    obj = {};
+                }
+                var arr = string.match(/([^\[]+)\[([^\]]+)\]/);
+                if (arr) {
+                    // if parameter is array:
+                    string = string.replace(arr[1], '').replace('[', '').replace(']', '');
+
+                    if ( /[^\[]+/.test(string) ) {
+                        obj[arr[1]] = paramFromString(string, val, obj[arr[1]]);
+                    }
+                } else {
+                    obj[string] = val;
+                }
+                return obj;
+            }
+
+            var i = 0,
+                retObj = {},
+                pair = null,
+                parts = query.match(/^([^\?]*)(\?)?(.*)$/),
+                params = parts[3],
+                page = parts[1].replace('#!', ''),
+                qArr = params.split('&');
+         
+            for (i = 0; i < qArr.length; i++){
+                pair = qArr[i].split('=');
+
+                var paramName = decodeURIComponent(pair[0]);
+                paramFromString(paramName, pair[1], retObj);
+            }
+         
+            return {
+                page: page,
+                params: retObj
+            };
         },
         objToQuery: function(obj, prefix) {
             var str = [];
@@ -118,7 +149,7 @@ define(['config'], function(config) {
                     var k = prefix ? prefix + "[" + p + "]" : p, v = obj[p];
                     var param = typeof v == "object" ?
                         h.objToQuery(v, k) :
-                        encodeURIComponent(k) + "=" + encodeURIComponent(v)
+                        encodeURIComponent(k) + "=" + encodeURIComponent(v);
                     if (param) {
                         str.push(param);
                     }
@@ -127,7 +158,7 @@ define(['config'], function(config) {
 
             return str.join("&");
         }
-	}
+	};
 
 	return h;
 });

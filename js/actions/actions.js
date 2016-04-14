@@ -1,6 +1,6 @@
 define([
     'dispatcher',
-    'load!stores/resultsStore',
+    // 'load!stores/resultsStore',
     'load!stores/searchStore',
     'load!stores/locationsStore',
     'load!stores/customerStore',
@@ -9,7 +9,7 @@ define([
     'lodash'
 ], function(
     dispatcher,
-    resultsStore,
+    // resultsStore,
     searchStore,
     locationsStore,
     customerStore,

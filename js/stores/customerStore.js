@@ -151,6 +151,10 @@ define([
                     customer.follow_up = config.sa ? false : payload.config.default_quote_call_back;
                     change = true;
                     break;
+                case 'summary.page.update':
+                    selectedTire = payload.entryParams.tire_id;
+                    selectedQuantity = payload.entryParams.quantity;
+                    break;
                 case constants.LOAD_QUOTE_SUCCESS:
                 case 'quote.request.form.show':
                     selectedTire = payload.tireId;
@@ -171,6 +175,14 @@ define([
                         order.payment_percentage = payload.tires[0].prices.payment_percentage;
                         change = true;
                     }
+                    break;
+
+                case 'email_only.page.update':
+                    customer.follow_up = false;
+                    break;
+                case 'email.page.update':
+                case 'print.page.update':
+                    customer.follow_up = config.sa ? false : true;
                     break;
 
                 case 'order.payment':

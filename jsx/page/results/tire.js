@@ -222,8 +222,6 @@ define([
         },
         
         _onSupplierChange: function(supplier, event) {
-            var index = event.target.href.replace(/^[^#]+#/, '');
-
             this.setState({
                 price:  supplier.price,
                 quantity: supplier.quantity,
@@ -243,7 +241,8 @@ define([
             event.preventDefault();
             A.summaryPage.update({
                 quantity: this.state.selQuantity,
-                tire_id: this.state.supplier ? this.state.supplier.tire_id : this.props.tire.id
+                tire_id: this.props.tire.id, //this.state.supplier ? this.state.supplier.tire_id : this.props.tire.id
+                supplier: this.state.supplier
             });
             // Act.Tire.select(this.props.tire, this.state.selQuantity, this.state.supplier);
         },

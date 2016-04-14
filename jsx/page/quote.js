@@ -1,18 +1,23 @@
 define([
     'react',
     'classnames',
-    'load!actions/actions'
+    'load!actions/actions',
+    'load!actions/act',
+    'load!components/page/common/back'
 ], function(
     React,
     cn,
-    Act
+    Act,
+    A,
+    Back
 ) {
    
     return {
         render: function() {
             return (
                 <div>
-                    <a href="#results" onClick={this._handleBackClick} className={cn('back_link')}><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE5C4;' }} />Back to summary</a>
+                    <Back />
+                    {/*<a href="#results" onClick={this._handleBackClick} className={cn('back_link')}><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE5C4;' }} />Back to summary</a>*/}
 
                     <div className={cn(['quote_wrapper', 'max_width'])}>
                         <div className={cn(['row'])}>
@@ -40,15 +45,15 @@ define([
             );
         },
 
-        _handleBackClick: function(event) {
-            event.preventDefault();
-            Act.Page.show('summary');
-        },
+        // _handleBackClick: function(event) {
+        //     event.preventDefault();
+        //     Act.Page.show('summary');
+        // },
 
         _handlePrintClick: function(event) {
             event.preventDefault();
             if ( this.refs.follow_up.checked ) {
-                Act.Quote.appointmentForm('print', {follow_up: true});
+                A.printPage.update(); //  appointmentForm('print', {follow_up: true});
             } else {
                 Act.Quote.print({follow_up: false});
             }
@@ -57,9 +62,11 @@ define([
         _handleEmailClick: function(event) {
             event.preventDefault();
             if ( this.refs.follow_up.checked ) {
-                Act.Quote.appointmentForm('email', {follow_up: true});
+                A.emailPage.update();
+                // Act.Quote.appointmentForm('email', {follow_up: true});
             } else {
-                Act.Quote.emailForm({follow_up: false});
+                A.emailOnlyPage.update();
+                //Act.Quote.emailForm({follow_up: false});
             }  
         }
     }

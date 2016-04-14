@@ -56,8 +56,8 @@ window.TCWidget = {
                 }
             });
 
-            requirejs(['react', 'reactDOM', 'load!components/wrapper', 'load!actions/actions', 'load!components/overlay', 'classnames', 'load!stores/widgetStore', 'actions/api'], 
-            function(React, ReactDOM, Wrapper, Act, Overlay, cn, widgetStore, Api) {
+            requirejs(['react', 'reactDOM', 'load!components/wrapper', 'load!actions/actions', 'load!components/overlay', 'classnames', 'actions/api'], 
+            function(React, ReactDOM, Wrapper, Act, Overlay, cn, Api) {
                 
                 var render = function() {
                     var container = document.getElementById(params.container);

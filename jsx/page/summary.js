@@ -40,6 +40,9 @@ define([
         render: function() {
             var tire = this.props.tire;
             var quote = this.state.quote;
+            if (Object.keys(quote) <= 0 || Object.keys(tire) <= 0) {
+                return null;
+            }
 
             var recyclingFee = null;
             if (quote.recycling_fee) {
@@ -57,7 +60,9 @@ define([
             return (
                 <div>
                     <Back />
+                    {/*
                     <a href="#results" onClick={this._handleBackClick} className={cn('back_link')}><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE5C4;' }} />Back to results</a>
+                    */}
 
                     <div className={cn(['max_width', 'summary_wrapper'])}>
                         <div className={cn('table_wrapper')}>
@@ -317,7 +322,8 @@ define([
 
         _handleAppointmentClick: function(event) {
             event.preventDefault();
-            Act.Quote.appointmentForm();
+            A.appointmentPage.update();
+            // Act.Quote.appointmentForm();
         },
 
         _handleOrderClick: function(event) {
@@ -327,17 +333,20 @@ define([
 
         _handleQuoteClick: function(event) {
             event.preventDefault();
-            Act.Page.show('quote');
+            A.getAQuotePage.update();
+            //Act.Page.show('quote');
         },
 
         _handleEmailClick: function(event) {
             event.preventDefault();
-            Act.Quote.appointmentForm('email');
+            A.emailPage.update();
+            // Act.Quote.appointmentForm('email');
         },
 
         _handlePrintClick: function(event) {
             event.preventDefault();
-            Act.Quote.appointmentForm('print');
+            A.printPage.update();
+            // Act.Quote.appointmentForm('print');
         }
 
     }

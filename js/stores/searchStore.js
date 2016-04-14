@@ -86,8 +86,8 @@ define([
         if (field == 'display') {
             options = fieldOptions.display;
             setValue('common', 'display', options[0].value);
-        } else if (fieldValues.filters[field]) {
-            setValue('filters', field, []);
+        // } else if (fieldValues.filters[field]) {
+        //     setValue('filters', field, []);
         } else if (field == 'page') {
             setValue('common', field, 1);
         }
@@ -217,9 +217,13 @@ define([
                     change = true;
                     break;
                 case 'results.page.update':
+                    // console.log(payload.entryParams);   
+
                     Object.keys(fieldValues).map(function(section) {
                         Object.keys(fieldValues[section]).map(function(fieldName) {
-                            if (payload.entryParams[fieldName]) {
+                            if (section == 'filters' && payload.entryParams.filters && payload.entryParams.filters[fieldName]) {
+                                setValue(section, fieldName, _.toArray(payload.entryParams.filters[fieldName]));
+                            } else if (payload.entryParams[fieldName]) {
                                 setValue(section, fieldName, payload.entryParams[fieldName]);
                             }
                         });
@@ -257,10 +261,10 @@ define([
                 case 'tire.search':
                     if (payload.step == 1) {
                         setDefaultValue('display');
-                        setDefaultValue('brand');
-                        setDefaultValue('run_flat');
-                        setDefaultValue('light_truck');
-                        setDefaultValue('category');
+                        // setDefaultValue('brand');
+                        // setDefaultValue('run_flat');
+                        // setDefaultValue('light_truck');
+                        // setDefaultValue('category');
                         setDefaultValue('page');
 
                         // set filter by category base on base_category
