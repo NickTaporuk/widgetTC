@@ -60,9 +60,6 @@ define([
             return (
                 <div>
                     <Back />
-                    {/*
-                    <a href="#results" onClick={this._handleBackClick} className={cn('back_link')}><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE5C4;' }} />Back to results</a>
-                    */}
 
                     <div className={cn(['max_width', 'summary_wrapper'])}>
                         <div className={cn('table_wrapper')}>

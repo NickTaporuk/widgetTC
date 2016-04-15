@@ -38,9 +38,9 @@ define([
 
     var fieldValues = {
         size: {
-            width: '195',
-            height: '65',
-            rim: '15',
+            width: '',
+            height: '',
+            rim: '',
             speed_rating: '',
             load_index: '',
             base_category: ''
@@ -77,40 +77,19 @@ define([
     var sections = ['size', 'vehicle', 'part_number', 'common'];
 
     function setDefaultValue(field) {
-        var options;
-        /*
-        if (field == 'car_tire_id') {
-            options = fieldOptions.car_tire_id;
-            setValue('vehicle', 'car_tire_id', options[0].value);
-        } else */
-        if (field == 'display') {
-            options = fieldOptions.display;
+        if (field == 'display' && fieldOptions.display.length > 0) {
+            var options = fieldOptions.display;
             setValue('common', 'display', options[0].value);
-        // } else if (fieldValues.filters[field]) {
-        //     setValue('filters', field, []);
         } else if (field == 'page') {
             setValue('common', field, 1);
         }
     }
 
     function setOptions(field, options) {
-        // if (options.length === 0) {
-        //     // if no options set value of field to empty
-        //     var sectionsCount = sections.length;
-        //     for (var i = 0; i < sectionsCount; i++) {
-        //         if (fieldValues[sections[i]][field]) {
-        //             setValue(sections[i], field, '');
-        //             break;
-        //         }
-        //     }
-        //     fieldOptions[field] = [];
-        // } else {
-
-            fieldOptions[field] = options;
-            if (options.length > 0) {
-                setDefaultValue(field);
-            }
-        // }
+        fieldOptions[field] = options;
+        if (options.length > 0) {
+            setDefaultValue(field);
+        }
     }
 
     function setValue(section, field, value) {
@@ -177,6 +156,8 @@ define([
 
             // needed categories will be returned base on filter
             if (params.base_category) {
+               
+             
                 delete params.base_category;
             }
 
@@ -217,11 +198,9 @@ define([
                     change = true;
                     break;
                 case 'results.page.update':
-                    // console.log(payload.entryParams);   
-
                     Object.keys(fieldValues).map(function(section) {
                         Object.keys(fieldValues[section]).map(function(fieldName) {
-                            if (section == 'filters' && payload.entryParams.filters && payload.entryParams.filters[fieldName]) {
+                            if (section == 'filters' && payload.entryParams.filters && payload.entryParams.filters[fieldName] !== undefined) {
                                 setValue(section, fieldName, _.toArray(payload.entryParams.filters[fieldName]));
                             } else if (payload.entryParams[fieldName]) {
                                 setValue(section, fieldName, payload.entryParams[fieldName]);
@@ -257,32 +236,33 @@ define([
                     break;
 
                 case 'locations.current.change':
-                    payload.step = 1;
-                case 'tire.search':
-                    if (payload.step == 1) {
-                        setDefaultValue('display');
-                        // setDefaultValue('brand');
-                        // setDefaultValue('run_flat');
-                        // setDefaultValue('light_truck');
-                        // setDefaultValue('category');
-                        setDefaultValue('page');
+                case 'search.page.update':
+                    setDefaultValue('display');
+                    fieldValues.common.page = 1;
+                    fieldValues.filters.brand = [];
+                    fieldValues.filters.run_flat = [];
+                    fieldValues.filters.light_truck = [];
+                    fieldValues.filters.category = [];
 
-                        // set filter by category base on base_category
-                        var baseCategoriesLength = fieldOptions.base_category.length;
-                        for (var i = 0; i < baseCategoriesLength; i++) {
-                            if (fieldValues[activeSection].base_category == fieldOptions.base_category[i].value) {
-                                fieldValues.filters.category = fieldOptions.base_category[i].categories;
-                                break;
-                            }
-                        }
-
-                        change = true;
-                    } else if (payload.values) {
-                        if (payload.values.page) {
-                            setValue('common', 'page', payload.values.page);
-                        }
-                    }
+                    change = true;
                     break;
+                // case 'tire.search':
+                //     if (payload.step == 1) {
+                //         // set filter by category base on base_category
+                //         var baseCategoriesLength = fieldOptions.base_category.length;
+                //         for (var i = 0; i < baseCategoriesLength; i++) {
+                //             if (fieldValues[activeSection].base_category == fieldOptions.base_category[i].value) {
+                //                 fieldValues.filters.category = fieldOptions.base_category[i].categories;
+                //                 break;
+                //             }
+                //         }
+                //         change = true;
+                //     } else if (payload.values) {
+                //         if (payload.values.page) {
+                //             setValue('common', 'page', payload.values.page);
+                //         }
+                //     }
+                //     break;
                 case constants.LOAD_DEALER_CONFIG_SUCCESS:
                     var c = payload.config;
                     if (c.default_order) {

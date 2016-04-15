@@ -45,7 +45,6 @@ window.TCWidget = {
                     lodash: 'bower_components/lodash/lodash',
                     validate: 'bower_components/validate/validate',
                     moment: 'bower_components/moment/moment',
-                    page: 'bower_components/page/page',
                     dispatcher: 'lib/dispatcher',
                     ajax: 'lib/ajax',
                     react: 'bower_components/react/react',
@@ -56,7 +55,7 @@ window.TCWidget = {
                 }
             });
 
-            requirejs(['react', 'reactDOM', 'load!components/wrapper', 'load!actions/actions', 'load!components/overlay', 'classnames', 'actions/api'], 
+            requirejs(['react', 'reactDOM', 'load!components/wrapper', 'load!actions/act', 'load!components/overlay', 'classnames', 'actions/api'], 
             function(React, ReactDOM, Wrapper, Act, Overlay, cn, Api) {
                 
                 var render = function() {

@@ -120,7 +120,7 @@ define([
             
             // we need location config only for mobile version (to gate call number) for now
             if (isMobile.any) {
-                ajax.make({
+                return ajax.make({
                     url: 'location/' + locationId + '/config',
                     cache: true
                 }).then(function(response) {
@@ -134,7 +134,7 @@ define([
         },
 
         loadTireParameters: function() {
-            ajax.make({
+            return ajax.make({
                 url: 'tire/parameters',
                 cache: true
             }).then(function(response) {
@@ -277,7 +277,7 @@ define([
                 dispatch();
             }
 
-            ajax.make({
+            return ajax.make({
                 url: 'vehicle/years',
                 cache: true
             }).then(function(response) {
@@ -287,7 +287,7 @@ define([
         },
 
         loadDealerInfo: function() {
-            ajax.make({
+            return ajax.make({
                 url: 'dealer/list',
                 cache: true
             }).then(function(response) {
@@ -299,7 +299,7 @@ define([
         },
 
         loadDealerConfig: function() {
-            ajax.make({
+            return ajax.make({
                 url: 'dealer/config',
                 data: {wdg:true},
                 cache: true
@@ -353,7 +353,7 @@ define([
             if (validationErrors) {
                 dispatchError(validationErrors);
             } else {
-                ajax.make({
+                return ajax.make({
                     url: 'quote/appointment',
                     method: 'post',
                     data: data,
@@ -422,7 +422,7 @@ define([
             if (validationErrors) {
                 dispatchError(validationErrors);
             } else {
-                ajax.make({
+                return ajax.make({
                     url: 'quote/email',
                     method: 'post',
                     data: data,
@@ -455,7 +455,7 @@ define([
             if (validationErrors) {
                 dispatchError(validationErrors);
             } else {
-                ajax.make({
+                return ajax.make({
                     url: 'quote/request',
                     method: 'post',
                     data: data,
@@ -477,7 +477,7 @@ define([
         },
 
         orderCreate: function(data) {
-            ajax.make({
+            return ajax.make({
                 url: 'order',
                 method: 'post',
                 data: data
@@ -501,7 +501,7 @@ define([
             if (validationErrors) {
                 dispatchError(validationErrors);
             } else {
-                ajax.make({
+                return ajax.make({
                     url: 'order/' + orderId + '/checkout',
                     method: 'post',
                     data: data,
@@ -523,7 +523,7 @@ define([
         },
 
         orderPayment: function(orderId, token) {
-            ajax.make({
+            return ajax.make({
                 url: 'order/' + orderId + '/payment',
                 method: 'post',
                 data: {token: token},
@@ -546,7 +546,7 @@ define([
         },
 
         loadFullStock: function(tireId) {
-            ajax.make({
+            return ajax.make({
                 url: 'tire/' + tireId + '/fullStock',
                 cache: true
             }).then(function(response) {
@@ -559,7 +559,7 @@ define([
         },
 
         loadStock: function(tireId) {
-            ajax.make({
+            return ajax.make({
                 url: 'tire/' + tireId + '/stock'
             }).then(function(response) {
                 dispatcher.dispatch({
@@ -573,7 +573,7 @@ define([
         loadReviews: function(tireId, offset) {
             offset = offset || 0;
 
-            ajax.make({
+            return ajax.make({
                 url: 'tire/' + tireId + '/reviews',
                 data: { offset: offset, limit: 5 },
                 cache: true
@@ -588,7 +588,7 @@ define([
         },
 
         setSession: function(callback) {
-            ajax.make({
+            return ajax.make({
                 url: 'session',
                 method: 'post',
                 data: {is_returned: config.isReturnedUser, source: (config.sa ? 'instore' : 'website') }

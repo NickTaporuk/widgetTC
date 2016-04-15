@@ -7,19 +7,26 @@ define([
     constants,
     locationsStore
 ) {
-    var curLocId = locationsStore.getCurLocId();
+    // var curLocId = locationsStore.getCurLocId();
 
-    var eventsForReady = curLocId ? 6 : 5;
-    var count = 0;
+    // var eventsForReady = curLocId ? 6 : 5;
+    // var count = 0;
+    // 
+    var isReady = false;
 
     var store = {
         getIsReady: function() {
-            return count >= eventsForReady;
+            return isReady; // count >= eventsForReady;
         },
 
         dispatchToken: dispatcher.register(function(payload) {
             change = false;
             switch (payload.actionType) {
+                case 'widget.inited':
+                    isReady = true;
+                    break;
+
+                /*
                 case constants.LOAD_LOCATIONS_SUCCESS:
                 case constants.LOAD_DEALER_CONFIG_SUCCESS:
                 case constants.LOAD_TIRE_PARAMETERS_SUCCESS:
@@ -31,14 +38,17 @@ define([
 
                         change = store.getIsReady();
                     }
-                    break;
+                    break; */
             }
+    
+            store.trigger('change');    
 
+            /*
             if (change) {
                 setTimeout(function() {
                     store.trigger('change');
                 }, 1);
-            }
+            } */
         })
     };
 

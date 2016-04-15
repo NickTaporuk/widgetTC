@@ -44,6 +44,11 @@ define([
         _handleSelectClick: function(id, event) {
             event.preventDefault();
             Act.Locations.select(id);
+            
+            if (this.props.onLocationSelect) {
+                this.props.onLocationSelect();
+            }
+            
         }
     }
 

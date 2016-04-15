@@ -19,24 +19,24 @@ define([
 ) {
 
     var Actions = {
-        init: function() {
-            // action 1
-            Api.loadLocations();
-            // action 2
-            Api.loadTireParameters();
-            // action 3
-            Api.getVehicleOptions();
-            // action 4
-            Api.loadDealerConfig();
-            // action 5
-            Api.loadDealerInfo();  
+        // init: function() {
+        //     // action 1
+        //     Api.loadLocations();
+        //     // action 2
+        //     Api.loadTireParameters();
+        //     // action 3
+        //     Api.getVehicleOptions();
+        //     // action 4
+        //     Api.loadDealerConfig();
+        //     // action 5
+        //     Api.loadDealerInfo();  
 
-            var curLocId = locationsStore.getCurLocId();
-            if (curLocId) {
-                // action 6
-                Api.loadLocationConfig(curLocId);
-            }
-        },
+        //     var curLocId = locationsStore.getCurLocId();
+        //     if (curLocId) {
+        //         // action 6
+        //         Api.loadLocationConfig(curLocId);
+        //     }
+        // },
         Page: {
             show: function(name, props) {
                 dispatcher.dispatch({
@@ -67,8 +67,6 @@ define([
                     id: id
                 });
 
-                Api.searchTires(searchStore.getParamsForSearch());
-
                 Api.loadLocationConfig(id);
             }
         },
@@ -89,6 +87,7 @@ define([
             }
         },
         Tire: {
+            /*
             search: function(values, step) {
                 var location = locationsStore.getCurrentLocation();
                 if (location) {
@@ -103,8 +102,8 @@ define([
                         actionType: 'popup.update',
                         name: 'locations'
                     });
-                }
-            },
+                } 
+            }, */
             loadFullStock: function(tireId) {
                 Api.loadFullStock(tireId);
             },

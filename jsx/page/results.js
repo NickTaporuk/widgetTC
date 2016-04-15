@@ -66,8 +66,6 @@ define([
         },
 
         render: function() {
-            // console.log(this.props.fieldValues.filters);
-
             var tires = [];
 
             var curTime = new Date().getTime();
@@ -78,22 +76,25 @@ define([
                 ));
             }.bind(this));
 
-            var filters = null;
-            if (Object.keys(this.state.filters).length > 0) {
-                var filtersInfo = [
-                    {key: 'run_flat', desc: 'Run-Flat', all: 'All/None'}, 
-                    {key: 'light_truck', desc: 'Light Track', all: 'All/None'}, 
-                    {key: 'brand', desc: 'Brand', all: 'All Brands'},
-                    {key: 'category', desc: 'Category', all: 'All Categories'}
-                ];
-                filters = [];
-                filtersInfo.forEach(function(info, i) {
-                    if (this.state.filters[info.key].parameters.length > 1) {
-                        filters.push((
-                            <FilterBlock key={i} by={info.desc} topDirection={ !this.state.totalCount } name={info.key} allDesc={info.all} defaultValue={ this.props.fieldValues.filters[info.key] } params={ this.state.filters[info.key].parameters } onChange={this._handleFilterChange} />
-                        ));
-                    }
-                }, this);
+            if (tires.length > 0) {
+                var filters = null;
+                if (Object.keys(this.state.filters).length > 0) {
+                    var filtersInfo = [
+                        {key: 'run_flat', desc: 'Run-Flat', all: 'All/None'}, 
+                        {key: 'light_truck', desc: 'Light Track', all: 'All/None'}, 
+                        {key: 'brand', desc: 'Brand', all: 'All Brands'},
+                        {key: 'category', desc: 'Category', all: 'All Categories'}
+                    ];
+                    filters = [];
+                    filtersInfo.forEach(function(info, i) {
+                        if (this.state.filters[info.key].parameters.length > 1) {
+                            filters.push((
+                                <FilterBlock key={i} by={info.desc} topDirection={ !this.state.totalCount } name={info.key} allDesc={info.all} defaultValue={ this.props.fieldValues.filters[info.key] } params={ this.state.filters[info.key].parameters } onChange={this._handleFilterChange} />
+                            ));
+                        }
+                    }, this);
+                }
+
             }
 
             return (
@@ -182,9 +183,9 @@ define([
                 location_id: locationsStore.getCurrentLocation().id
             };
             var searchParams = searchStore.getSectionValues(searchStore.getActiveSection());
+            delete searchParams.base_category;
 
             return _.merge(params, searchParams);
-            // return _.cloneDeep(this.state.entry);
         },
 
         _handleFieldChange: function(event) {
@@ -193,10 +194,6 @@ define([
             entry[fieldName] = event.target.value;
             entry.page = 1;
             Act.resultsPage.update(entry);
-
-            // var fieldName = event.target.name.replace('filter_', '');
-            // Act.Search.updateField('common', fieldName, event.target.value);
-            // Act.Tire.search({page: 1});
         },
 
         _handleFilterChange: function(name, values, event) {
@@ -204,9 +201,6 @@ define([
             entry.filters[name] = values;
             entry.page = 1;
             Act.resultsPage.update(entry);
-
-            //Act.Search.updateField('filters', name, values);
-            //Act.Tire.search({page: 1});
         },
 
         _handlePageClick: function(page, event) {
@@ -214,8 +208,6 @@ define([
             var entry = this._getEntry();
             entry.page = page;
             Act.resultsPage.update(entry);
-
-            //Act.Tire.search({page: page});
         }
     }
 

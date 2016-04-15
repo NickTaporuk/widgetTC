@@ -21,6 +21,39 @@ define([
 ) {
 
     var actions = {
+        init: function() {
+            var steps = 5;
+            var curStep = 0;
+            var checkReady = function() {
+                curStep++;
+
+                if (steps == curStep) {
+                    start();
+
+                    dispatcher.dispatch({
+                        actionType: 'widget.inited'
+                    });
+                }
+            };
+
+            // action 1
+            Api.loadLocations().then(checkReady);
+            // action 2
+            Api.loadTireParameters().then(checkReady);
+            // action 3
+            Api.getVehicleOptions().then(checkReady);
+            // action 4
+            Api.loadDealerConfig().then(checkReady);
+            // action 5
+            Api.loadDealerInfo().then(checkReady);  
+
+            var curLocId = locationsStore.getCurLocId();
+            if (curLocId) {
+                // action 6
+                Api.loadLocationConfig(curLocId); //.then(function() {checkReady()});
+            }
+        },
+
         searchPage: {
             update: function(entryParams, afterNav) {
                 dispatcher.dispatch({
@@ -35,38 +68,64 @@ define([
         },
         resultsPage: {
             update: function(entryParams, afterNav) {
-                var defaultEntryParams = {
-                    display: 'full',
-                    page: 1,
-                    filters: {
-                        brand: [],
-                        category: [],
-                        run_flat: [],
-                        ligth_truck: []
+                // set filter by category base no base_category
+                if (entryParams.base_category) {
+                    var baseCategories = searchStore.getOptions('base_category');
+                    var baseCategoriesLength = baseCategories.length;
+                    for (var i = 0; i < baseCategoriesLength; i++) {
+                        if (entryParams.base_category == baseCategories[i].value) {
+                            if (!entryParams.filters) {
+                                entryParams.filters = {};
+                            }
+                            entryParams.filters.category = baseCategories[i].categories;
+                            break;
+                        }
                     }
+                }
+
+                var dispatch = function() {
+                    dispatcher.dispatch({
+                        actionType: 'results.page.update',
+                        entryParams: entryParams
+                    });
                 };
 
-                var entryParams = entryParams ? _.merge(defaultEntryParams, entryParams) : defaultEntryParams;
-
-                dispatcher.dispatch({
-                    actionType: 'results.page.update',
-                    entryParams: entryParams
-                });
-                
                 if (!afterNav) {
-                    Api.searchTires(entryParams);
+                    var params = _.cloneDeep(entryParams);
+                    if (params.base_category) {
+                        delete params.base_category;
+                    }
+
+                    Api.searchTires(params).then(dispatch);
 
                     setUrl('results', entryParams);
+                } else {
+                    dispatch();
                 }
             }
         },
         summaryPage: {
             update: function(entryParams, afterNav) {
                 var dispatch = function() {
+
                     dispatcher.dispatch({
                         actionType: 'summary.page.update',
                         entryParams: entryParams || {}
                     });
+
+                    if (!afterNav) {
+                        Api.loadQuote(
+                            entryParams.tire_id,
+                            entryParams.quantity,
+                            entryParams.optional_services || 'use_default',
+                            entryParams.with_discount || false,
+                            entryParams.custom_discount || null
+                        );
+
+                        delete entryParams.supplier;
+
+                        setUrl('summary', entryParams);
+                    }
                 };
 
                 if (!resultsStore.getTire(entryParams.tire_id)) {
@@ -75,20 +134,6 @@ define([
                     });
                 } else {
                     dispatch();
-                }
-
-                if (!afterNav) {
-                    Api.loadQuote(
-                        entryParams.tire_id,
-                        entryParams.quantity,
-                        entryParams.optional_services || 'use_default',
-                        entryParams.with_discount || false,
-                        entryParams.custom_discount || null
-                    );
-
-                    delete entryParams.supplier;
-
-                    setUrl('summary', entryParams);
                 }
             }
         },
@@ -151,8 +196,14 @@ define([
         
     };
 
+    var firstRun = true;
+
     function setUrl(page, params) {
-        var path = '#!' + page + '?'  + h.objToQuery(params);
+        if (firstRun) {
+            firstRun = false;
+            return;
+        }
+        var path = '#!' + page + (params ? '?'  + h.objToQuery(params) : '');
 
         var state = {
             page: page,
@@ -168,10 +219,9 @@ define([
     }
 
     function execute(page, params, afterNav) {
-        // console.log(page, params);
         switch (page) {
             case '':
-                actions.searchPage.update(params, true);
+                actions.searchPage.update(params, afterNav);
                 break;
             case 'get_a_quote':
                 actions.getAQuotePage.update(params, afterNav);
@@ -190,9 +240,16 @@ define([
         execute(page, params, true);
     }, false);
 
-    var urlData = h.queryToObj(window.location.hash);
-
-    execute(urlData.page, urlData.params, false);
+    function start() {
+        var urlData = h.queryToObj(window.location.hash);
+        if ( ['search', 'results', 'summary'].indexOf(urlData.page) == -1) {
+            urlData = {
+                page: 'search',
+                params: null
+            };
+        }
+        execute(urlData.page, urlData.params, false);
+    }
 
     return actions;
 });

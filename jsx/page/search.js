@@ -9,6 +9,7 @@ define([
     'load!actions/actions',
     'load!actions/act',
     'load!stores/searchStore',
+    'load!stores/locationsStore',
     'load!components/elements/select'
 ], function(
     React,
@@ -17,6 +18,7 @@ define([
     Act,
     A,
     searchStore,
+    locationsStore,
     SelectField
 ) {
 
@@ -186,16 +188,28 @@ define([
         },
 
         _isReadyForSearch: function() {
-            return searchStore.isReadyForSearch();
+            //return searchStore.isReadyForSearch();
+            var isReady = false;
+            var values = this.state.fieldValues[this.state.activeTab];
+            switch (this.state.activeTab) {
+                case 'size':
+                    isReady = (values.width && values.height && values.rim);
+                    break;
+                case 'vehicle':
+                    isReady = (values.car_tire_id != false);
+                    break;
+                case 'part_number':
+                    isReady = (values.part_number != false);
+                    break;
+            }
+            return isReady;
         },
 
         _updateState: function() {
-            var fieldValues = searchStore.getAllValues();
-            var options = searchStore.getAllOptions();
             this.setState({
                 activeTab: searchStore.getActiveSection(),
-                fieldOptions: options,
-                fieldValues: fieldValues
+                fieldOptions: searchStore.getAllOptions(),
+                fieldValues: searchStore.getAllValues()
             });
         },
 
@@ -208,11 +222,16 @@ define([
             if (event) {
                 event.preventDefault();
             }
-
-            var params = this.state.fieldValues[this.state.activeTab];
-            params.location_id = 1;
-            A.resultsPage.update(params);
-            // Act.Tire.search(null, 1);
+            if (this._isReadyForSearch()) {
+                var params = this.state.fieldValues[this.state.activeTab];
+                params.location_id = locationsStore.getCurrentLocation().id;
+                
+                if ( params.location_id ) {
+                    A.resultsPage.update(params);
+                } else {
+                    this._handleLocationsClick();    
+                }
+            }
         },
 
         _handleFieldChange: function(event) {
@@ -239,8 +258,15 @@ define([
         },
 
         _handleLocationsClick: function(event) {
-            event.preventDefault();
-            Act.Popup.show('locations');
+            if (event) {
+                event.preventDefault();
+            }
+            var self = this;
+            Act.Popup.show('locations', {
+                onLocationSelect: function() {
+                    self._handleSubmit();
+                }
+            });
         }
     }
 

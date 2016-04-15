@@ -102,6 +102,7 @@ define([
                     change = true;
                     break;
                 case constants.LOAD_TIRE_SUCCESS:
+                    console.log(payload.tire);
                     addTires([payload.tire]);
                     change = true;
                     break;

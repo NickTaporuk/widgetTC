@@ -31,20 +31,16 @@ define([
         },
 
         componentWillMount: function() {
-            var allValues = [];
-            this.props.params.forEach(function(param, i){
-                allValues.push(param.value);
-            }, this);
+            this._setStateFromProps(this.props, true);
+        },
 
-            this.setState({
-                checkedValues: this.props.defaultValue.length > 0 ? this.props.defaultValue : allValues,
-                allValues: allValues
-            });
+        componentWillReceiveProps: function(nextProps) {
+            this._setStateFromProps(nextProps);
         },
  
-        shouldComponentUpdate: function(nextProps, nextState) {
-            return this.state.checkedValues.length !== nextState.checkedValues.length || this.state.isShown !== nextState.isShown || nextProps.topDirection !== this.props.topDirection;
-        },
+        // shouldComponentUpdate: function(nextProps, nextState) {
+        //     return this.state.checkedValues.length !== nextState.checkedValues.length || this.state.isShown !== nextState.isShown || nextProps.topDirection !== this.props.topDirection;
+        // },
 
         render: function() {
             var list = [];
@@ -83,6 +79,20 @@ define([
                     </ul>
                 </div>
             );
+        },
+
+        _setStateFromProps: function(props, init) {
+            var allValues = [];
+            props.params.forEach(function(param, i) {
+                allValues.push(param.value);
+            }, this);
+
+            var state = {
+                allValues: allValues,
+                checkedValues: props.defaultValue.length === 0 ? allValues : props.defaultValue
+            };
+
+            this.setState(state);
         },
 
         _handleFieldChange: function(event) {

@@ -37,7 +37,7 @@ define([
             switch (this.state.name) {
                 case 'locations':
                     title = 'Please select a preferred location:';
-                    content = <Locations />;
+                    content = <Locations {...this.state.props} />;
                     break;
                 case 'alert':
                     var title = this.state.props.title;

@@ -117,7 +117,7 @@ define(['config'], function(config) {
                         obj[arr[1]] = paramFromString(string, val, obj[arr[1]]);
                     }
                 } else {
-                    obj[string] = val;
+                    obj[string] = isNaN(parseInt(val)) ? val : val * 1;
                 }
                 return obj;
             }
@@ -128,13 +128,17 @@ define(['config'], function(config) {
                 parts = query.match(/^([^\?]*)(\?)?(.*)$/),
                 params = parts[3],
                 page = parts[1].replace('#!', ''),
-                qArr = params.split('&');
-         
-            for (i = 0; i < qArr.length; i++){
-                pair = qArr[i].split('=');
+                qArr = params ? params.split('&') : [];
 
-                var paramName = decodeURIComponent(pair[0]);
-                paramFromString(paramName, pair[1], retObj);
+            if (params) {
+                for (i = 0; i < qArr.length; i++) {
+                    pair = qArr[i].split('=');
+
+                    var paramName = decodeURIComponent(pair[0]);
+                    paramFromString(paramName, decodeURIComponent(pair[1]), retObj);
+                }
+            } else {
+                retObj = null;
             }
          
             return {

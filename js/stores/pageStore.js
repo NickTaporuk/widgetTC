@@ -1,6 +1,5 @@
 define([
     'dispatcher',
-    'page',
     'lodash',
     'load!stores/resultsStore',
     'load!stores/searchStore',
@@ -11,7 +10,6 @@ define([
     'config'
 ], function(
     dispatcher,
-    page,
     _,
     resultsStore,
     searchStore,
@@ -28,7 +26,7 @@ define([
     var lastScrollPos = {};
 
     function setPage(_name, _props) {
-        if (_name !== name || !_.isEqual(_props, props)) {
+        if (true || _name !== name || !_.isEqual(_props, props)) {
 
             name = _name || 'search';
             props = _props || {};
@@ -95,8 +93,8 @@ define([
 
 
 
-                case constants.SEARCH_TIRES_SUCCESS:
-                    dispatcher.waitFor([resultsStore.dispatchToken]);
+                // case constants.SEARCH_TIRES_SUCCESS:
+                    // dispatcher.waitFor([resultsStore.dispatchToken]);
                 case constants.REQUEST_QUOTE_SUCCESS:
                     change = setPage('results');
                     break;
@@ -115,8 +113,8 @@ define([
                     change = setPage('email');
                     break;
 
-                case constants.LOAD_QUOTE_SUCCESS:
-                    dispatcher.waitFor([customerStore.dispatchToken, resultsStore.dispatchToken]);
+                // case constants.LOAD_QUOTE_SUCCESS:
+                    // dispatcher.waitFor([customerStore.dispatchToken, resultsStore.dispatchToken]);
                 case constants.SEND_APPOINTMENT_SUCCESS:
                 case constants.PRINT_QUOTE_SUCCESS:
                 case constants.EMAIL_QUOTE_SUCCESS:
