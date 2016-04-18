@@ -20,7 +20,7 @@ define([
     config
 ) {
 
-    var name = 'search';
+    var name = '';
     var props = {};
 
     var lastScrollPos = {};
@@ -28,7 +28,7 @@ define([
     function setPage(_name, _props) {
         if (true || _name !== name || !_.isEqual(_props, props)) {
 
-            name = _name || 'search';
+            name = _name || '';
             props = _props || {};
 
             if (lastScrollPos[name]) {
@@ -102,12 +102,6 @@ define([
                 case 'quote.request.form.show':
                     dispatcher.waitFor([resultsStore.dispatchToken]);
                     payload.type = 'request';
-                case 'quote.appointment.form.show':
-                    dispatcher.waitFor([customerStore.dispatchToken]);
-                    change = setPage('appointment', {
-                        type: payload.type
-                    });
-                    break;
                     
                 case 'quote.emmail.form.show':
                     change = setPage('email');

@@ -100,9 +100,6 @@ define([
             return (
                 <div>
                     <Back />
-                    {/*
-                    <a href="#search" onClick={this._handleBackClick} className={cn('back_link')}><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE5C4;' }} />Back to search</a>
-                    */}
                     <div className={cn('results_wrapper')}>
                         <div className={cn('results_title')}>
                             <p className={cn('results_query')}>
@@ -162,11 +159,6 @@ define([
         _scrollToTop: function() {
             var results = ReactDOM.findDOMNode(this);
             h.scrollToTop(results);
-        },
-
-        _handleBackClick: function(event) {
-            event.preventDefault();
-            Act.Page.show('search');
         },
 
         _getEntry: function() {

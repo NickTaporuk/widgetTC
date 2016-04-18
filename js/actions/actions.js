@@ -19,24 +19,6 @@ define([
 ) {
 
     var Actions = {
-        // init: function() {
-        //     // action 1
-        //     Api.loadLocations();
-        //     // action 2
-        //     Api.loadTireParameters();
-        //     // action 3
-        //     Api.getVehicleOptions();
-        //     // action 4
-        //     Api.loadDealerConfig();
-        //     // action 5
-        //     Api.loadDealerInfo();  
-
-        //     var curLocId = locationsStore.getCurLocId();
-        //     if (curLocId) {
-        //         // action 6
-        //         Api.loadLocationConfig(curLocId);
-        //     }
-        // },
         Page: {
             show: function(name, props) {
                 dispatcher.dispatch({
@@ -87,23 +69,6 @@ define([
             }
         },
         Tire: {
-            /*
-            search: function(values, step) {
-                var location = locationsStore.getCurrentLocation();
-                if (location) {
-                    dispatcher.dispatch({
-                        actionType: 'tire.search',
-                        step: step || 2,
-                        values: values
-                    });
-                    Api.searchTires(searchStore.getParamsForSearch());
-                } else {
-                    dispatcher.dispatch({
-                        actionType: 'popup.update',
-                        name: 'locations'
-                    });
-                } 
-            }, */
             loadFullStock: function(tireId) {
                 Api.loadFullStock(tireId);
             },
@@ -133,28 +98,12 @@ define([
             }
         },
         Quote: {
-            update: function(tireId, quantity, services, withDiscount, customDiscount) {
-                Api.loadQuote(
-                    tireId,
-                    quantity,
-                    services || 'use_default',
-                    withDiscount || false,
-                    customDiscount || null
-                );
-            },
             requestForm: function(tireId, quantity, supplier) {
                 dispatcher.dispatch({
                     actionType: 'quote.request.form.show',
                     tireId: tireId,
                     quantity: quantity,
                     supplier: supplier
-                });
-            },
-            appointmentForm: function(type, values) {
-                dispatcher.dispatch({
-                    actionType: 'quote.appointment.form.show',
-                    type: type || 'appointment', 
-                    values: values || {}
                 });
             },
             sendAppointment: function(values) {

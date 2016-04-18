@@ -1,5 +1,6 @@
 define([
     'dispatcher',
+    'promise',
     'load!stores/resultsStore',
     'load!stores/searchStore',
     'load!stores/locationsStore',
@@ -10,6 +11,7 @@ define([
     'config'
 ], function(
     dispatcher,
+    Promise,
     resultsStore,
     searchStore,
     locationsStore,
@@ -22,36 +24,26 @@ define([
 
     var actions = {
         init: function() {
-            var steps = 5;
-            var curStep = 0;
-            var checkReady = function() {
-                curStep++;
-
-                if (steps == curStep) {
-                    start();
-
-                    dispatcher.dispatch({
-                        actionType: 'widget.inited'
-                    });
-                }
-            };
-
-            // action 1
-            Api.loadLocations().then(checkReady);
-            // action 2
-            Api.loadTireParameters().then(checkReady);
-            // action 3
-            Api.getVehicleOptions().then(checkReady);
-            // action 4
-            Api.loadDealerConfig().then(checkReady);
-            // action 5
-            Api.loadDealerInfo().then(checkReady);  
-
             var curLocId = locationsStore.getCurLocId();
+
+            var promises = [
+                Api.loadLocations(),
+                Api.loadTireParameters(),
+                Api.getVehicleOptions(),
+                Api.loadDealerConfig(),
+                Api.loadDealerInfo()
+            ];
+
             if (curLocId) {
-                // action 6
-                Api.loadLocationConfig(curLocId); //.then(function() {checkReady()});
+                promises.push(Api.loadLocationConfig(curLocId));
             }
+
+            Promise.all(promises).then(function() {
+                start();
+                // dispatcher.dispatch({
+                //     actionType: 'widget.inited'
+                // });
+            });
         },
 
         searchPage: {
@@ -90,7 +82,7 @@ define([
                     });
                 };
 
-                if (!afterNav) {
+                if (!visitedPages['results'] || !afterNav) {
                     var params = _.cloneDeep(entryParams);
                     if (params.base_category) {
                         delete params.base_category;
@@ -98,7 +90,9 @@ define([
 
                     Api.searchTires(params).then(dispatch);
 
-                    setUrl('results', entryParams);
+                    if (!afterNav) {
+                        setUrl('results', entryParams);
+                    }
                 } else {
                     dispatch();
                 }
@@ -197,12 +191,16 @@ define([
     };
 
     var firstRun = true;
+    var visitedPages = {};
 
     function setUrl(page, params) {
+        visitedPages[page] = true;
+
         if (firstRun) {
             firstRun = false;
             return;
         }
+
         var path = '#!' + page + (params ? '?'  + h.objToQuery(params) : '');
 
         var state = {
@@ -232,7 +230,7 @@ define([
             default:
                 actions[page + 'Page'].update(params, afterNav);
         }
-    };
+    }
 
     window.addEventListener('popstate', function(e) {
         var page = e.state && e.state.page ? e.state.page : 'search';

@@ -1,6 +1,7 @@
 define([
     'reactDOM',
     'lib/helper',
+    'load!components/preloader',
     'load!components/page/search',
     'load!components/page/results',
     'load!components/page/summary',
@@ -22,6 +23,7 @@ define([
 ], function(
     ReactDOM,
     h,
+    Preloader,
     Search,
     Results,
     Summary,
@@ -78,8 +80,6 @@ define([
 
         _getContent: function() {
             var content = null;
-
-            // console.log(this.state.name);
 
             switch (this.state.name) {
                 case 'search':
@@ -140,7 +140,7 @@ define([
                     };
                     // props = _.merge(props, this.state.props);
 
-                    content = <Results {...props} />
+                    content = <Results {...props} />;
                     break;
                 case 'summary':
                     var props = {
@@ -149,7 +149,7 @@ define([
                         callNumber:   locationsStore.getCurLocConfig().call_number
                     };
                     props = _.merge(props, this.state.props);
-                    content = <Summary {...props} />
+                    content = <Summary {...props} />;
                     break;
                 case 'appointment':
                 case 'order':
@@ -165,25 +165,29 @@ define([
                     };
                     if (this.state.name == 'appointment') {
                         props.type = this.state.props.type;
-                        content = <Appointment {...props} />
+                        content = <Appointment {...props} />;
                     } else if (this.state.name == 'order') {
-                        content = <Order {...props} />
+                        content = <Order {...props} />;
                     } else if (this.state.name == 'confirmation') {
                         props.location = locationsStore.getCurrentLocation();
-                        content = <Confirmation {...props} />
+                        content = <Confirmation {...props} />;
                     }
                     break;
                 case 'quote':
                     var props = {
                         followUp: customerStore.getCustomerValue('follow_up')
                     };
-                    content = <Quote {...props} />
+                    content = <Quote {...props} />;
                     break;
                 case 'email':
                     var props = {
                         quote: customerStore.getQuote()
                     };
-                    content = <Email {...props} />
+                    content = <Email {...props} />;
+                    break;
+                case '':
+                    //content = <Preloader />;
+                    content = null;
                     break;
             }
 

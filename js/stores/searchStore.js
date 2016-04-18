@@ -144,49 +144,6 @@ define([
         getAllValues: function() {
             return _.cloneDeep(fieldValues);
         },
-        getParamsForSearch: function(force) {
-            if (!searchStore.isReadyForSearch() && !force) {
-                return null;
-            }
-
-            // var resultsStore = require('load!stores/resultsStore');
-            var locationsStore = require('load!stores/locationsStore');
-
-            var params = searchStore.getSectionValues(activeSection);
-
-            // needed categories will be returned base on filter
-            if (params.base_category) {
-               
-             
-                delete params.base_category;
-            }
-
-            params.location_id = locationsStore.getCurrentLocation().id;
-            // params.items_per_page = resultsStore.getItemsPerPage();
-
-            params = _.assign(params, searchStore.getSectionValues('common'));
-
-            params.filters = searchStore.getSectionValues('filters');
-
-            return params;
-        },
-        isReadyForSearch: function() {
-            var sectionValues = searchStore.getSectionValues(activeSection);
-            var isReady = false;
-            switch (activeSection) {
-                case 'size':
-                    isReady = (sectionValues.width && sectionValues.height && sectionValues.rim);
-                    break;
-                case 'vehicle':
-                    isReady = (sectionValues.car_tire_id != false);
-                    break;
-                case 'part_number':
-                    isReady = (sectionValues.part_number != false);
-                    break;
-            }
-
-            return isReady;
-        },
         dispatchToken: dispatcher.register(function(payload) {
             var change = false;
             switch (payload.actionType) {                    
@@ -204,10 +161,14 @@ define([
                                 setValue(section, fieldName, _.toArray(payload.entryParams.filters[fieldName]));
                             } else if (payload.entryParams[fieldName]) {
                                 setValue(section, fieldName, payload.entryParams[fieldName]);
+
+                                if (['common', 'filters'].indexOf(section) == -1) {
+                                    activeSection = section;
+                                }
                             }
                         });
                     });
-
+                    console.log(fieldValues);
                     change = true;
                     break;
                 case 'search.params.update':
@@ -284,7 +245,8 @@ define([
 
                 case constants.GET_VEHICLE_OPTIONS_SUCCESS:
                     var pageStore = require('load!stores/pageStore');
-                    if (pageStore.getPageName() === 'search')
+
+                    if (pageStore.getPageName() === 'search' || pageStore.getPageName() == '')
                     {
                         Object.keys(payload.options).map(function(field, i) {
                             setOptions(field, payload.options[field]);

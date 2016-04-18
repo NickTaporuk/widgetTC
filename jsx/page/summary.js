@@ -144,11 +144,6 @@ define([
             );
         },
 
-        _loadQuote: function() {
-            var params = this._getEntry();
-            Act.summaryPage.update(params);
-        },
-
         _getButtons: function() {
             var btns = {};
             if (config.sa) {
@@ -271,11 +266,6 @@ define([
             }
         },
 
-        _handleBackClick: function(event) {
-            event.preventDefault();
-            Act.Page.show('results');
-        },
-
         _handleServiceClick: function(serviceKey, event) {
             event.preventDefault();
             var optServices = this._getActiveOptServicesKeys();
@@ -290,7 +280,6 @@ define([
             var params = this._getParamsForQuote();
             params.optional_services = optServices;
             A.summaryPage.update(params);
-            // Act.Quote.update(params.tireId, params.quantity, optServices, params.withDiscount, params.customDiscount);
         },
 
         _handleQuantityChange: function(event) {
@@ -298,7 +287,6 @@ define([
             var params = this._getParamsForQuote();
             params.quantity = event.target.value;
             A.summaryPage.update(params);
-            // Act.Quote.update(params.tireId, event.target.value, params.optServices, params.withDiscount, params.customDiscount);
         },
 
         _handleDiscountClick: function(event) {
@@ -306,7 +294,6 @@ define([
             var params = this._getParamsForQuote();
             params.with_discount = !params.with_discount;
             A.summaryPage.update(params);
-            // Act.Quote.update(params.tireId, params.quantity, params.optServices, !params.withDiscount, params.customDiscount);
         },
 
         _handleDiscountChange: function(event) {
@@ -314,13 +301,11 @@ define([
             var params = this._getParamsForQuote();
             params.custom_discount = event.target.value;
             A.summaryPage.update(params);
-            //Act.Quote.update(params.tireId, params.quantity, params.optServices, params.withDiscount, event.target.value);
         },
 
         _handleAppointmentClick: function(event) {
             event.preventDefault();
             A.appointmentPage.update();
-            // Act.Quote.appointmentForm();
         },
 
         _handleOrderClick: function(event) {
@@ -331,19 +316,16 @@ define([
         _handleQuoteClick: function(event) {
             event.preventDefault();
             A.getAQuotePage.update();
-            //Act.Page.show('quote');
         },
 
         _handleEmailClick: function(event) {
             event.preventDefault();
             A.emailPage.update();
-            // Act.Quote.appointmentForm('email');
         },
 
         _handlePrintClick: function(event) {
             event.preventDefault();
             A.printPage.update();
-            // Act.Quote.appointmentForm('print');
         }
 
     }

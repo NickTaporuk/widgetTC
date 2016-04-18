@@ -50,6 +50,7 @@ window.TCWidget = {
                     react: 'bower_components/react/react',
                     reactDOM: 'bower_components/react/react-dom',
                     microEvent: 'bower_components/microevent/microevent',
+                    promise: 'bower_components/es6-promise-polyfill/promise',
                     load: 'loader',
                     stripe: 'https://js.stripe.com/v2/stripe'
                 }
@@ -86,10 +87,10 @@ window.TCWidget = {
                 render();
 
                 if (!config.sessionId) {
-                    Api.setSession(function(sessionId) {
+                    Api.setSession().then(function(sessionId) {
                         config.setParam('sessionId', sessionId);
-                        Act.init();                        
-                    })
+                        Act.init();
+                    });
                 } else {
                     Act.init();
                 }

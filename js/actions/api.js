@@ -1,5 +1,6 @@
 define([
     'dispatcher',
+    'promise',
     'ajax',
     'isMobile',
     'validate',
@@ -8,6 +9,7 @@ define([
     'config'
 ], function(
     dispatcher,
+    Promise,
     ajax,
     isMobile,
     validate,
@@ -127,9 +129,11 @@ define([
                     dispatch(response.data);
                 });
             } else {
-                dispatch({
-                    call_number: null
-                });
+                return Promise.resolve({
+                        call_number: null
+                    }).then(function(response) {
+                        dispatch(response);
+                    });
             }
         },
 
@@ -208,23 +212,18 @@ define([
                 }
             }
 
-            var readySteps = 0;
             var dispatch = function() {
-                if (readySteps > index) {
-                    if (!allOptions.car_tire_id) {
-                        allOptions.car_tire_id = [];
-                    }
-                    dispatcher.dispatch({
-                        actionType: constants.GET_VEHICLE_OPTIONS_SUCCESS,
-                        options: allOptions,
-                        values: values
-                    });
-                }
-                readySteps++;
+                dispatcher.dispatch({
+                    actionType: constants.GET_VEHICLE_OPTIONS_SUCCESS,
+                    options: allOptions,
+                    values: values
+                });
+                
             }
 
+            var promises = [];
             if (values.trim) {
-                ajax.make({
+                promises.push(ajax.make({
                     url: 'vehicle/tireSizes',
                     data: values,
                     cache: true
@@ -237,53 +236,50 @@ define([
                         });
                     });
                     allOptions.car_tire_id = options;
-                    dispatch();
-                });
+                }));
             }
 
             if (values.model) {
-                ajax.make({
+                promises.push(ajax.make({
                     url: 'vehicle/trims',
                     data: values,
                     cache: true
                 }).then(function(response) {
                     allOptions.trim = prepareVehicleResponse(response);
-                    dispatch();
-                });
+                }));
             }
 
             if (values.make) {
-                ajax.make({
+                promises.push(ajax.make({
                     url: 'vehicle/models',
                     data: values,
                     cache: true
                 }).then(function(response) {
                     allOptions.model = prepareVehicleResponse(response);
-                    dispatch();
-                });
+                }));
             }
 
             if (values.year) {
-                ajax.make({
+                promises.push(ajax.make({
                     url: 'vehicle/makes',
                     data: values,
                     cache: true
                 }).then(function(response) {
                     allOptions.make = prepareVehicleResponse(response);
-                    dispatch();
-                });
-            } else {
-                // if year is not selected
-                dispatch();
+                }));
             }
 
-            return ajax.make({
+            promises.push(ajax.make({
                 url: 'vehicle/years',
                 cache: true
             }).then(function(response) {
                 allOptions.year = prepareVehicleResponse(response);
+                return allOptions.year
+            }));
+
+            return Promise.all(promises).then(function(responses) {
                 dispatch();
-            });
+            })
         },
 
         loadDealerInfo: function() {
@@ -351,7 +347,9 @@ define([
 
             var validationErrors = validateParamsForQuote(data, ['name', 'email', 'phone']);  
             if (validationErrors) {
-                dispatchError(validationErrors);
+                return Promise.reject(validationErrors).catch(function(response) {
+                    dispatchError(response);    
+                });
             } else {
                 return ajax.make({
                     url: 'quote/appointment',
@@ -384,7 +382,9 @@ define([
 
             var validationErrors = validateParamsForQuote(data, !config.sa && data.name !== undefined ? ['name', 'email', 'phone'] : []);
             if (validationErrors) {
-                dispatchError(validationErrors);
+                return Promise.reject(validationErrors).catch(function(response) {
+                    dispatchError(response);    
+                });
             } else {
                 var WinPrint = window.open('', '', 'left=0,top=0,width=800,height=800,toolbar=0,scrollbars=0,status=0');
                 ajax.make({
@@ -420,7 +420,9 @@ define([
             
             var validationErrors = validateParamsForQuote(data, !config.sa && data.name !== undefined ? ['name', 'email', 'phone'] : ['email']);
             if (validationErrors) {
-                dispatchError(validationErrors);
+                return Promise.reject(validationErrors).catch(function(response) {
+                    dispatchError(response);    
+                });
             } else {
                 return ajax.make({
                     url: 'quote/email',
@@ -453,7 +455,9 @@ define([
 
             var validationErrors = validateParamsForQuote(data, ['name', 'email', 'phone']);
             if (validationErrors) {
-                dispatchError(validationErrors);
+                return Promise.reject(validationErrors).catch(function(response) {
+                    dispatchError(response);    
+                });
             } else {
                 return ajax.make({
                     url: 'quote/request',
@@ -499,7 +503,9 @@ define([
 
             var validationErrors = validateParamsForQuote(data, ['name', 'email', 'phone', 'vehicle_info']);
             if (validationErrors) {
-                dispatchError(validationErrors);
+                return Promise.reject(validationErrors).catch(function(response) {
+                    dispatchError(response);    
+                });
             } else {
                 return ajax.make({
                     url: 'order/' + orderId + '/checkout',
@@ -587,13 +593,13 @@ define([
             });
         },
 
-        setSession: function(callback) {
+        setSession: function() {
             return ajax.make({
                 url: 'session',
                 method: 'post',
                 data: {is_returned: config.isReturnedUser, source: (config.sa ? 'instore' : 'website') }
             }).then(function(response) {
-                callback(response.data.session_id);
+                return response.data.session_id;
             });
         }
     };

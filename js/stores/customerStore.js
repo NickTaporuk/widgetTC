@@ -186,7 +186,6 @@ define([
                     break;
 
                 case 'order.payment':
-                case 'quote.appointment.form.show':
                 case 'quote.emmail.form.show':
                 case 'customer.values.update':
                     _.merge(customer, payload.values);

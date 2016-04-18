@@ -1,4 +1,4 @@
-define(['config'], function(config) {
+define(['config', 'promise'], function(config, Promise) {
 	function Ajax() {
 		var $public = {};
 		var $private = {};

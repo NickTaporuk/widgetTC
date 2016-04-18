@@ -188,7 +188,6 @@ define([
         },
 
         _isReadyForSearch: function() {
-            //return searchStore.isReadyForSearch();
             var isReady = false;
             var values = this.state.fieldValues[this.state.activeTab];
             switch (this.state.activeTab) {
@@ -224,9 +223,10 @@ define([
             }
             if (this._isReadyForSearch()) {
                 var params = this.state.fieldValues[this.state.activeTab];
-                params.location_id = locationsStore.getCurrentLocation().id;
-                
-                if ( params.location_id ) {
+                var curLocation = locationsStore.getCurrentLocation();
+
+                if ( curLocation ) {
+                    params.location_id = curLocation.id;
                     A.resultsPage.update(params);
                 } else {
                     this._handleLocationsClick();    
