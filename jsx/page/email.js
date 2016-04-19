@@ -4,14 +4,16 @@ define([
     'load!actions/actions',
     'lib/helper',
     'load!stores/customerStore',
-    'load!components/page/common/mainPrices'
+    'load!components/page/common/mainPrices',
+    'load!components/page/common/back'
 ], function(
     React,
     cn,
     Act,
     h,
     customerStore,
-    MainPrices
+    MainPrices,
+    Back
 ) {
 
     return {
@@ -32,7 +34,7 @@ define([
 
             return (
                 <div>
-                    {this._getBackLink()}
+                    <Back />
 
                     <div className={cn('summary_wrapper')}>
                         <form action="" className={cn('appointment_form')} onSubmit={this._handleFormSubmit}>
@@ -51,10 +53,6 @@ define([
                     </div>
                 </div>
             );
-        },
-
-        _getBackLink: function() {
-            return <a href="#summary" onClick={this._handleBackClick} className={cn('back_link')}><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE5C4;' }} />Back</a>
         },
 
         _getBtn: function() {
@@ -76,11 +74,6 @@ define([
                 errors: customerStore.getValidationErrors(),
                 values: customerStore.getCustomer()
             });
-        },
-
-        _handleBackClick: function(event) {
-            event.preventDefault();
-            Act.Page.show('quote');
         },
 
         _handleFormSubmit: function(event) {

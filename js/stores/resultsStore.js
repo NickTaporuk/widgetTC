@@ -94,15 +94,18 @@ define([
         dispatchToken: dispatcher.register(function(payload) {
             var change = false;
             switch (payload.actionType) {
-                case constants.SEARCH_TIRES_SUCCESS:
-                    addTires(payload.tires);
-                    totalCount = payload.totalCount;
-                    filters = payload.filters;
-                    page = payload.page;                
-                    change = true;
+                case 'results.page.update':
+                    if (payload.results) {
+                        var results = payload.results;
+                        addTires(results.tires);
+                        totalCount = results.nb_results;
+                        filters = results.filters;
+                        page = results.page;                
+                        change = true;
+                    }
                     break;
+                    
                 case constants.LOAD_TIRE_SUCCESS:
-                    console.log(payload.tire);
                     addTires([payload.tire]);
                     change = true;
                     break;
@@ -120,7 +123,6 @@ define([
                     change = true;
                     break;
                 case 'quote.request.form.show':
-                // case 'tire.select':
                     if (payload.supplier) {
                         changeSupplier(payload.tireId, payload.supplier);
                     }

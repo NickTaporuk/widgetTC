@@ -2,11 +2,13 @@ define([
     'react',
     'classnames', 
     'load!stores/ajaxStore',
+    'load!stores/pageStore',
     'config'
 ], function(
     React,
     cn,
     ajaxStore,
+    pageStore,
     config
 ) {
     return {
@@ -30,7 +32,7 @@ define([
 
         render: function() {
             return (
-                <div className={cn('loader')} style={ {display: this.state.loader ? 'block' : 'none' } }>
+                <div className={cn('loader')} style={ {display: this.state.loader && pageStore.getPageName() !== '' ? 'block' : 'none' } }>
                     <img src={config.imagesFolder + 'loader.gif'} alt="Loading" />
                 </div>
             )

@@ -310,7 +310,10 @@ define([
 
         _handleOrderClick: function(event) {
             event.preventDefault();
-            Act.Order.create();
+            var params = this._getParamsForQuote();
+            params.with_discount = this.state.quote.discount && this.state.quote.discount.applied;
+            A.orderPage.update(params);
+            // Act.Order.create();
         },
 
         _handleQuoteClick: function(event) {

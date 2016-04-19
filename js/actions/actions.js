@@ -115,12 +115,6 @@ define([
                 values = customerStore.getParamsForQuote('appointment');
                 Api.sendAppointment(values);
             },
-            emailForm: function(values) {
-                dispatcher.dispatch({
-                    actionType: 'quote.emmail.form.show',
-                    values: values || {}
-                });
-            },
             email: function(values) {
                 dispatcher.dispatch({
                     actionType: 'customer.values.update',
@@ -149,41 +143,6 @@ define([
                 values.quantity = customerStore.getSelectedQuantity();
 
                 Api.requestQuote(values);
-            }
-        },
-        Order: {
-            create: function() {
-                var quote = customerStore.getQuote();
-                var optionalServices = [];
-                quote.optional_services.map(function(service) {
-                    if (service.applied) {
-                        optionalServices.push(service.key);
-                    }
-                });
-
-                Api.orderCreate({
-                    tires: [{
-                        id: customerStore.getSelectedTireId(),
-                        quantity: customerStore.getSelectedQuantity(),
-                        with_discount: quote.discount ? quote.discount.applied : false,
-                        optional_services: optionalServices
-                    }]
-                });
-            },
-
-            payment: function(values) {
-                dispatcher.dispatch({
-                    actionType: 'order.payment',
-                    values: values
-                });
-
-                var order = customerStore.getOrder();
-
-                if (order.status === 'initiated') {
-                    Api.orderCheckout(order.order_id, values);
-                } else {
-                    Api.orderPayment(order.order_id, values.token);
-                }
             }
         },
         Vehicle: {

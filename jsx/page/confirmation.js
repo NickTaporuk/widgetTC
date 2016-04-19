@@ -1,13 +1,13 @@
 define([
     'react',
     'classnames',
-    'load!actions/actions',
+    'load!actions/act',
     'lib/helper',
     'config'
 ], function(
     React,
     cn,
-    Act,
+    A,
     h,
     config
 ) {
@@ -194,7 +194,7 @@ define([
 
         _handleToStartClick: function(event) {
             event.preventDefault();
-            Act.Page.show('search');
+            A.searchPage.update();
         },
 
         _handelPrintClick: function(event) {

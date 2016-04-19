@@ -182,6 +182,8 @@ define([
                     filters: results.filters,
                     page: results.page
                 });
+
+                return response.data;
             });
         },
 
@@ -334,6 +336,8 @@ define([
                     quantity: quantity,
                     quote: quote
                 });
+
+                return quote;
             });
         },
 
@@ -490,6 +494,8 @@ define([
                 orderInfo.actionType = constants.ORDER_CREATE_SUCCESS;
 
                 dispatcher.dispatch(orderInfo);
+
+                return response.data;
             });
         },
 
@@ -517,18 +523,25 @@ define([
                     orderInfo.actionType = constants.ORDER_CHECKOUT_SUCCESS;
                     dispatcher.dispatch(orderInfo);
 
-                    Api.orderPayment(orderId, data.token); // auto payment if success
+                    // auto payment
+                    return Api.orderPayment(orderId, data.token, true).then(function(order) {
+                        return order;
+                    }).catch(function(r) {
+                        // if payment is not success return order received by checkout method
+                        return response.data;
+                    });
                 }).catch(function(response) {
                     if (response.error_code == 400001) {
                         dispatchError(response.errors);
                     } else {
                         ajax.error(response);
                     }
+                    return response;
                 });
             }
         },
 
-        orderPayment: function(orderId, token) {
+        orderPayment: function(orderId, token, throwError) {
             return ajax.make({
                 url: 'order/' + orderId + '/payment',
                 method: 'post',
@@ -539,6 +552,8 @@ define([
                 info.notice = response.notice;
                 info.actionType = constants.ORDER_PAYMENT_SUCCESS;
                 dispatcher.dispatch(info);
+
+                return info;
             }).catch(function(response) {
                 if (response.error_code == 400001) {
                     dispatcher.dispatch({
@@ -547,6 +562,9 @@ define([
                     });
                 } else {
                     ajax.error(response);
+                }
+                if (throwError) {
+                    throw new Error();
                 }
             });
         },

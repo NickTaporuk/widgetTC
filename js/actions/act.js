@@ -40,9 +40,6 @@ define([
 
             Promise.all(promises).then(function() {
                 start();
-                // dispatcher.dispatch({
-                //     actionType: 'widget.inited'
-                // });
             });
         },
 
@@ -60,7 +57,7 @@ define([
         },
         resultsPage: {
             update: function(entryParams, afterNav) {
-                // set filter by category base no base_category
+                // set filter by category base on base_category
                 if (entryParams.base_category) {
                     var baseCategories = searchStore.getOptions('base_category');
                     var baseCategoriesLength = baseCategories.length;
@@ -75,20 +72,33 @@ define([
                     }
                 }
 
-                var dispatch = function() {
+                var dispatch = function(results) {
                     dispatcher.dispatch({
                         actionType: 'results.page.update',
-                        entryParams: entryParams
+                        entryParams: entryParams,
+                        results: results || null
                     });
+                };
+
+                var makeSearch = function(params) {
+                    Api.searchTires(params).then(dispatch);
                 };
 
                 if (!visitedPages['results'] || !afterNav) {
                     var params = _.cloneDeep(entryParams);
                     if (params.base_category) {
+                        // removing of base category. We apply it through category filter. See above.
                         delete params.base_category;
                     }
 
-                    Api.searchTires(params).then(dispatch);
+                    if (!visitedPages['results'] && entryParams.car_tire_id) {
+                        // if search  by vehile, load vehicle options
+                        Api.getVehicleOptions(entryParams).then(function() {
+                            makeSearch(params);
+                        });
+                    } else {
+                        makeSearch(params);
+                    }
 
                     if (!afterNav) {
                         setUrl('results', entryParams);
@@ -102,10 +112,13 @@ define([
             update: function(entryParams, afterNav) {
                 var dispatch = function() {
 
-                    dispatcher.dispatch({
-                        actionType: 'summary.page.update',
-                        entryParams: entryParams || {}
-                    });
+                    var dispatch = function(quote) {
+                        dispatcher.dispatch({
+                            actionType: 'summary.page.update',
+                            entryParams: entryParams || {},
+                            quote: quote || null
+                        });
+                    };
 
                     if (!afterNav) {
                         Api.loadQuote(
@@ -114,11 +127,15 @@ define([
                             entryParams.optional_services || 'use_default',
                             entryParams.with_discount || false,
                             entryParams.custom_discount || null
-                        );
+                        ).then(function(quote){
+                            dispatch(quote);
+                        });
 
                         delete entryParams.supplier;
 
                         setUrl('summary', entryParams);
+                    } else {
+                        dispatch();
                     }
                 };
 
@@ -186,9 +203,74 @@ define([
                 }
             }
         },
+        orderPage: {
+            update: function(entryParams, afterNav) {
+                var dispatch = function(order) {
+                    dispatcher.dispatch({
+                        actionType: 'order.page.update',
+                        order: order || null
+                    });
+                }
 
-        
+                if (!afterNav) {
+                    Api.orderCreate({
+                        tires: [{
+                            id: entryParams.tire_id,
+                            quantity: entryParams.quantity,
+                            with_discount: entryParams.with_discount || false,
+                            optional_services: entryParams.optional_services || 'use_default'
+                        }]
+                    }).then(function(order) { 
+                        dispatch(order)
+                    });
+
+                    setUrl('order');
+                } else {
+                    dispatch();
+                }
+            },
+            payment: function(values) {
+                var order = customerStore.getOrder();
+
+                var dispatch = function(order, step) {
+                    step = step || 'payment';
+                    dispatcher.dispatch({
+                        actionType: 'order.' + step + '.success',
+                        customer: values,
+                        order: order
+                    });
+                    if (step == 'payment') {
+                        actions.confirmationPage.update({
+                            notice: order.notice
+                        });
+                    }
+                };
+
+                if (order.status === 'initiated') {
+                    Api.orderCheckout(order.order_id, values).then(function(order) {
+                        if (order.status == 'incomplete') {
+                            dispatch(order, 'checkout');    
+                        } else {
+                            dispatch(order);    
+                        }
+                    });
+                } else {
+                    Api.orderPayment(order.order_id, values.token).then(function(order) {
+                        dispatch(order);
+                    });
+                }
+            }
+        },
+        confirmationPage: {
+            update: function(entryParams, afterNav) {
+                dispatcher.dispatch({
+                    actionType: 'confirmation.page.update',
+                    notice: entryParams.notice
+                });
+            }
+        }
     };
+
 
     var firstRun = true;
     var visitedPages = {};
@@ -207,7 +289,7 @@ define([
             page: page,
             params: params,
             path: path
-        }
+        };
 
         if (history.state && history.state.page && history.state.page == page) {
             history.replaceState(state, page, config.allowUrl ? path : '');

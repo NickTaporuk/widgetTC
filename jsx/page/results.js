@@ -47,11 +47,13 @@ define([
         },
 
         componentDidMount: function() {
-            resultsStore.bind('change', this._updateState);
+            // resultsStore.bind('change', this._updateState);
+            searchStore.bind('change', this._updateState);
         },
 
         componentWillUnmount: function() {
-            resultsStore.unbind('change', this._updateState);    
+            // resultsStore.unbind('change', this._updateState);    
+            searchStore.unbind('change', this._updateState);
         },
 
         componentDidUpdate: function(prevProps, prevState) {
@@ -60,13 +62,9 @@ define([
             }
         },
 
-        componentWillReceiveProps: function(nextProps) {
-            var entry = _.merge(this.state.entry, nextProps.entryParams);
-            this.setState({entry: entry});
-        },
-
         render: function() {
             var tires = [];
+            var fieldOptions = this._getFieldsOptions();
 
             var curTime = new Date().getTime();
             this.state.tires.map(function(tire, i) {
@@ -75,27 +73,6 @@ define([
                     <Tire key={tKey} tire={tire} isInMile={this.props.isInMile} isTop={(i < 3 && this.state.page == 1)} />
                 ));
             }.bind(this));
-
-            if (tires.length > 0) {
-                var filters = null;
-                if (Object.keys(this.state.filters).length > 0) {
-                    var filtersInfo = [
-                        {key: 'run_flat', desc: 'Run-Flat', all: 'All/None'}, 
-                        {key: 'light_truck', desc: 'Light Track', all: 'All/None'}, 
-                        {key: 'brand', desc: 'Brand', all: 'All Brands'},
-                        {key: 'category', desc: 'Category', all: 'All Categories'}
-                    ];
-                    filters = [];
-                    filtersInfo.forEach(function(info, i) {
-                        if (this.state.filters[info.key].parameters.length > 1) {
-                            filters.push((
-                                <FilterBlock key={i} by={info.desc} topDirection={ !this.state.totalCount } name={info.key} allDesc={info.all} defaultValue={ this.props.fieldValues.filters[info.key] } params={ this.state.filters[info.key].parameters } onChange={this._handleFilterChange} />
-                            ));
-                        }
-                    }, this);
-                }
-
-            }
 
             return (
                 <div>
@@ -110,14 +87,14 @@ define([
                             </p>
                         </div>
                         <div id={cn('optional_fields')} className={cn(['box', 'results_filters'])}>
-                            <SelectField onChange={this._handleFieldChange} options={this.props.fieldOptions.display}  label="Display:" name="display"  className={cn('filter_field')} emptyDesc={false} defaultValue={this.props.fieldValues.display} />
-                            <SelectField onChange={this._handleFieldChange} options={this.props.fieldOptions.order_by} label="Sort by:" name="order_by" className={cn('filter_field')} emptyDesc={false} defaultValue={this.props.fieldValues.order_by} />
+                            <SelectField onChange={this._handleFieldChange} options={fieldOptions.display}  label="Display:" name="display"  className={cn('filter_field')} emptyDesc={false} defaultValue={this.props.fieldValues.display} />
+                            <SelectField onChange={this._handleFieldChange} options={fieldOptions.order_by} label="Sort by:" name="order_by" className={cn('filter_field')} emptyDesc={false} defaultValue={this.props.fieldValues.order_by} />
                         </div>
                         {
                             tires.length > 0 ? null : <h3 className={cn('message')}><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE000;' }} /> We did not find any tires based on your search criteria. Please try searching again later as inventory changes frequently.</h3>
                         }
                         <div className={cn('filters')} id={cn('filters')}>
-                            {filters}
+                            {this._getFilterBlocks()}
                         </div>
                         <div className={cn('results')}>
                             <div className={cn('twelvecol')}>
@@ -147,13 +124,47 @@ define([
             );
         },
 
+        _getSearchParamsInfo: function() {
+
+        },
+
+        _getFilterBlocks: function() {
+            if (this.state.tires.length > 0) {
+                var filters = null;
+                if (Object.keys(this.state.filters).length > 0) {
+                    var filtersInfo = [
+                        {key: 'run_flat', desc: 'Run-Flat', all: 'All/None'}, 
+                        {key: 'light_truck', desc: 'Light Track', all: 'All/None'}, 
+                        {key: 'brand', desc: 'Brand', all: 'All Brands'},
+                        {key: 'category', desc: 'Category', all: 'All Categories'}
+                    ];
+                    filters = [];
+                    filtersInfo.forEach(function(info, i) {
+                        if (this.state.filters[info.key].parameters.length > 1) {
+                            filters.push((
+                                <FilterBlock key={i} by={info.desc} topDirection={ !this.state.totalCount } name={info.key} allDesc={info.all} defaultValue={ this.props.fieldValues.filters[info.key] } params={ this.state.filters[info.key].parameters } onChange={this._handleFilterChange} />
+                            ));
+                        }
+                    }, this);
+                }
+            }
+            return filters;
+        },
+
+        _getFieldsOptions: function() {
+            return {
+                display: searchStore.getOptions('display'),  
+                order_by: searchStore.getOptions('order_by')
+            };
+        },
+
         _updateState: function() {
             this.setState({
                 page: searchStore.getValue('common', 'page'),
                 tires: resultsStore.getTires(),
                 totalCount: resultsStore.getTotalCount(),
                 filters: resultsStore.getFilters()
-            })
+            });
         },
 
         _scrollToTop: function() {

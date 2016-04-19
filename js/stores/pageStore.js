@@ -63,8 +63,10 @@ define([
                     change = setPage(payload.name, payload.props);
                     break;
 
-
-
+                case 'order.page.update':
+                    dispatcher.waitFor([customerStore.dispatchToken]);
+                    change = setPage('order');
+                    break;
                 case 'get_a_quote.page.update':
                     change = setPage('quote');
                     break;
@@ -87,14 +89,13 @@ define([
                     change = setPage('search', {entryParams: payload.entryParams});
                     break;
                 case 'results.page.update':
-                    dispatcher.waitFor([searchStore.dispatchToken]);
+                    dispatcher.waitFor([searchStore.dispatchToken, resultsStore.dispatchToken]);
                     change = setPage('results', {entryParams: payload.entryParams});
                     break;
+                case 'confirmation.page.update':
+                    change = setPage('confirmation', {notice: payload.notice});
+                    break;
 
-
-
-                // case constants.SEARCH_TIRES_SUCCESS:
-                    // dispatcher.waitFor([resultsStore.dispatchToken]);
                 case constants.REQUEST_QUOTE_SUCCESS:
                     change = setPage('results');
                     break;
@@ -102,32 +103,20 @@ define([
                 case 'quote.request.form.show':
                     dispatcher.waitFor([resultsStore.dispatchToken]);
                     payload.type = 'request';
-                    
-                case 'quote.emmail.form.show':
-                    change = setPage('email');
-                    break;
 
-                // case constants.LOAD_QUOTE_SUCCESS:
-                    // dispatcher.waitFor([customerStore.dispatchToken, resultsStore.dispatchToken]);
                 case constants.SEND_APPOINTMENT_SUCCESS:
                 case constants.PRINT_QUOTE_SUCCESS:
                 case constants.EMAIL_QUOTE_SUCCESS:
                     change = setPage('summary');
                     break;
-
-                case constants.ORDER_CREATE_SUCCESS:
-                    if (payload.tires && payload.tires[0]) {
-                        dispatcher.waitFor([customerStore.dispatchToken]);
-                        change = setPage('order');
-                    }
-                    break;
                     
-                case constants.ORDER_PAYMENT_SUCCESS:
-                    dispatcher.waitFor([customerStore.dispatchToken]);
-                    change = setPage('confirmation', {
-                        notice: payload.notice
-                    });
-                    break;
+
+                // case 'order.payment.success':
+                //     dispatcher.waitFor([customerStore.dispatchToken]);
+                //     change = setPage('confirmation', {
+                //         notice: payload.order.notice
+                //     });
+                //     break;
             }
 
             if (change) {

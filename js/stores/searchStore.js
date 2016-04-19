@@ -159,16 +159,18 @@ define([
                         Object.keys(fieldValues[section]).map(function(fieldName) {
                             if (section == 'filters' && payload.entryParams.filters && payload.entryParams.filters[fieldName] !== undefined) {
                                 setValue(section, fieldName, _.toArray(payload.entryParams.filters[fieldName]));
-                            } else if (payload.entryParams[fieldName]) {
+                            } else if (payload.entryParams[fieldName] !== undefined) {
                                 setValue(section, fieldName, payload.entryParams[fieldName]);
-
-                                if (['common', 'filters'].indexOf(section) == -1) {
-                                    activeSection = section;
-                                }
                             }
                         });
                     });
-                    console.log(fieldValues);
+                    if (payload.entryParams.car_tire_id) {
+                        activeSection = 'vehicle';
+                    } else if (payload.entryParams.width) {
+                        activeSection = 'size';
+                    } else if (payload.entryParams.part_number) {
+                        activeSection = 'part_number';
+                    }
                     change = true;
                     break;
                 case 'search.params.update':

@@ -34,13 +34,13 @@ define([
             this._setStateFromProps(this.props, true);
         },
 
-        componentWillReceiveProps: function(nextProps) {
-            this._setStateFromProps(nextProps);
-        },
- 
-        // shouldComponentUpdate: function(nextProps, nextState) {
-        //     return this.state.checkedValues.length !== nextState.checkedValues.length || this.state.isShown !== nextState.isShown || nextProps.topDirection !== this.props.topDirection;
+        // componentWillReceiveProps: function(nextProps) {
+        //     this._setStateFromProps(nextProps);
         // },
+ 
+        shouldComponentUpdate: function(nextProps, nextState) {
+            return this.state.checkedValues.length !== nextState.checkedValues.length || this.state.isShown !== nextState.isShown || nextProps.topDirection !== this.props.topDirection;
+        },
 
         render: function() {
             var list = [];

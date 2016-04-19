@@ -45,15 +45,11 @@ define([
             );
         },
 
-        // _handleBackClick: function(event) {
-        //     event.preventDefault();
-        //     Act.Page.show('summary');
-        // },
 
         _handlePrintClick: function(event) {
             event.preventDefault();
             if ( this.refs.follow_up.checked ) {
-                A.printPage.update(); //  appointmentForm('print', {follow_up: true});
+                A.printPage.update();
             } else {
                 Act.Quote.print({follow_up: false});
             }
@@ -63,10 +59,8 @@ define([
             event.preventDefault();
             if ( this.refs.follow_up.checked ) {
                 A.emailPage.update();
-                // Act.Quote.appointmentForm('email', {follow_up: true});
             } else {
                 A.emailOnlyPage.update();
-                //Act.Quote.emailForm({follow_up: false});
             }  
         }
     }

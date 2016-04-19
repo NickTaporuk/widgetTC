@@ -2,6 +2,7 @@ define([
     'react',
     'classnames',
     'load!actions/actions',
+    'load!actions/act',
     'lib/helper',
     'load!stores/customerStore',
     'load!stores/vehicleStore',
@@ -10,11 +11,13 @@ define([
     'validate',
     'moment',
     'load!components/page/common/formField',
+    'load!components/page/common/back',
     'config'
 ], function(
     React,
     cn,
     Act,
+    A,
     h,
     customerStore,
     vehicleStore,
@@ -23,6 +26,7 @@ define([
     validate,
     moment,
     Field,
+    Back,
     config
 ) {
 
@@ -60,7 +64,7 @@ define([
         render: function() {
             return (
                 <div>
-                    <a href="#summary" onClick={this._handleBackClick} className={cn('back_link')}><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE5C4;' }} />Back to your summary</a>
+                    <Back />
 
                     <div className={cn('order_wrapper')}>
                         <form action="confirmation.php" className={cn('order_form')} onSubmit={this._handleFormSubmit}>
@@ -80,7 +84,7 @@ define([
                                 <Field type="text" name="name" defaultValue={this.state.values.name} ref="name" label="Your Name" required={true} error={this._getError('name')} disabled={this.state.status == 'incomplete'} />
                                 <Field type="email" name="email" defaultValue={this.state.values.email} ref="email" label="Email Address" required={true} error={this._getError('email')} disabled={this.state.status == 'incomplete'} />
                                 <Field type="tel" name="phone" defaultValue={this.state.values.phone} ref="phone" label="Phone Number" required={true} error={this._getError('phone')} disabled={this.state.status == 'incomplete'} />
-                                <Field type="datetime" ref="datetime" name="datetime" defaultValue={this.state.values.preferred_time} label="Preferred Date and Time" error={this._getError('preferred_time')} 
+                                <Field type="datetime" ref="datetime" name="datetime" defaultValue={this.state.values.preferred_time} label="Preferred Date and Time" disabled={this.state.status == 'incomplete'} error={this._getError('preferred_time')} 
                                        custom={{
                                                 isValidDate: this._isValidDate,
                                                 inputProps: {'name': "preferred_time", 'readOnly': true},
@@ -92,20 +96,20 @@ define([
                                 <div className={cn('control_wrapper')}>
                                     <label htmlFor={cn('vehicle_year')}>Vehicle Info <span className="req">*</span></label>
                                     <div className={cn(['sixcol', 'field'])}>
-                                        <SelectField name="year" options={this.state.options.years} emptyDesc="- Year -" withWrapper={false} onChange={this._vehicleChange} value={this.state.values.vehicle.year} />
+                                        <SelectField name="year" options={this.state.options.years} disabled={this.state.status == 'incomplete'} emptyDesc="- Year -" withWrapper={false} onChange={this._vehicleChange} value={this.state.values.vehicle.year} />
                                     </div>
                                     <div className={cn(['sixcol', 'last', 'field'])}>
-                                        <SelectField name="make" options={this.state.options.makes} emptyDesc="- Make -" withWrapper={false} onChange={this._vehicleChange} value={this.state.values.vehicle.make} />
+                                        <SelectField name="make" options={this.state.options.makes} disabled={this.state.status == 'incomplete'} emptyDesc="- Make -" withWrapper={false} onChange={this._vehicleChange} value={this.state.values.vehicle.make} />
                                     </div>
                                 </div>
 
                                 <div className={cn('control_wrapper')}>
                                     <div className={cn('row')}>
                                         <div className={cn(['sixcol', 'field'])}>
-                                            <SelectField name="model" options={this.state.options.models} emptyDesc="- Model -" withWrapper={false} onChange={this._vehicleChange} value={this.state.values.vehicle.model} />
+                                            <SelectField name="model" options={this.state.options.models} disabled={this.state.status == 'incomplete'} emptyDesc="- Model -" withWrapper={false} onChange={this._vehicleChange} value={this.state.values.vehicle.model} />
                                         </div>
                                         <div className={cn(['sixcol', 'last', 'field'])}>
-                                            <SelectField name="trim" options={this.state.options.trims} emptyDesc="- Trim -" withWrapper={false} onChange={this._vehicleChange} value={this.state.values.vehicle.trim} />
+                                            <SelectField name="trim" options={this.state.options.trims} disabled={this.state.status == 'incomplete'} emptyDesc="- Trim -" withWrapper={false} onChange={this._vehicleChange} value={this.state.values.vehicle.trim} />
                                         </div>
                                     </div>
                                     {this._getError('vehicle_info')}
@@ -194,10 +198,6 @@ define([
                 options: vehicleStore.getAll(values.vehicle.year, values.vehicle.make, values.vehicle.model, values.vehicle.trim)
             });
         },
-        _handleBackClick: function(event) {
-            event.preventDefault();
-            Act.Page.show('summary');
-        },
 
         _checkStripeValues: function(stripeValues) {
 
@@ -273,7 +273,8 @@ define([
                             vehicle_info: self._getVehicleInfo()
                         };
 
-                        Act.Order.payment(values); 
+                        A.orderPage.payment(values);
+                        // Act.Order.payment(values);
                     }
                 });
             } else {

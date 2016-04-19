@@ -151,28 +151,43 @@ define([
                     customer.follow_up = config.sa ? false : payload.config.default_quote_call_back;
                     change = true;
                     break;
+
                 case 'summary.page.update':
                     selectedTire = payload.entryParams.tire_id;
                     selectedQuantity = payload.entryParams.quantity;
-                    break;
-                case constants.LOAD_QUOTE_SUCCESS:
-                case 'quote.request.form.show':
-                    selectedTire = payload.tireId;
-                    selectedQuantity = payload.quantity;
                     if (payload.quote) {
                         setQuote(payload.quote);
                     }
                     change = true;
                     break;
 
-                case constants.ORDER_CREATE_SUCCESS:
-                    if (payload.tires && payload.tires[0]) {
-                        order.order_id = payload.order_id;
-                        order.order_number = payload.order_number;
-                        order.status = payload.status;
-                        order.deposit_payment = payload.tires[0].prices.deposit_payment;
-                        order.outstanding_balance = payload.tires[0].prices.outstanding_balance;
-                        order.payment_percentage = payload.tires[0].prices.payment_percentage;
+                case 'quote.request.form.show':
+                    selectedTire = payload.tireId;
+                    selectedQuantity = payload.quantity;
+                    change = true;
+                    break;
+
+                case 'order.checkout.success':
+                case 'order.payment.success':
+                    var _order = payload.order;
+                    if (_order) {
+                        order.status = _order.status;
+                        change = true;
+                    }
+                    if (payload.customer) {
+                        _.merge(customer, payload.customer);
+                    }
+                    break;
+
+                case 'order.page.update':
+                    var _order = payload.order;
+                    if (_order && _order.tires && _order.tires[0]) {
+                        order.order_id = _order.order_id;
+                        order.order_number = _order.order_number;
+                        order.status = _order.status;
+                        order.deposit_payment = _order.tires[0].prices.deposit_payment;
+                        order.outstanding_balance = _order.tires[0].prices.outstanding_balance;
+                        order.payment_percentage = _order.tires[0].prices.payment_percentage;
                         change = true;
                     }
                     break;
@@ -180,13 +195,12 @@ define([
                 case 'email_only.page.update':
                     customer.follow_up = false;
                     break;
+
                 case 'email.page.update':
                 case 'print.page.update':
                     customer.follow_up = config.sa ? false : true;
                     break;
 
-                case 'order.payment':
-                case 'quote.emmail.form.show':
                 case 'customer.values.update':
                     _.merge(customer, payload.values);
                     validationErrors = {};
@@ -195,12 +209,6 @@ define([
 
                 case 'customer.vehicle.change':
                     customer.vehicle = payload.values;
-                    change = true;
-                    break;
-
-                case constants.ORDER_CHECKOUT_SUCCESS:
-                case constants.ORDER_PAYMENT_SUCCESS:
-                    order.status = payload.status;
                     change = true;
                     break;
 

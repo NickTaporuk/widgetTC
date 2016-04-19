@@ -95,7 +95,6 @@ define([
                     switch (tab) {
                         case 'size':
                             queryParams = {
-                                // first: searchStore.getValueDesc(tab, 'base_category'),
                                 first: searchStore.getValueDesc(tab, 'width') + '/' + searchStore.getValueDesc(tab, 'height') + 'R' + searchStore.getValueDesc(tab, 'rim'),
                             }
                             break;
@@ -103,7 +102,6 @@ define([
                         case 'vehicle':
                             queryParams = {
                                 first: searchStore.getValueDesc(tab, 'year') + ' ' + searchStore.getValueDesc(tab, 'make') + ' ' + searchStore.getValueDesc(tab, 'model') + ' ' + searchStore.getValueDesc(tab, 'trim'),
-                                // second: searchStore.getValueDesc(tab, 'base_category'),
                                 second: searchStore.getValueDesc(tab, 'car_tire_id')
                             }
                             break;
@@ -117,7 +115,6 @@ define([
                     var props = {
                         // Props for search tires (located in pageStore props):
                         fieldValues: {
-                            page: searchStore.getValue('common', 'page'),
                             display: searchStore.getValue('common', 'display'),
                             order_by: searchStore.getValue('common', 'order_by'),
                             filters: {
@@ -127,18 +124,10 @@ define([
                                 category: searchStore.getValue('filters', 'category')
                             }
                         },
-                        fieldOptions: {
-                            display: searchStore.getOptions('display'),  
-                            order_by: searchStore.getOptions('order_by'),
-                            brand: searchStore.getOptions('brand'),
-                            run_flat: searchStore.getOptions('run_flat'),
-                            light_truck: searchStore.getOptions('light_truck')
-                        },
                         queryParams: queryParams,
                         isInMile: locationsStore.getCurrentLocation().country !== 'Canada',
                         itemsOnPage: searchStore.getValue('common', 'items_per_page')
                     };
-                    // props = _.merge(props, this.state.props);
 
                     content = <Results {...props} />;
                     break;
@@ -186,8 +175,8 @@ define([
                     content = <Email {...props} />;
                     break;
                 case '':
-                    //content = <Preloader />;
-                    content = null;
+                    content = <Preloader />;
+                    // content = null;
                     break;
             }
 
