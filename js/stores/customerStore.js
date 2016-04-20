@@ -152,18 +152,17 @@ define([
                     change = true;
                     break;
 
+                case 'request.page.update':
                 case 'summary.page.update':
-                    selectedTire = payload.entryParams.tire_id;
-                    selectedQuantity = payload.entryParams.quantity;
+                    if (payload.entryParams.tire_id) {
+                        selectedTire = payload.entryParams.tire_id;
+                    }
+                    if (payload.entryParams.quantity) {
+                        selectedQuantity = payload.entryParams.quantity;
+                    }
                     if (payload.quote) {
                         setQuote(payload.quote);
                     }
-                    change = true;
-                    break;
-
-                case 'quote.request.form.show':
-                    selectedTire = payload.tireId;
-                    selectedQuantity = payload.quantity;
                     change = true;
                     break;
 
@@ -199,6 +198,15 @@ define([
                 case 'email.page.update':
                 case 'print.page.update':
                     customer.follow_up = config.sa ? false : true;
+                    break;
+
+                case 'print.quote':
+                case 'email.quote':
+                case 'appointment.make':
+                case 'request.quote':
+                    _.merge(customer, payload.customer);
+                    validationErrors = {};
+                    change = true;
                     break;
 
                 case 'customer.values.update':

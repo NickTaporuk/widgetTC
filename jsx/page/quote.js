@@ -1,13 +1,11 @@
 define([
     'react',
     'classnames',
-    'load!actions/actions',
     'load!actions/act',
     'load!components/page/common/back'
 ], function(
     React,
     cn,
-    Act,
     A,
     Back
 ) {
@@ -51,7 +49,7 @@ define([
             if ( this.refs.follow_up.checked ) {
                 A.printPage.update();
             } else {
-                Act.Quote.print({follow_up: false});
+                A.printPage.print({follow_up: false});
             }
         },
         

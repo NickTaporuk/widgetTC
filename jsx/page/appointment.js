@@ -3,6 +3,7 @@ define([
     'config',
     'classnames',
     'load!actions/actions',
+    'load!actions/act',
     'lib/helper',
     'load!stores/customerStore',
     'load!stores/vehicleStore',
@@ -16,6 +17,7 @@ define([
     config,
     cn,
     Act,
+    A,
     h,
     customerStore,
     vehicleStore,
@@ -28,19 +30,19 @@ define([
 
     var types = {
         email: {
-            submit: {action: Act.Quote.email, text: 'Send email'},
+            submit: {action: A.emailPage.sendEmail, text: 'Send email'},
             back:   {to: config.sa ? 'summary' : 'quote', text: 'Back'}
         },
         print: {
-            submit: {action: Act.Quote.print, text: 'Print quote'},
+            submit: {action: A.printPage.print, text: 'Print quote'},
             back:   {to: config.sa ? 'summary' : 'quote', text: 'Back'}
         },
         request: {
-            submit: {action: Act.Quote.request, text: 'Request quote'},
+            submit: {action: A.requestPage.request, text: 'Request quote'},
             back:   {to: 'results', text: 'Back to results'}
         },
         appointment: {
-            submit: {action: Act.Quote.sendAppointment, text: 'Send'},
+            submit: {action: A.appointmentPage.sendAppointment, text: 'Send'},
             back:   {to: 'summary', text: 'Back to summary'}
         }
     };
@@ -148,11 +150,6 @@ define([
         _isValidDate: function( current ) {
             return current.isAfter( moment().add(1, 'd').subtract(1,'day') );
         },
-/*
-        _getBackLink: function() {
-            var text =  types[this.props.type].back.text;
-            return <a href="#summary" onClick={this._handleBackClick} className={cn('back_link')}><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE5C4;' }} />{text}</a>
-        }, */
 
         _getBtn: function() {
             var text = types[this.props.type].submit.text;
@@ -178,12 +175,6 @@ define([
                 options: vehicleStore.getAll(values.vehicle.year, values.vehicle.make, values.vehicle.model, values.vehicle.trim)
             });
         },
-/*
-        _handleBackClick: function(event) {
-            event.preventDefault();
-            Act.Page.show(types[this.props.type].back.to);
-        },
-        */
 
         _handleFormSubmit: function(event) {
             event.preventDefault();

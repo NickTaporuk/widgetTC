@@ -241,7 +241,8 @@ define([
             event.preventDefault();
             A.summaryPage.update({
                 quantity: this.state.selQuantity,
-                tire_id: this.props.tire.id, //this.state.supplier ? this.state.supplier.tire_id : this.props.tire.id
+                tire_id: this.props.tire.id,
+                with_discount: this.props.tire.discount && this.props.tire.discount.added_by_default,
                 supplier: this.state.supplier
             });
             // Act.Tire.select(this.props.tire, this.state.selQuantity, this.state.supplier);
@@ -249,7 +250,12 @@ define([
 
         _handleGetQuoteClick: function(event) {
             event.preventDefault();
-            Act.Quote.requestForm(this.props.tire.id, this.state.selQuantity, this.state.supplier);
+            A.requestPage.update({
+                tire_id: this.props.tire.id,
+                quantity: this.state.selQuantity,
+                supplier: this.state.supplier
+            })
+            //Act.Quote.requestForm(this.props.tire.id, this.state.selQuantity, this.state.supplier);
         },
 
         _handleEnlargeClick: function(event) {

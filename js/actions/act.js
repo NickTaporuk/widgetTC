@@ -43,6 +43,28 @@ define([
             });
         },
 
+        route: function(url, params, mode) {
+            // modes :
+            // - 1: new (page init steps need to be done before show page)
+            // - 2: after navigation  (prev/next btn),
+            // - 3: show last (page init steps will be skiped and last params of the page will be used)
+            mode = mode || 1;
+
+
+            var needInit = true;
+            if (visitedPages[url]) {
+                params = visitedPages[url];
+                needInit = false;
+            }
+
+            actions[url + 'Page'].update(params, needInit);
+
+            if (mode !== 2) {
+                visitedPages[url] = params;
+                setUrl(url, params);
+            }
+        },
+
         searchPage: {
             update: function(entryParams, afterNav) {
                 dispatcher.dispatch({
@@ -157,7 +179,18 @@ define([
                 if (!afterNav) {
                     setUrl('appointment', entryParams);
                 }
-            }
+            },
+            sendAppointment: function(values) {
+                dispatcher.dispatch({
+                    actionType: 'appointment.make',
+                    customer: values
+                });
+
+                values = customerStore.getParamsForQuote('appointment');
+                Api.sendAppointment(values).then(function() {
+                    actions.summaryPage.update(visitedPages['summary'], false);
+                }, function() {});
+            },
         },
         getAQuotePage: {
             update: function(entryParams, afterNav) {
@@ -179,6 +212,17 @@ define([
                 if (!afterNav) {
                     setUrl('email', entryParams);
                 }
+            },
+            sendEmail: function(values) {
+                dispatcher.dispatch({
+                    actionType: 'email.quote',
+                    customer: values
+                });
+
+                var values = customerStore.getParamsForQuote('email');
+                Api.emailQuote(values).then(function() {
+                    actions.summaryPage.update(visitedPages['summary'], false);
+                }, function() {});
             }
         },
         printPage: {
@@ -190,6 +234,17 @@ define([
                 if (!afterNav) {
                     setUrl('print', entryParams);
                 }
+            },
+            print: function(values) {
+                dispatcher.dispatch({
+                    actionType: 'print.quote',
+                    customer: values
+                });
+
+                var values = customerStore.getParamsForQuote('print');
+                Api.printQuote(values).then(function() {
+                    actions.summaryPage.update(visitedPages['summary'], false);
+                }, function() {});
             }
         },
         emailOnlyPage: {
@@ -268,15 +323,41 @@ define([
                     notice: entryParams.notice
                 });
             }
+        },
+        requestPage: {
+            update: function(entryParams, afterNav) {
+                dispatcher.dispatch({
+                    actionType: 'request.page.update',
+                    entryParams: entryParams
+                });
+
+                if (!afterNav) {
+                    setUrl('request');
+                }
+            },
+            request: function(values) {
+                dispatcher.dispatch({
+                    actionType: 'request.quote',
+                    customer: values
+                });
+
+                values.tire_id = customerStore.getSelectedTireId();
+                values.quantity = customerStore.getSelectedQuantity();
+
+                Api.requestQuote(values).then(function() {
+                    actions.resultsPage.update(visitedPages['results'], false);
+                }, function() {});
+            }
         }
     };
 
 
     var firstRun = true;
     var visitedPages = {};
+    var currentPage = '';
 
     function setUrl(page, params) {
-        visitedPages[page] = true;
+        visitedPages[page] = params || true;
 
         if (firstRun) {
             firstRun = false;
@@ -291,10 +372,19 @@ define([
             path: path
         };
 
-        if (history.state && history.state.page && history.state.page == page) {
-            history.replaceState(state, page, config.allowUrl ? path : '');
+        if (history.pushState) {
+            if (history.state && history.state.page && history.state.page == page) {
+                history.replaceState(state, page, config.allowUrl ? path : '');
+            } else {
+                history.pushState(state, page, config.allowUrl ? path : '');
+            }
         } else {
-            history.pushState(state, page, config.allowUrl ? path : '');
+            if (currentPage === page) {
+                location.replace(path);
+            } else {
+                currentPage = page;
+                window.location.hash = path;                
+            }
         }
     }
 
@@ -314,19 +404,37 @@ define([
         }
     }
 
-    window.addEventListener('popstate', function(e) {
-        var page = e.state && e.state.page ? e.state.page : 'search';
-        var params = e.state && e.state.params ? e.state.params : {};
-        execute(page, params, true);
-    }, false);
+    if (history.pushState) {    //('onpopstate' in window)
+        window.addEventListener('popstate', function(e) {
+            var page = e.state && e.state.page ? e.state.page : 'search';
+            var params = e.state && e.state.params ? e.state.params : {};
+            execute(page, params, true);
+        }, false);
+    } else {
+        window.addEventListener('hashchange', function(e) {
+            var urlData = h.queryToObj(window.location.hash);
+            if (currentPage !== urlData.page) {
+                var params = visitedPages[urlData.page] || {};
+                execute(urlData.page, urlData.params, true);
+                currentPage = urlData.page;
+            }
+        });
+    }
 
     function start() {
         var urlData = h.queryToObj(window.location.hash);
         if ( ['search', 'results', 'summary'].indexOf(urlData.page) == -1) {
             urlData = {
                 page: 'search',
-                params: null
+                params: null,
+                path: '#!search'
             };
+            if (history.pushState) {
+                history.replaceState(urlData, urlData.page, config.allowUrl ? urlData.path : '');
+            } else {
+                currentPage = urlData.page;
+                location.replace(urlData.path);
+            }
         }
         execute(urlData.page, urlData.params, false);
     }

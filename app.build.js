@@ -19,6 +19,7 @@
 	  'react': 'bower_components/react/react',
 	  'reactDOM': 'bower_components/react/react-dom',
 	  'microEvent': 'bower_components/microevent/microevent',
+	  'promise': 'bower_components/es6-promise-polyfill/promise',
 	  'validate': 'bower_components/validate/validate',
 	  'lodash': 'bower_components/lodash/lodash',
 	  'lockr': 'bower_components/lockr/lockr',

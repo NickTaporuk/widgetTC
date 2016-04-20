@@ -50,7 +50,6 @@ define(['config', 'promise'], function(config, Promise) {
 		        .apply( $private.methods, $private.parseResponse( xhr ) );
 		    };
 		    xhr.onerror = function() {
-		    	console.log(xhr.responseText);
 		      $private.methods.always
 		        .apply( $private.methods, $private.parseResponse( xhr ) );
 		      $private.methods.error

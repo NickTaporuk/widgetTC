@@ -78,71 +78,12 @@ define([
             loadRewiews: function(tireId, offset) {
                 Api.loadReviews(tireId, offset);
             },
-            select: function(tire, selQuantity, supplier) {
-                dispatcher.dispatch({
-                    actionType: 'tire.select',
-                    tireId: tire.id,
-                    quantity: selQuantity,
-                    supplier: supplier
-                });
-
-                var withDiscount = tire.discount && tire.discount.added_by_default;
-                Api.loadQuote((supplier ? supplier.tire_id : tire.id), selQuantity, 'use_default', withDiscount, null, true);
-            },
             enlargeImage: function(image, model) {
                 dispatcher.dispatch({
                     actionType: 'tire.enlarge',
                     image: image,
                     model: model
                 });
-            }
-        },
-        Quote: {
-            requestForm: function(tireId, quantity, supplier) {
-                dispatcher.dispatch({
-                    actionType: 'quote.request.form.show',
-                    tireId: tireId,
-                    quantity: quantity,
-                    supplier: supplier
-                });
-            },
-            sendAppointment: function(values) {
-                dispatcher.dispatch({
-                    actionType: 'customer.values.update',
-                    values: values
-                });
-
-                values = customerStore.getParamsForQuote('appointment');
-                Api.sendAppointment(values);
-            },
-            email: function(values) {
-                dispatcher.dispatch({
-                    actionType: 'customer.values.update',
-                    values: values
-                });
-
-                var data = customerStore.getParamsForQuote('email');
-                Api.emailQuote(data);
-            },
-            print: function(values) {
-                dispatcher.dispatch({
-                    actionType: 'customer.values.update',
-                    values: values || {}
-                });
-
-                values = customerStore.getParamsForQuote('print');
-                Api.printQuote(values);
-            },
-            request: function(values) {
-                dispatcher.dispatch({
-                    actionType: 'customer.values.update',
-                    values: values || {}
-                });
-
-                values.tire_id = customerStore.getSelectedTireId();
-                values.quantity = customerStore.getSelectedQuantity();
-
-                Api.requestQuote(values);
             }
         },
         Vehicle: {

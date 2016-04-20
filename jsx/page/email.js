@@ -1,7 +1,8 @@
 define([
     'react',
     'classnames',
-    'load!actions/actions',
+    // 'load!actions/actions',
+    'load!actions/act',
     'lib/helper',
     'load!stores/customerStore',
     'load!components/page/common/mainPrices',
@@ -9,7 +10,8 @@ define([
 ], function(
     React,
     cn,
-    Act,
+    // Act,
+    A,
     h,
     customerStore,
     MainPrices,
@@ -78,7 +80,9 @@ define([
 
         _handleFormSubmit: function(event) {
             event.preventDefault();
-            Act.Quote.email({ email: this.refs.email.value });
+            // Act.Quote.email();
+
+            A.emailPage.sendEmail({ email: this.refs.email.value });
         }
     }
 

@@ -92,31 +92,13 @@ define([
                     dispatcher.waitFor([searchStore.dispatchToken, resultsStore.dispatchToken]);
                     change = setPage('results', {entryParams: payload.entryParams});
                     break;
+                case 'request.page.update':
+                    dispatcher.waitFor([resultsStore.dispatchToken]);
+                    change = setPage('appointment', {type: 'request'});
+                    break;
                 case 'confirmation.page.update':
                     change = setPage('confirmation', {notice: payload.notice});
                     break;
-
-                case constants.REQUEST_QUOTE_SUCCESS:
-                    change = setPage('results');
-                    break;
-
-                case 'quote.request.form.show':
-                    dispatcher.waitFor([resultsStore.dispatchToken]);
-                    payload.type = 'request';
-
-                case constants.SEND_APPOINTMENT_SUCCESS:
-                case constants.PRINT_QUOTE_SUCCESS:
-                case constants.EMAIL_QUOTE_SUCCESS:
-                    change = setPage('summary');
-                    break;
-                    
-
-                // case 'order.payment.success':
-                //     dispatcher.waitFor([customerStore.dispatchToken]);
-                //     change = setPage('confirmation', {
-                //         notice: payload.order.notice
-                //     });
-                //     break;
             }
 
             if (change) {

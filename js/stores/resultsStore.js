@@ -94,17 +94,6 @@ define([
         dispatchToken: dispatcher.register(function(payload) {
             var change = false;
             switch (payload.actionType) {
-                case 'results.page.update':
-                    if (payload.results) {
-                        var results = payload.results;
-                        addTires(results.tires);
-                        totalCount = results.nb_results;
-                        filters = results.filters;
-                        page = results.page;                
-                        change = true;
-                    }
-                    break;
-                    
                 case constants.LOAD_TIRE_SUCCESS:
                     addTires([payload.tire]);
                     change = true;
@@ -115,18 +104,24 @@ define([
                     showInStock = c.show_in_stock;
                     change = true;
                     break;
+                case 'results.page.update':
+                    if (payload.results) {
+                        var results = payload.results;
+                        addTires(results.tires);
+                        totalCount = results.nb_results;
+                        filters = results.filters;
+                        page = results.page;                
+                        change = true;
+                    }
+                    break;
+                case 'request.page.update':
                 case 'summary.page.update':
                     if (payload.entryParams.supplier) {
                         changeSupplier(payload.entryParams.tire_id, payload.entryParams.supplier);
                     }
-                    changeSelectedQuantity(payload.entryParams.tire_id, payload.entryParams.quantity);
-                    change = true;
-                    break;
-                case 'quote.request.form.show':
-                    if (payload.supplier) {
-                        changeSupplier(payload.tireId, payload.supplier);
+                    if (payload.entryParams.quantity) {
+                        changeSelectedQuantity(payload.entryParams.tire_id, payload.entryParams.quantity);
                     }
-                    changeSelectedQuantity(payload.tireId, payload.quantity);
                     change = true;
                     break;
             }

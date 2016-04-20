@@ -353,6 +353,7 @@ define([
             if (validationErrors) {
                 return Promise.reject(validationErrors).catch(function(response) {
                     dispatchError(response);    
+                    throw new Error();
                 });
             } else {
                 return ajax.make({
@@ -372,6 +373,7 @@ define([
                     } else {
                         ajax.error(response);
                     }
+                    throw new Error();
                 });
             }
         },
@@ -387,11 +389,12 @@ define([
             var validationErrors = validateParamsForQuote(data, !config.sa && data.name !== undefined ? ['name', 'email', 'phone'] : []);
             if (validationErrors) {
                 return Promise.reject(validationErrors).catch(function(response) {
-                    dispatchError(response);    
+                    dispatchError(response);
+                    throw new Error();
                 });
             } else {
                 var WinPrint = window.open('', '', 'left=0,top=0,width=800,height=800,toolbar=0,scrollbars=0,status=0');
-                ajax.make({
+                return ajax.make({
                     url: 'quote/print',
                     method: 'post',
                     data: data,
@@ -410,6 +413,7 @@ define([
                     } else {
                         ajax.error(response);
                     }
+                    throw new Error();
                 });
             }
         },
@@ -426,6 +430,7 @@ define([
             if (validationErrors) {
                 return Promise.reject(validationErrors).catch(function(response) {
                     dispatchError(response);    
+                    throw new Error();
                 });
             } else {
                 return ajax.make({
@@ -445,6 +450,7 @@ define([
                     } else {
                         ajax.error(response);
                     }
+                    throw new Error();
                 });
             }
         },
@@ -461,6 +467,7 @@ define([
             if (validationErrors) {
                 return Promise.reject(validationErrors).catch(function(response) {
                     dispatchError(response);    
+                    throw new Error();
                 });
             } else {
                 return ajax.make({
@@ -480,6 +487,7 @@ define([
                     } else {
                         ajax.error(response);
                     }
+                    throw new Error();
                 });
             }
         },
