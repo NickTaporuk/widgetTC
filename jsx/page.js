@@ -135,7 +135,7 @@ define([
                     var props = {
                         tire:         customerStore.getSelectedTire(),
                         withOrderBtn: dealerStore.getStripeKey() !== null && !config.sa,
-                        callNumber:   locationsStore.getCurLocConfig().call_number
+                        callNumber:   locationsStore.getCurLocConfig() ? locationsStore.getCurLocConfig().call_number : null
                     };
                     props = _.merge(props, this.state.props);
                     content = <Summary {...props} />;
@@ -176,7 +176,6 @@ define([
                     break;
                 case '':
                     content = <Preloader />;
-                    // content = null;
                     break;
             }
 

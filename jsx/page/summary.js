@@ -117,8 +117,7 @@ define([
                                         <td>Sub-total</td>
                                         <td>${h.priceFormat(quote.total.sub_total)}</td>
                                     </tr>
-                                    <OfferLine type="discount" offer={this.state.quote.discount} onClick={this._handleDiscountClick} onChange={this._handleDiscountChange} />
-
+                                    { this.state.quote.discount ? <OfferLine type="discount" offer={this.state.quote.discount} onClick={this._handleDiscountClick} onChange={this._handleDiscountChange} /> : null }
                                     { recyclingFee && quote.recycling_fee.is_taxable ? recyclingFee : null }
                                     <tr>
                                         <td>{quote.tax.name}</td>
@@ -131,7 +130,7 @@ define([
                                         <td><sup dangerouslySetInnerHTML={{ __html: '&#8224;' }} />Total Price:</td>
                                         <td>${h.priceFormat(quote.total.price)}</td>
                                     </tr>
-                                    <OfferLine type="rebate" offer={this.state.quote.rebates[0]} />
+                                    { this.state.quote.rebates[0] ? <OfferLine type="rebate" offer={this.state.quote.rebates[0]} /> : null }
                                 </tfoot>
                             </table>
                         </div>

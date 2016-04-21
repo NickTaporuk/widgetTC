@@ -1,33 +1,21 @@
 define([
     'dispatcher',
-    // 'load!stores/resultsStore',
-    'load!stores/searchStore',
-    'load!stores/locationsStore',
-    'load!stores/customerStore',
-    'actions/api',
-    'lib/helper',
-    'lodash'
+    'actions/api'
 ], function(
     dispatcher,
-    // resultsStore,
-    searchStore,
-    locationsStore,
-    customerStore,
-    Api,
-    h,
-    _
+    Api
 ) {
 
     var Actions = {
-        Page: {
-            show: function(name, props) {
-                dispatcher.dispatch({
-                    actionType: 'page.update',
-                    name: name,
-                    props: props || {}
-                });
-            }
-        },
+        // Page: {
+        //     show: function(name, props) {
+        //         dispatcher.dispatch({
+        //             actionType: 'page.update',
+        //             name: name,
+        //             props: props || {}
+        //         });
+        //     }
+        // },
         Popup: {
             show: function(name, props) {
                 dispatcher.dispatch({

@@ -44,7 +44,7 @@ define([
         },
 
         route: function(url, params, mode) {
-            // modes :
+            // modes:
             // - 1: new (page init steps need to be done before show page)
             // - 2: after navigation  (prev/next btn),
             // - 3: show last (page init steps will be skiped and last params of the page will be used)
@@ -78,6 +78,9 @@ define([
             }
         },
         resultsPage: {
+            init: function() {
+
+            },
             update: function(entryParams, afterNav) {
                 // set filter by category base on base_category
                 if (entryParams.base_category) {
@@ -170,7 +173,7 @@ define([
                 }
             }
         },
-        appointmentPage: { 
+        appointmentPage: {
             update: function(entryParams, afterNav) {
                 dispatcher.dispatch({
                     actionType: 'appointment.page.update'
@@ -357,6 +360,8 @@ define([
     var currentPage = '';
 
     function setUrl(page, params) {
+        console.log(history);
+
         visitedPages[page] = params || true;
 
         if (firstRun) {
@@ -364,7 +369,7 @@ define([
             return;
         }
 
-        var path = '#!' + page + (params ? '?'  + h.objToQuery(params) : '');
+        var path = '#/' + page + (params ? '?'  + h.objToQuery(params) : '');
 
         var state = {
             page: page,
@@ -373,9 +378,11 @@ define([
         };
 
         if (history.pushState) {
-            if (history.state && history.state.page && history.state.page == page) {
+            //if (history.state && history.state.page && history.state.page == page) {
+            if (currentPage === page) {
                 history.replaceState(state, page, config.allowUrl ? path : '');
             } else {
+                currentPage = page;
                 history.pushState(state, page, config.allowUrl ? path : '');
             }
         } else {
@@ -383,7 +390,7 @@ define([
                 location.replace(path);
             } else {
                 currentPage = page;
-                window.location.hash = path;                
+                window.location.hash = path;
             }
         }
     }
@@ -404,17 +411,22 @@ define([
         }
     }
 
-    if (history.pushState) {    //('onpopstate' in window)
+    if (history.pushState) {
         window.addEventListener('popstate', function(e) {
-            var page = e.state && e.state.page ? e.state.page : 'search';
+            var page = e.state && e.state.page ? e.state.page : null;
             var params = e.state && e.state.params ? e.state.params : {};
+            if (!page && config.allowUrl) {
+                var urlData = h.queryToObj(window.location.hash);
+                page = urlData.page;                
+                params = urlData.params;
+            }
             execute(page, params, true);
+            currentPage = page;
         }, false);
     } else {
         window.addEventListener('hashchange', function(e) {
             var urlData = h.queryToObj(window.location.hash);
             if (currentPage !== urlData.page) {
-                var params = visitedPages[urlData.page] || {};
                 execute(urlData.page, urlData.params, true);
                 currentPage = urlData.page;
             }
@@ -427,7 +439,7 @@ define([
             urlData = {
                 page: 'search',
                 params: null,
-                path: '#!search'
+                path: '#/search'
             };
             if (history.pushState) {
                 history.replaceState(urlData, urlData.page, config.allowUrl ? urlData.path : '');

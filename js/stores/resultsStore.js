@@ -17,11 +17,6 @@ define([
     var filters = [];
     var page;
 
-    function changeSelectedQuantity(tireId, quantity) {
-        var tire = tires[tiresIndexes[tireId]];
-        tire.selected_quantity = quantity <= tire.quantity ? quantity : tire.quantity;
-    }
-
     function addTires(_tires) {
         tires = _tires;
         _tires.map(function(tire, i) {
@@ -62,6 +57,12 @@ define([
             tire.is_in_stock = (showInStock && tire.is_in_stock);
         });
     }
+
+    function changeSelectedQuantity(tireId, quantity) {
+        var tire = tires[tiresIndexes[tireId]];
+        tire.selected_quantity = quantity <= tire.quantity ? quantity : tire.quantity;
+    }
+
 
     function changeSupplier(tireId, supplier) {
         var tire = tires[tiresIndexes[tireId]];

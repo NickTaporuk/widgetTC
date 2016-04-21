@@ -4,6 +4,7 @@ define([
     'load!stores/resultsStore',
     'load!stores/searchStore',
     'load!stores/customerStore',
+    'load!stores/locationsStore',
     'load!actions/constants',
     'classnames',
     'lib/helper',
@@ -14,6 +15,7 @@ define([
     resultsStore,
     searchStore,
     customerStore,
+    locationsStore,
     constants,
     cn,
     h,
@@ -55,14 +57,6 @@ define([
         dispatchToken:  dispatcher.register(function(payload) {
             var change = false;
             switch (payload.actionType) {
-                case 'tire.select':
-                    lastScrollPos['results'] = h.getScrollPos()[1];
-                    break;
-
-                case 'page.update':
-                    change = setPage(payload.name, payload.props);
-                    break;
-
                 case 'order.page.update':
                     dispatcher.waitFor([customerStore.dispatchToken]);
                     change = setPage('order');
@@ -83,13 +77,16 @@ define([
                     change = setPage('appointment', {type: 'appointment'});
                     break;
                 case 'summary.page.update':
+                    if (name == 'results') {
+                        lastScrollPos['results'] = h.getScrollPos()[1];
+                    }
                     change = setPage('summary', {entryParams: payload.entryParams});
                     break;
                 case 'search.page.update':
                     change = setPage('search', {entryParams: payload.entryParams});
                     break;
                 case 'results.page.update':
-                    dispatcher.waitFor([searchStore.dispatchToken, resultsStore.dispatchToken]);
+                    dispatcher.waitFor([locationsStore.dispatchToken, searchStore.dispatchToken, resultsStore.dispatchToken]);
                     change = setPage('results', {entryParams: payload.entryParams});
                     break;
                 case 'request.page.update':

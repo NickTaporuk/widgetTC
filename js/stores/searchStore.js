@@ -173,20 +173,20 @@ define([
                     }
                     change = true;
                     break;
-                case 'search.params.update':
-                    activeSection = payload.params.searchBy.replace('by_', '');
-                    Object.keys(fieldValues[activeSection]).map(function(field) {
-                        if (payload.params[field]) {
-                            fieldValues[activeSection][field] = payload.params[field];
-                        }
-                    });
-                    Object.keys(fieldValues['common']).map(function(field) {
-                        if (payload.params[field]) {
-                            fieldValues['common'][field] = payload.params[field];
-                        }
-                    });
-                    change = true;
-                    break;
+                // case 'search.params.update':
+                //     activeSection = payload.params.searchBy.replace('by_', '');
+                //     Object.keys(fieldValues[activeSection]).map(function(field) {
+                //         if (payload.params[field]) {
+                //             fieldValues[activeSection][field] = payload.params[field];
+                //         }
+                //     });
+                //     Object.keys(fieldValues['common']).map(function(field) {
+                //         if (payload.params[field]) {
+                //             fieldValues['common'][field] = payload.params[field];
+                //         }
+                //     });
+                //     change = true;
+                //     break;
                 case 'search.field.update':
                     setValue(payload.section, payload.field, payload.value);
                     change = true;
