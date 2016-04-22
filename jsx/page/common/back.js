@@ -1,9 +1,11 @@
 define([
     'react',
-    'classnames'
+    'classnames',
+    'lib/history'
 ], function(
     React,
-    cn
+    cn,
+    history
 ) {
 
     return {
@@ -13,7 +15,7 @@ define([
 
         _handleClick: function(e) {
             e.preventDefault();
-            window.history.back();
+            history.back();
         }
     }
 

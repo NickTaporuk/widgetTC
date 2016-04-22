@@ -7,6 +7,7 @@ define([
     'load!stores/customerStore',
     'actions/api',
     'lib/helper',
+    'lib/history',
     'lodash',
     'config'
 ], function(
@@ -18,6 +19,7 @@ define([
     customerStore,
     Api,
     h,
+    history,
     _,
     config
 ) {
@@ -43,27 +45,27 @@ define([
             });
         },
 
-        route: function(url, params, mode) {
-            // modes:
-            // - 1: new (page init steps need to be done before show page)
-            // - 2: after navigation  (prev/next btn),
-            // - 3: show last (page init steps will be skiped and last params of the page will be used)
-            mode = mode || 1;
+        // route: function(url, params, mode) {
+        //     // modes:
+        //     // - 1: new (page init steps need to be done before show page)
+        //     // - 2: after navigation  (prev/next btn),
+        //     // - 3: show last (page init steps will be skiped and last params of the page will be used)
+        //     mode = mode || 1;
 
 
-            var needInit = true;
-            if (visitedPages[url]) {
-                params = visitedPages[url];
-                needInit = false;
-            }
+        //     var needInit = true;
+        //     if (visitedPages[url]) {
+        //         params = visitedPages[url];
+        //         needInit = false;
+        //     }
 
-            actions[url + 'Page'].update(params, needInit);
+        //     actions[url + 'Page'].update(params, needInit);
 
-            if (mode !== 2) {
-                visitedPages[url] = params;
-                setUrl(url, params);
-            }
-        },
+        //     if (mode !== 2) {
+        //         visitedPages[url] = params;
+        //         setUrl(url, params);
+        //     }
+        // },
 
         searchPage: {
             update: function(entryParams, afterNav) {
@@ -72,15 +74,10 @@ define([
                     entryParams: entryParams || {}
                 });
 
-                if (!afterNav) {
-                    setUrl('search', entryParams);
-                }
+                setUrl('search', entryParams);
             }
         },
         resultsPage: {
-            init: function() {
-
-            },
             update: function(entryParams, afterNav) {
                 // set filter by category base on base_category
                 if (entryParams.base_category) {
@@ -125,9 +122,7 @@ define([
                         makeSearch(params);
                     }
 
-                    if (!afterNav) {
-                        setUrl('results', entryParams);
-                    }
+                    setUrl('results', entryParams);
                 } else {
                     dispatch();
                 }
@@ -179,9 +174,7 @@ define([
                     actionType: 'appointment.page.update'
                 });
 
-                if (!afterNav) {
-                    setUrl('appointment', entryParams);
-                }
+                setUrl('appointment', entryParams);
             },
             sendAppointment: function(values) {
                 dispatcher.dispatch({
@@ -201,9 +194,7 @@ define([
                     actionType: 'get_a_quote.page.update'
                 });
 
-                if (!afterNav) {
-                    setUrl('get_a_quote', entryParams);
-                }
+                setUrl('get_a_quote', entryParams);
             }
         },
         emailPage: {
@@ -212,9 +203,7 @@ define([
                     actionType: 'email.page.update'
                 });
 
-                if (!afterNav) {
-                    setUrl('email', entryParams);
-                }
+                setUrl('email', entryParams);
             },
             sendEmail: function(values) {
                 dispatcher.dispatch({
@@ -234,9 +223,7 @@ define([
                     actionType: 'print.page.update'
                 });
 
-                if (!afterNav) {
-                    setUrl('print', entryParams);
-                }
+                setUrl('print', entryParams);
             },
             print: function(values) {
                 dispatcher.dispatch({
@@ -256,9 +243,7 @@ define([
                     actionType: 'email_only.page.update'
                 });
 
-                if (!afterNav) {
-                    setUrl('email_only', entryParams);
-                }
+                setUrl('email_only', entryParams);
             }
         },
         orderPage: {
@@ -278,7 +263,7 @@ define([
                             with_discount: entryParams.with_discount || false,
                             optional_services: entryParams.optional_services || 'use_default'
                         }]
-                    }).then(function(order) { 
+                    }).then(function(order) {
                         dispatch(order)
                     });
 
@@ -334,9 +319,7 @@ define([
                     entryParams: entryParams
                 });
 
-                if (!afterNav) {
-                    setUrl('request');
-                }
+                setUrl('request');
             },
             request: function(values) {
                 dispatcher.dispatch({
@@ -354,44 +337,23 @@ define([
         }
     };
 
-
-    var firstRun = true;
     var visitedPages = {};
-    var currentPage = '';
 
     function setUrl(page, params) {
-        console.log(history);
-
         visitedPages[page] = params || true;
 
-        if (firstRun) {
-            firstRun = false;
-            return;
-        }
-
-        var path = '#/' + page + (params ? '?'  + h.objToQuery(params) : '');
+        var path = '#!' + page + (params ? '?'  + h.objToQuery(params) : '');
 
         var state = {
             page: page,
             params: params,
             path: path
         };
-
-        if (history.pushState) {
-            //if (history.state && history.state.page && history.state.page == page) {
-            if (currentPage === page) {
-                history.replaceState(state, page, config.allowUrl ? path : '');
-            } else {
-                currentPage = page;
-                history.pushState(state, page, config.allowUrl ? path : '');
-            }
+        
+        if (!history.state || (history.state && history.state.page && history.state.page == page)) {
+            history.replaceState(state, page, path);
         } else {
-            if (currentPage === page) {
-                location.replace(path);
-            } else {
-                currentPage = page;
-                window.location.hash = path;
-            }
+            history.pushState(state, page, path);
         }
     }
 
@@ -411,42 +373,20 @@ define([
         }
     }
 
-    if (history.pushState) {
-        window.addEventListener('popstate', function(e) {
-            var page = e.state && e.state.page ? e.state.page : null;
-            var params = e.state && e.state.params ? e.state.params : {};
-            if (!page && config.allowUrl) {
-                var urlData = h.queryToObj(window.location.hash);
-                page = urlData.page;                
-                params = urlData.params;
-            }
-            execute(page, params, true);
-            currentPage = page;
-        }, false);
-    } else {
-        window.addEventListener('hashchange', function(e) {
-            var urlData = h.queryToObj(window.location.hash);
-            if (currentPage !== urlData.page) {
-                execute(urlData.page, urlData.params, true);
-                currentPage = urlData.page;
-            }
-        });
-    }
+    history.bind('popstate', function(state) {
+        var page = state && state.page ? state.page : null,
+            params = state && state.params ? state.params : {};
+        
+        execute(page, params, true);
+    });
 
     function start() {
         var urlData = h.queryToObj(window.location.hash);
         if ( ['search', 'results', 'summary'].indexOf(urlData.page) == -1) {
             urlData = {
                 page: 'search',
-                params: null,
-                path: '#/search'
+                params: null
             };
-            if (history.pushState) {
-                history.replaceState(urlData, urlData.page, config.allowUrl ? urlData.path : '');
-            } else {
-                currentPage = urlData.page;
-                location.replace(urlData.path);
-            }
         }
         execute(urlData.page, urlData.params, false);
     }

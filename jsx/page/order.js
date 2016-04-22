@@ -274,7 +274,6 @@ define([
                         };
 
                         A.orderPage.payment(values);
-                        // Act.Order.payment(values);
                     }
                 });
             } else {

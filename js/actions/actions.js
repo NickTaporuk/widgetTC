@@ -7,15 +7,6 @@ define([
 ) {
 
     var Actions = {
-        // Page: {
-        //     show: function(name, props) {
-        //         dispatcher.dispatch({
-        //             actionType: 'page.update',
-        //             name: name,
-        //             props: props || {}
-        //         });
-        //     }
-        // },
         Popup: {
             show: function(name, props) {
                 dispatcher.dispatch({
