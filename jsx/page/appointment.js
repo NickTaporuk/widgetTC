@@ -9,7 +9,8 @@ define([
     'load!components/elements/select',
     'load!components/page/common/mainPrices',
     'load!components/page/common/formField',
-    'moment'
+    'moment',
+    'lodash'
 ], function(
     React,
     config,
@@ -21,7 +22,8 @@ define([
     SelectField,
     MainPrices,
     Field,
-    moment
+    moment,
+    _
 ) {
 
     var types = {
@@ -55,6 +57,11 @@ define([
             customerStore.unbind('change', this._updateState);
             vehicleStore.unbind('change', this._updateState);
         },
+        componentDidUpdate: function(prevProps, prevState) {
+            if (Object.keys(this.state.errors).length > 0 && !_.isEqual(this.state.errors, prevState.errors)) {
+                this._scrollToError();
+            }
+        },
 
         render: function() {
             var tire = this.props.tire;
@@ -80,7 +87,7 @@ define([
                                     :   null
                                 }
                                 { this.props.type === 'appointment'
-                                    ?   <Field type="datetime" ref="datetime" name="datetime" defaultValue={this.state.values.preferred_time} label="Preferred Date and Time" error={this._getError('preferred_time')} 
+                                    ?   <Field type="datetime" ref="preferred_time" name="datetime" defaultValue={this.state.values.preferred_time} label="Preferred Date and Time" error={this._getError('preferred_time')} 
                                                custom={{
                                                         isValidDate: this._isValidDate,
                                                         inputProps: {'name': "preferred_time", 'readOnly': true},
@@ -98,7 +105,7 @@ define([
                                 <div className={cn('control_wrapper')}>
                                     <label htmlFor={cn('vehicle_year')}>Vehicle Info</label>
                                     <div className={cn(['sixcol', 'field'])}>
-                                        <SelectField name="year" options={this.state.options.years} emptyDesc="- Year -" withWrapper={false} onChange={this._vehicleChange} value={this.state.values.vehicle.year} />
+                                        <SelectField name="year" ref="vehicle_year" options={this.state.options.years} emptyDesc="- Year -" withWrapper={false} onChange={this._vehicleChange} value={this.state.values.vehicle.year} />
                                     </div>
                                     <div className={cn(['sixcol', 'last', 'field'])}>
                                         <SelectField name="make" options={this.state.options.makes} emptyDesc="- Make -" withWrapper={false} onChange={this._vehicleChange} value={this.state.values.vehicle.make} />
@@ -166,6 +173,19 @@ define([
             }
         },
 
+        _scrollToError: function(errors) {
+            var fields = Object.keys(this.state.errors);
+            if (fields.length > 0) {
+                var field = fields[0];
+                if (field == 'vehicle_info') {
+                    field = 'vehicle_year';
+                }
+                if (this.refs[field]) {
+                    h.scrollToTop( this.refs[field].getDOMNode() );
+                }
+            }
+        },
+
         _updateState: function(isInit) {
             var values = customerStore.getCustomer();
 
@@ -190,8 +210,8 @@ define([
                 notes: this.refs.notes.value(),
                 vehicle_info: this._getVehicleInfo()
             };
-            if (this.refs.datetime) {
-                values.preferred_time = this.refs.datetime.value();
+            if (this.refs.preferred_time) {
+                values.preferred_time = this.refs.preferred_time.value();
             }
             if (this.refs.way_to_contact) {
                 values.way_to_contact = this.refs.way_to_contact.value();
