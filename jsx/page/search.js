@@ -1,7 +1,3 @@
-/**
- * Selecting params for search tires and send selected params to search action after submit.
- */
-
 define([
     'react',
     'classnames',
@@ -10,7 +6,10 @@ define([
     'load!actions/act',
     'load!stores/searchStore',
     'load!stores/locationsStore',
-    'load!components/elements/select'
+    'load!components/elements/select',
+    'actions/api',
+    'promise',
+    'lodash'
 ], function(
     React,
     cn,
@@ -19,7 +18,10 @@ define([
     A,
     searchStore,
     locationsStore,
-    SelectField
+    SelectField,
+    Api,
+    Promise,
+    _
 ) {
 
     return {
@@ -27,25 +29,40 @@ define([
 
         getInitialState: function() {
             return  {
+                ready: false,
                 activeTab: 'size',
                 fieldOptions: {},
                 fieldValues: {}
             }
         },
 
-        componentWillMount: function() {
-            this._updateState();
-        },
-
         componentDidMount: function() {
-            searchStore.bind('change', this._updateState);
-        },
+            var self = this;
 
-        componentWillUnmount: function() {
-            searchStore.unbind('change', this._updateState);
+            Promise.all([
+                Api.loadTireParameters(),
+                Api.loadVehicleOptions(),
+                Api.loadLocations()
+            ]).then(function(response) {
+                self.setState({
+                    ready: true,
+
+                    fieldOptions: _.merge(response[0], response[1]),
+                    locations: response[3],
+
+                    activeTab: searchStore.getActiveSection(),
+                    fieldValues: searchStore.getAllValues(),
+                    locations_id: locationsStore.getCurrentLocation() ? locationsStore.getCurrentLocation().id : null
+                });
+            });
         },
         
         render: function() {
+
+            if (!this.state.ready) {
+                return null;
+            }
+
             return (
                 <div className={cn('search_wrapper')} id={cn('search_wrapper')}>
                     <div className={cn('search_inner')}>
@@ -86,40 +103,41 @@ define([
         },
 
         _tabsContent: function() {
+
             var contents = [
                 <div key={1} className={cn(['tab_cont', 'search_fields', 'by_vehicle_tab'])} id={cn('by_vehicle_tab')} role="tabpanel" tabIndex="0" aria-hidden={this.state.activeTab !== 'vehicle'}>
                     <fieldset className={cn('fields_wrapper')}>
                         <div className={cn(['sixcol', 'fields_wrapper_1'])}>
                             <SelectField 
-                                        options={this.state.fieldOptions.year}                                                                     
-                                        value={this.state.fieldValues.vehicle.year} onChange={this._handleVehicleChange} 
-                                        name="vehicle_year" label="Choose Year"
+                                        options={this.state.fieldOptions.year}
+                                        value={this.state.fieldValues.vehicle.year} onChange={this._handleVehicleChange}
+                                        name="year" label="Choose Year"
                                         className={cn(['field'])} required={true} />
                             <SelectField 
-                                        options={this.state.fieldOptions.make}          
+                                        options={this.state.fieldOptions.make}
                                         value={this.state.fieldValues.vehicle.make} onChange={this._handleVehicleChange}
-                                        name="vehicle_make" label="Choose Make" required={true}
+                                        name="make" label="Choose Make" required={true}
                                         className={cn(['field'])} disabled={this.state.fieldOptions.make.length <= 0} />
                             <SelectField 
-                                        options={this.state.fieldOptions.model}         
-                                        value={this.state.fieldValues.vehicle.model} onChange={this._handleVehicleChange}
-                                        name="vehicle_model" label="Choose Model"
+                                        options={this.state.fieldOptions.model}
+                                        defaultValue={this.state.fieldValues.vehicle.model} onChange={this._handleVehicleChange}
+                                        name="model" label="Choose Model"
                                         className={cn(['field'])} disabled={this.state.fieldOptions.model.length <= 0} required="1" />
                         </div>
                         <div className={cn(['sixcol', 'last', 'fields_wrapper_2'])}>
                             <SelectField 
-                                        options={this.state.fieldOptions.trim}          
+                                        options={this.state.fieldOptions.trim}
                                         value={this.state.fieldValues.vehicle.trim} onChange={this._handleVehicleChange}
-                                        name="vehicle_trim" label="Choose Trim"
+                                        name="trim" label="Choose Trim"
                                         className={cn(['field'])} disabled={this.state.fieldOptions.trim.length <= 0} required="1" />
                             <SelectField 
-                                        options={this.state.fieldOptions.car_tire_id}   
+                                        options={this.state.fieldOptions.car_tire_id}
                                         value={this.state.fieldValues.vehicle.car_tire_id} onChange={this._handleFieldChange}
-                                        name="vehicle_car_tire_id" label="Tire Size"    
+                                        name="car_tire_id" label="Tire Size"
                                         className={cn(['field'])} disabled={this.state.fieldOptions.car_tire_id.length <= 0} required="1" emptyDesc={false}/>
                             <SelectField 
-                                        options={this.state.fieldOptions.base_category}                                                            
-                                        value={this.state.fieldValues.vehicle.base_category} onChange={this._handleFieldChange} 
+                                        options={this.state.fieldOptions.base_category}
+                                        value={this.state.fieldValues.vehicle.base_category} onChange={this._handleFieldChange}
                                         name="vehicle_base_category" label="Tire Category"
                                         className={cn(['field'])} emptyDesc="All Tires" />
                         </div>
@@ -131,8 +149,8 @@ define([
                     <fieldset className={cn('fields_wrapper')}>
                         <div className={cn(['sixcol', 'fields_wrapper_1'])}>
                             <SelectField 
-                                        options={this.state.fieldOptions.width}         
-                                        value={this.state.fieldValues.size.width} onChange={this._handleFieldChange}          
+                                        options={this.state.fieldOptions.width}
+                                        value={this.state.fieldValues.size.width} onChange={this._handleFieldChange}
                                         name="size_width" label="Choose Width"  
                                         className={cn(['field'])} required="1" />
                             <SelectField 
@@ -204,17 +222,11 @@ define([
             return isReady;
         },
 
-        _updateState: function() {
-            this.setState({
-                activeTab: searchStore.getActiveSection(),
-                fieldOptions: searchStore.getAllOptions(),
-                fieldValues: searchStore.getAllValues()
-            });
-        },
-
         _handleTabClick: function(tab, event) {
             event.preventDefault();
-            Act.Search.changeTab(tab);
+            this.setState({
+                activeTab: tab
+            });
         },
 
         _handleSubmit: function(event) {
@@ -236,15 +248,22 @@ define([
 
         _handleFieldChange: function(event) {
             var fieldName = event.target.name.replace( (this.state.activeTab + '_'), '');
-            Act.Search.updateField(this.state.activeTab, fieldName, event.target.value);
+
+            var fieldValues = _.cloneDeep(this.state.fieldValues);
+            fieldValues[this.state.activeTab][fieldName] = event.target.value;
+            this.setState({
+                fieldValues: fieldValues
+            });
         },
 
         _handleVehicleChange: function(event) {
+            var self = this;
+
             var fields = ['year', 'make', 'model', 'trim'];
-            var fieldName = event.target.name.replace( (this.state.activeTab + '_'), '');
+            var fieldName = event.target.name;
             var index = fields.indexOf(fieldName);
 
-            var values = this.state.fieldValues.vehicle;
+            var values = _.cloneDeep(this.state.fieldValues.vehicle);
             values[fieldName] = event.target.value;
             
             var values = {
@@ -254,7 +273,22 @@ define([
                 trim: index < 3 ? '' : values.trim
             };
 
-            Act.Vehicle.change(values, 'search');
+            Api.loadVehicleOptions(values).then(function(options) {
+                self._updateVehicleOptions(options, values);
+            });
+        },
+
+        _updateVehicleOptions: function(newOptions, newValues) {
+            var fieldOptions = _.cloneDeep(this.state.fieldOptions);
+            var fieldValues = _.cloneDeep(this.state.fieldValues);
+            fieldValues.vehicle = _.assign(fieldValues.vehicle, newValues);
+            if (newOptions.car_tire_id[0]) {
+                fieldValues.vehicle.car_tire_id = newOptions.car_tire_id[0].value;
+            }
+            this.setState({
+                fieldOptions: _.assign(fieldOptions, newOptions),
+                fieldValues: fieldValues
+            });
         },
 
         _handleLocationsClick: function(event) {

@@ -19,7 +19,7 @@ define([
     customerStore,
     Api,
     h,
-    history,
+    history,  // history must be used to fill appStore
     _,
     config
 ) {
@@ -30,8 +30,8 @@ define([
 
             var promises = [
                 Api.loadLocations(),
-                Api.loadTireParameters(),
-                Api.getVehicleOptions(),
+                // Api.loadTireParameters(),
+                // Api.getVehicleOptions(),
                 Api.loadDealerConfig(),
                 Api.loadDealerInfo()
             ];
@@ -292,9 +292,9 @@ define([
                 if (order.status === 'initiated') {
                     Api.orderCheckout(order.order_id, values).then(function(order) {
                         if (order.status == 'incomplete') {
-                            dispatch(order, 'checkout');    
+                            dispatch(order, 'checkout');
                         } else {
-                            dispatch(order);    
+                            dispatch(order);
                         }
                     });
                 } else {
@@ -349,7 +349,7 @@ define([
             params: params,
             path: path
         };
-        
+
         if (!history.state || (history.state && history.state.page && history.state.page == page)) {
             history.replaceState(state, page, path);
         } else {
@@ -376,7 +376,7 @@ define([
     history.bind('popstate', function(state) {
         var page = state && state.page ? state.page : null,
             params = state && state.params ? state.params : {};
-        
+
         execute(page, params, true);
     });
 

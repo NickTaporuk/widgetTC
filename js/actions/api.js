@@ -105,10 +105,19 @@ define([
                 url: 'location/list',
                 cache: true
             }).then(function(response) {
-                dispatcher.dispatch({
-                    actionType: constants.LOAD_LOCATIONS_SUCCESS,
-                    locations: response.data.locations
+                return response.data.locations;
+            });
+        },
+
+        loadLocation: function(locationId) {
+            return Api.loadLocations().then(function(locations) {
+                var location = null;
+                locations.map(function(loc) {
+                    if (loc.id == locationId) {
+                        location = loc;
+                    }
                 });
+                return location;
             });
         },
 
@@ -146,6 +155,8 @@ define([
                     actionType: constants.LOAD_TIRE_PARAMETERS_SUCCESS,
                     options: response.data
                 });
+
+                return response.data;
             });
         },
 
@@ -198,29 +209,20 @@ define([
             });
         },
 
-        getVehicleOptions: function(values, updateField) {
-            var fields = ['year', 'make', 'model', 'trim'];
+        loadVehicleOptions: function(values, updateField) {
+            var fields = ['year', 'make', 'model', 'trim', 'car_tire_id'];
             var index = updateField ? fields.indexOf(updateField) : 3;
             var allOptions = {};   
             values = values || {};
             
-            for (var i = 0; i < 4; i++) {
+            for (var i = 0; i < 5; i++) {
                 var field = fields[i];
                 values[field] = index < i || !values[field] ? '' : values[field];
                 allOptions[field] = [];
                 if (!updateField && !values[field]) {
-                    index = i-1;
+                    index = i - 1;
                     updateField = fields[index];
                 }
-            }
-
-            var dispatch = function() {
-                dispatcher.dispatch({
-                    actionType: constants.GET_VEHICLE_OPTIONS_SUCCESS,
-                    options: allOptions,
-                    values: values
-                });
-                
             }
 
             var promises = [];
@@ -276,12 +278,11 @@ define([
                 cache: true
             }).then(function(response) {
                 allOptions.year = prepareVehicleResponse(response);
-                return allOptions.year
             }));
 
-            return Promise.all(promises).then(function(responses) {
-                dispatch();
-            })
+            return Promise.all(promises).then(function() {
+                return allOptions;
+            });
         },
 
         loadDealerInfo: function() {

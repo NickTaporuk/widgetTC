@@ -75,11 +75,6 @@ define([
                     change = true;
                     break;
 
-                // case 'search.params.update':
-                //     currectLocationId = payload.params.location_id || null;
-                //     change = true;
-                //     break;
-
                 case 'results.page.update':
                     if (payload.entryParams.location_id) {
                         currectLocationId = payload.entryParams.location_id;
