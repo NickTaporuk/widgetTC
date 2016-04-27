@@ -5,14 +5,15 @@ define([
     'classnames',
     'lodash',
     'load!actions/act',
+    'actions/api',
     'load!stores/searchStore',
-    'load!stores/resultsStore',
     'load!stores/locationsStore',
     'load!components/elements/select',
     'load!components/page/results/tire',
     'load!components/page/results/pagination',
     'load!components/page/results/filterBlock',
-    'load!components/page/common/back'
+    'load!components/page/common/back',
+    'promise'
 ], function (
     React,
     ReactDOM ,
@@ -20,14 +21,15 @@ define([
     cn,
     _,
     Act,
+    Api,
     searchStore,
-    resultsStore,
     locationsStore,
     SelectField,
     Tire,
     Pagination,
     FilterBlock,
-    Back
+    Back,
+    Promise
 ) {
 
     return {
@@ -35,6 +37,7 @@ define([
 
         getInitialState: function() {
             return {
+                ready: false,
                 page: 1,
                 tires: [],
                 totalCount: 0,
@@ -43,17 +46,31 @@ define([
         },
 
         componentWillMount: function() {
-            this._updateState();
+            // this._updateState();
         },
 
         componentDidMount: function() {
-            // resultsStore.bind('change', this._updateState);
-            searchStore.bind('change', this._updateState);
+            // searchStore.bind('change', this._updateState);
+
+            console.log(this.props);
+            var self = this;
+
+            Promise.all([
+                Api.searchTires(this.props)
+            ]).then(function (responses) {
+                var results = responses[0];
+                self.setState({
+                    ready: true,
+                    page: results.page,
+                    tires: results.tires,
+                    totalCount: results.nb_results,
+                    filters: results.filters
+                });
+            });
         },
 
         componentWillUnmount: function() {
-            // resultsStore.unbind('change', this._updateState);    
-            searchStore.unbind('change', this._updateState);
+            // searchStore.unbind('change', this._updateState);
         },
 
         componentDidUpdate: function(prevProps, prevState) {
@@ -63,6 +80,10 @@ define([
         },
 
         render: function() {
+            if (!this.state.ready) {
+                return null;
+            }
+
             var tires = [];
             var fieldOptions = this._getFieldsOptions();
 
@@ -81,9 +102,9 @@ define([
                         <div className={cn('results_title')}>
                             <p className={cn('results_query')}>
                                 <span>Found <strong className={cn('results_count')}>{this.state.totalCount}</strong> tires for:</span>
-                                { this.props.queryParams.first ? <span className={cn('results_query_param')}>{this.props.queryParams.first}</span> : null }
-                                { this.props.queryParams.second ? <span className={cn('results_query_param')}>{this.props.queryParams.second}</span> : null }
-                                { this.props.queryParams.third ? <span className={cn('results_query_param')}>{this.props.queryParams.third}</span> : null }
+                                {/* this.props.queryParams.first ? <span className={cn('results_query_param')}>{this.props.queryParams.first}</span> : null */}
+                                {/* this.props.queryParams.second ? <span className={cn('results_query_param')}>{this.props.queryParams.second}</span> : null */}
+                                {/* this.props.queryParams.third ? <span className={cn('results_query_param')}>{this.props.queryParams.third}</span> : null */}
                             </p>
                         </div>
                         <div id={cn('optional_fields')} className={cn(['box', 'results_filters'])}>

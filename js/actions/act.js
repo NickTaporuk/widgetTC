@@ -1,6 +1,7 @@
 define([
     'dispatcher',
     'promise',
+    'load!stores/store',
     'load!stores/resultsStore',
     'load!stores/searchStore',
     'load!stores/locationsStore',
@@ -13,6 +14,7 @@ define([
 ], function(
     dispatcher,
     Promise,
+    store,
     resultsStore,
     searchStore,
     locationsStore,
@@ -25,7 +27,7 @@ define([
 ) {
 
     var actions = {
-        init: function() {
+        init: function () {
             var curLocId = locationsStore.getCurLocId();
 
             var promises = [
@@ -40,35 +42,38 @@ define([
                 promises.push(Api.loadLocationConfig(curLocId));
             }
 
-            Promise.all(promises).then(function() {
+            Promise.all(promises).then(function () {
                 start();
             });
         },
 
-        // route: function(url, params, mode) {
-        //     // modes:
-        //     // - 1: new (page init steps need to be done before show page)
-        //     // - 2: after navigation  (prev/next btn),
-        //     // - 3: show last (page init steps will be skiped and last params of the page will be used)
-        //     mode = mode || 1;
+        route: function(url, params) {
+            // modes:
+            // - 1: new (page init steps need to be done before show page)
+            // - 2: after navigation  (prev/next btn),
+            // - 3: show last (page init steps will be skiped and last params of the page will be used)
 
 
-        //     var needInit = true;
-        //     if (visitedPages[url]) {
-        //         params = visitedPages[url];
-        //         needInit = false;
-        //     }
+            // var needInit = true;
+            // if (visitedPages[url]) {
+                // params = visitedPages[url];
+                // needInit = false;
+            // }
 
-        //     actions[url + 'Page'].update(params, needInit);
+            // actions[url + 'Page'].update(params, needInit);
 
-        //     if (mode !== 2) {
-        //         visitedPages[url] = params;
-        //         setUrl(url, params);
-        //     }
-        // },
+            dispatcher.dispatch({
+                actionType: 'page.update',
+                page: url,
+                props: params
+            });
+
+            // visitedPages[url] = params;
+            setUrl(url, params);
+        },
 
         searchPage: {
-            update: function(entryParams, afterNav) {
+            update: function (entryParams, afterNav) {
                 dispatcher.dispatch({
                     actionType: 'search.page.update',
                     entryParams: entryParams || {}
@@ -78,7 +83,7 @@ define([
             }
         },
         resultsPage: {
-            update: function(entryParams, afterNav) {
+            update: function (entryParams, afterNav) {
                 // set filter by category base on base_category
                 if (entryParams.base_category) {
                     var baseCategories = searchStore.getOptions('base_category');
@@ -94,7 +99,7 @@ define([
                     }
                 }
 
-                var dispatch = function(results) {
+                var dispatch = function (results) {
                     dispatcher.dispatch({
                         actionType: 'results.page.update',
                         entryParams: entryParams,
@@ -102,7 +107,7 @@ define([
                     });
                 };
 
-                var makeSearch = function(params) {
+                var makeSearch = function (params) {
                     Api.searchTires(params).then(dispatch);
                 };
 
@@ -115,7 +120,7 @@ define([
 
                     if (!visitedPages['results'] && entryParams.car_tire_id) {
                         // if search  by vehile, load vehicle options
-                        Api.getVehicleOptions(entryParams).then(function() {
+                        Api.getVehicleOptions(entryParams).then(function () {
                             makeSearch(params);
                         });
                     } else {
@@ -129,10 +134,10 @@ define([
             }
         },
         summaryPage: {
-            update: function(entryParams, afterNav) {
-                var dispatch = function() {
+            update: function (entryParams, afterNav) {
+                var dispatch = function () {
 
-                    var dispatch = function(quote) {
+                    var dispatch = function (quote) {
                         dispatcher.dispatch({
                             actionType: 'summary.page.update',
                             entryParams: entryParams || {},
@@ -147,7 +152,7 @@ define([
                             entryParams.optional_services || 'use_default',
                             entryParams.with_discount || false,
                             entryParams.custom_discount || null
-                        ).then(function(quote){
+                        ).then(function (quote) {
                             dispatch(quote);
                         });
 
@@ -160,7 +165,7 @@ define([
                 };
 
                 if (!resultsStore.getTire(entryParams.tire_id)) {
-                    Api.loadTire(entryParams.tire_id).then(function() {
+                    Api.loadTire(entryParams.tire_id).then(function () {
                         dispatch();
                     });
                 } else {
@@ -169,27 +174,28 @@ define([
             }
         },
         appointmentPage: {
-            update: function(entryParams, afterNav) {
+            update: function (entryParams, afterNav) {
                 dispatcher.dispatch({
                     actionType: 'appointment.page.update'
                 });
 
                 setUrl('appointment', entryParams);
             },
-            sendAppointment: function(values) {
+            sendAppointment: function (values) {
                 dispatcher.dispatch({
                     actionType: 'appointment.make',
                     customer: values
                 });
 
                 values = customerStore.getParamsForQuote('appointment');
-                Api.sendAppointment(values).then(function() {
+                Api.sendAppointment(values).then(function () {
                     actions.summaryPage.update(visitedPages['summary'], false);
-                }, function() {});
+                }, function () {
+                });
             },
         },
         getAQuotePage: {
-            update: function(entryParams, afterNav) {
+            update: function (entryParams, afterNav) {
                 dispatcher.dispatch({
                     actionType: 'get_a_quote.page.update'
                 });
@@ -198,47 +204,49 @@ define([
             }
         },
         emailPage: {
-            update: function(entryParams, afterNav) {
+            update: function (entryParams, afterNav) {
                 dispatcher.dispatch({
                     actionType: 'email.page.update'
                 });
 
                 setUrl('email', entryParams);
             },
-            sendEmail: function(values) {
+            sendEmail: function (values) {
                 dispatcher.dispatch({
                     actionType: 'email.quote',
                     customer: values
                 });
 
                 var values = customerStore.getParamsForQuote('email');
-                Api.emailQuote(values).then(function() {
+                Api.emailQuote(values).then(function () {
                     actions.summaryPage.update(visitedPages['summary'], false);
-                }, function() {});
+                }, function () {
+                });
             }
         },
         printPage: {
-            update: function(entryParams, afterNav) {
+            update: function (entryParams, afterNav) {
                 dispatcher.dispatch({
                     actionType: 'print.page.update'
                 });
 
                 setUrl('print', entryParams);
             },
-            print: function(values) {
+            print: function (values) {
                 dispatcher.dispatch({
                     actionType: 'print.quote',
                     customer: values
                 });
 
                 var values = customerStore.getParamsForQuote('print');
-                Api.printQuote(values).then(function() {
+                Api.printQuote(values).then(function () {
                     actions.summaryPage.update(visitedPages['summary'], false);
-                }, function() {});
+                }, function () {
+                });
             }
         },
         emailOnlyPage: {
-            update: function(entryParams, afterNav) {
+            update: function (entryParams, afterNav) {
                 dispatcher.dispatch({
                     actionType: 'email_only.page.update'
                 });
@@ -247,8 +255,8 @@ define([
             }
         },
         orderPage: {
-            update: function(entryParams, afterNav) {
-                var dispatch = function(order) {
+            update: function (entryParams, afterNav) {
+                var dispatch = function (order) {
                     dispatcher.dispatch({
                         actionType: 'order.page.update',
                         order: order || null
@@ -263,7 +271,7 @@ define([
                             with_discount: entryParams.with_discount || false,
                             optional_services: entryParams.optional_services || 'use_default'
                         }]
-                    }).then(function(order) {
+                    }).then(function (order) {
                         dispatch(order)
                     });
 
@@ -272,10 +280,10 @@ define([
                     dispatch();
                 }
             },
-            payment: function(values) {
+            payment: function (values) {
                 var order = customerStore.getOrder();
 
-                var dispatch = function(order, step) {
+                var dispatch = function (order, step) {
                     step = step || 'payment';
                     dispatcher.dispatch({
                         actionType: 'order.' + step + '.success',
@@ -290,7 +298,7 @@ define([
                 };
 
                 if (order.status === 'initiated') {
-                    Api.orderCheckout(order.order_id, values).then(function(order) {
+                    Api.orderCheckout(order.order_id, values).then(function (order) {
                         if (order.status == 'incomplete') {
                             dispatch(order, 'checkout');
                         } else {
@@ -298,14 +306,14 @@ define([
                         }
                     });
                 } else {
-                    Api.orderPayment(order.order_id, values.token).then(function(order) {
+                    Api.orderPayment(order.order_id, values.token).then(function (order) {
                         dispatch(order);
                     });
                 }
             }
         },
         confirmationPage: {
-            update: function(entryParams, afterNav) {
+            update: function (entryParams, afterNav) {
                 dispatcher.dispatch({
                     actionType: 'confirmation.page.update',
                     notice: entryParams.notice
@@ -313,7 +321,7 @@ define([
             }
         },
         requestPage: {
-            update: function(entryParams, afterNav) {
+            update: function (entryParams, afterNav) {
                 dispatcher.dispatch({
                     actionType: 'request.page.update',
                     entryParams: entryParams
@@ -321,7 +329,7 @@ define([
 
                 setUrl('request');
             },
-            request: function(values) {
+            request: function (values) {
                 dispatcher.dispatch({
                     actionType: 'request.quote',
                     customer: values
@@ -330,9 +338,10 @@ define([
                 values.tire_id = customerStore.getSelectedTireId();
                 values.quantity = customerStore.getSelectedQuantity();
 
-                Api.requestQuote(values).then(function() {
+                Api.requestQuote(values).then(function () {
                     actions.resultsPage.update(visitedPages['results'], false);
-                }, function() {});
+                }, function () {
+                });
             }
         }
     };
@@ -342,7 +351,7 @@ define([
     function setUrl(page, params) {
         visitedPages[page] = params || true;
 
-        var path = '#!' + page + (params ? '?'  + h.objToQuery(params) : '');
+        var path = '#!' + page + (params ? '?' + h.objToQuery(params) : '');
 
         var state = {
             page: page,
@@ -358,22 +367,24 @@ define([
     }
 
     function execute(page, params, afterNav) {
-        switch (page) {
-            case '':
-                actions.searchPage.update(params, afterNav);
-                break;
-            case 'get_a_quote':
-                actions.getAQuotePage.update(params, afterNav);
-                break;
-            case 'email_only':
-                actions.emailOnlyPage.update(params, afterNav);
-                break;
-            default:
-                actions[page + 'Page'].update(params, afterNav);
-        }
+        actions.route(page, params);
+
+        // switch (page) {
+        //     case '':
+        //         actions.searchPage.update(params, afterNav);
+        //         break;
+        //     case 'get_a_quote':
+        //         actions.getAQuotePage.update(params, afterNav);
+        //         break;
+        //     case 'email_only':
+        //         actions.emailOnlyPage.update(params, afterNav);
+        //         break;
+        //     default:
+        //         actions[page + 'Page'].update(params, afterNav);
+        // }
     }
 
-    history.bind('popstate', function(state) {
+    history.bind('popstate', function (state) {
         var page = state && state.page ? state.page : null,
             params = state && state.params ? state.params : {};
 
@@ -382,7 +393,7 @@ define([
 
     function start() {
         var urlData = h.queryToObj(window.location.hash);
-        if ( ['search', 'results', 'summary'].indexOf(urlData.page) == -1) {
+        if (['search', 'results', 'summary'].indexOf(urlData.page) == -1) {
             urlData = {
                 page: 'search',
                 params: null

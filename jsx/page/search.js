@@ -235,11 +235,14 @@ define([
             }
             if (this._isReadyForSearch()) {
                 var params = this.state.fieldValues[this.state.activeTab];
-                var curLocation = locationsStore.getCurrentLocation();
+                var curLocation = {
+                    id: 3586
+                } //locationsStore.getCurrentLocation();
 
                 if ( curLocation ) {
                     params.location_id = curLocation.id;
-                    A.resultsPage.update(params);
+                    A.route('results', params);
+                    // A.resultsPage.update(params);
                 } else {
                     this._handleLocationsClick();    
                 }
