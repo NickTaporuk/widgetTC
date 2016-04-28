@@ -2,43 +2,51 @@ define([
     'react',
     'classnames',
     'config',
-    'load!actions/actions',
     'load!actions/act',
     'lib/helper',
     'lodash',
-    'load!stores/customerStore',
     'load!components/page/summary/offerLine',
     'isMobile',
-    'load!components/page/common/back'
+    'load!components/page/common/back',
+    'actions/api',
+    'promise'
 ], function(
     React,
     cn,
     config,
-    Act,
     A,
     h,
     _,
-    customerStore,
     OfferLine,
     isMobile,
-    Back
+    Back,
+    Api,
+    Promise
 ) {
 
     return {
-        componentWillMount: function() {
-            this._updateQuote();
+        getInitialState: function() {
+            return {
+                ready: false
+            };
         },
 
         componentDidMount: function() {
-            customerStore.bind('change', this._updateQuote);
+            this._init();
         },
 
-        componentWillUnmount: function() {
-            customerStore.unbind('change', this._updateQuote);    
+        componentDidUpdate: function(prevProps, prevState) {
+            if (!_.isEqual(this.props, prevProps)) {
+                this._init();
+            }
         },
 
         render: function() {
-            var tire = this.props.tire;
+            if (!this.state.ready) {
+                return null;
+            }
+
+            var tire = this.state.tire;
             var quote = this.state.quote;
             if (Object.keys(quote) <= 0 || Object.keys(tire) <= 0) {
                 return null;
@@ -78,12 +86,12 @@ define([
                                         <td>${ h.priceFormat(tire.price) }</td>
                                         <td>
                                             <label className={cn(['qty', 'compare_qty'])} onChange={this._handleQuantityChange}>
-                                                <select defaultValue={this.state.quantity}>
+                                                <select defaultValue={this.props.quantity}>
                                                     {quantityItems}
                                                 </select>
                                             </label>
                                         </td>
-                                        <td>${ h.priceFormat(this.state.quantity * tire.price) }</td>
+                                        <td>${ h.priceFormat(this.props.quantity * tire.price) }</td>
                                     </tr>
                                     <tr>
                                         <td>{ tire.size_short + ' ' + tire.load_index + tire.speed_rating}</td>
@@ -143,6 +151,27 @@ define([
             );
         },
 
+        _init: function () {
+            var self = this;
+            var props = this.props;
+            // console.log(props);
+            Promise.all([
+                Api.loadTire(props.tire_id),
+                Api.loadQuote(props.tire_id, props.quantity, props.optional_services, props.with_discount, props.custom_discount),
+                Api.loadDealerConfig()
+            ]).then(function(responses) {
+                var tire = responses[0];
+                var quote = responses[1];
+                var dealerConfig = responses[2];
+                self.setState({
+                    ready: true,
+                    withOrderBtn: !config.sa && dealerConfig.ecommerce && dealerConfig.ecommerce.services && dealerConfig.ecommerce.services.stripe && dealerConfig.ecommerce.services.stripe.publishable_key,
+                    quote: quote,
+                    tire: tire
+                });
+            });
+        },
+
         _getButtons: function() {
             var btns = {};
             if (config.sa) {
@@ -155,7 +184,7 @@ define([
                     quote: <a href="#quote" onClick={this._handleQuoteClick} className={cn(['brand_btn_light', 'btn_small'])}><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE14F;' }} /> Get a Quote</a>,
                     appointment: <a href="#appointment" onClick={this._handleAppointmentClick} className={cn(['brand_btn_light', 'btn_small'])}><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE192;' }} /> Make an Appointment</a>
                 };
-                if (this.props.withOrderBtn) {
+                if (this.state.withOrderBtn) {
                     btns.order = <a href="#order" onClick={this._handleOrderClick} className={cn('brand_btn')}>Order Your Tires <i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE5C8;' }} /></a>
                 }
 
@@ -233,15 +262,6 @@ define([
                 </table>
             </div>
         },
-       
-        _updateQuote: function() {
-            var state = {
-                quote: customerStore.getQuote(),
-                quantity: customerStore.getSelectedQuantity()
-            };
-
-            this.setState(state);
-        },
 
         _getActiveOptServicesKeys: function() {
             var keys = [];
@@ -257,8 +277,8 @@ define([
         _getParamsForQuote: function() {
             var discount = this.state.quote.discount;
             return {
-                tire_id: this.props.tire.id,
-                quantity: this.state.quantity,
+                tire_id: this.props.tire_id,
+                quantity: this.props.quantity,
                 optional_services: this._getActiveOptServicesKeys(),
                 with_discount: discount && discount.tried_to_apply,
                 custom_discount: discount && discount.is_custom ? discount.total_value : null
@@ -278,28 +298,28 @@ define([
             }
             var params = this._getParamsForQuote();
             params.optional_services = optServices;
-            A.summaryPage.update(params);
+            A.route('summary', params);
         },
 
         _handleQuantityChange: function(event) {
             event.preventDefault();
             var params = this._getParamsForQuote();
             params.quantity = event.target.value;
-            A.summaryPage.update(params);
+            A.route('summary', params);
         },
 
         _handleDiscountClick: function(event) {
             event.preventDefault();
             var params = this._getParamsForQuote();
             params.with_discount = !params.with_discount;
-            A.summaryPage.update(params);
+            A.route('summary', params);
         },
 
         _handleDiscountChange: function(event) {
             event.preventDefault();
             var params = this._getParamsForQuote();
             params.custom_discount = event.target.value;
-            A.summaryPage.update(params);
+            A.route('summary', params);
         },
 
         _handleAppointmentClick: function(event) {
@@ -312,7 +332,6 @@ define([
             var params = this._getParamsForQuote();
             params.with_discount = this.state.quote.discount && this.state.quote.discount.applied;
             A.orderPage.update(params);
-            // Act.Order.create();
         },
 
         _handleQuoteClick: function(event) {

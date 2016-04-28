@@ -127,7 +127,7 @@ define([
         },
 
         dispatchToken: dispatcher.register(function(payload) {
-            console.log(payload);
+            // console.log(payload);
             switch (payload.actionType) {
                 case 'page.update':
                     // if (payload.page == 'summary') {

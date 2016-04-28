@@ -28,26 +28,30 @@ define([
 
     var actions = {
         init: function () {
-            var curLocId = locationsStore.getCurLocId();
+            // var curLocId = locationsStore.getCurLocId();
 
-            var promises = [
-                Api.loadLocations(),
+            // var promises = [
+                // Api.loadLocations()
                 // Api.loadTireParameters(),
                 // Api.getVehicleOptions(),
-                Api.loadDealerConfig(),
-                Api.loadDealerInfo()
-            ];
+                // Api.loadDealerConfig(),
+                // Api.loadDealerInfo()
+            // ];
 
-            if (curLocId) {
-                promises.push(Api.loadLocationConfig(curLocId));
-            }
+            // if (curLocId) {
+            //     promises.push(Api.loadLocationConfig(curLocId));
+            // }
 
-            Promise.all(promises).then(function () {
-                start();
-            });
+            // Promise.all(promises).then(function () {
+            //     start();
+            // });
+
+            start();
         },
 
         route: function(url, params) {
+            // console.log(params);
+
             // modes:
             // - 1: new (page init steps need to be done before show page)
             // - 2: after navigation  (prev/next btn),

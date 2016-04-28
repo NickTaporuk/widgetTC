@@ -151,11 +151,6 @@ define([
                 url: 'tire/parameters',
                 cache: true
             }).then(function(response) {
-                dispatcher.dispatch({
-                    actionType: constants.LOAD_TIRE_PARAMETERS_SUCCESS,
-                    options: response.data
-                });
-
                 return response.data;
             });
         },
@@ -164,7 +159,8 @@ define([
             if (!searchParams) {
                 return;
             }
-            
+            var searchParams = _.cloneDeep(searchParams);
+
             var method;
             if (searchParams.part_number) {
                 method = 'searchByPartNumbers';
@@ -185,15 +181,6 @@ define([
                 data: searchParams,
                 method: 'post'
             }).then(function(response) {
-                var results = response.data;
-                dispatcher.dispatch({
-                    actionType: constants.SEARCH_TIRES_SUCCESS,
-                    tires: results.tires,
-                    totalCount: results.nb_results,
-                    filters: results.filters,
-                    page: results.page
-                });
-
                 return response.data;
             });
         },
@@ -202,10 +189,7 @@ define([
             return ajax.make({
                 url: 'tire/' + tireId
             }).then(function(response){
-                dispatcher.dispatch({
-                    actionType: constants.LOAD_TIRE_SUCCESS,
-                    tire: response.data
-                });
+                return response.data;
             });
         },
 
@@ -303,10 +287,7 @@ define([
                 data: {wdg:true},
                 cache: true
             }).then(function(response) {
-                dispatcher.dispatch({
-                    actionType: constants.LOAD_DEALER_CONFIG_SUCCESS,
-                    config: response.data
-                });
+                return response.data;
             });
         },
 
@@ -330,13 +311,6 @@ define([
                     quote.discount.tried_to_apply = withDiscount;
                     quote.discount.is_custom = customDiscount ? true : false;
                 }
-
-                dispatcher.dispatch({
-                    actionType: constants.LOAD_QUOTE_SUCCESS,
-                    tireId: tireId,
-                    quantity: quantity,
-                    quote: quote
-                });
 
                 return quote;
             });

@@ -95,56 +95,14 @@ define([
                     content = <Search {...props} />;
                     break;
                 case 'results':
-                    // var tab = searchStore.getActiveSection();
-                    // var queryParams = {first: '', second: '', third: ''};
-                    // switch (tab) {
-                    //     case 'size':
-                    //         queryParams = {
-                    //             first: searchStore.getValueDesc(tab, 'width') + '/' + searchStore.getValueDesc(tab, 'height') + 'R' + searchStore.getValueDesc(tab, 'rim'),
-                    //         }
-                    //         break;
-                    //
-                    //     case 'vehicle':
-                    //         queryParams = {
-                    //             first: searchStore.getValueDesc(tab, 'year') + ' ' + searchStore.getValueDesc(tab, 'make') + ' ' + searchStore.getValueDesc(tab, 'model') + ' ' + searchStore.getValueDesc(tab, 'trim'),
-                    //             second: searchStore.getValueDesc(tab, 'car_tire_id')
-                    //         }
-                    //         break;
-                    //
-                    //     case 'part_number':
-                    //         queryParams = {
-                    //             first: searchStore.getValue(tab, 'part_number')
-                    //         }
-                    //         break;
-                    // }
-                    // var props = {
-                    //     // Props for search tires (located in pageStore props):
-                    //     fieldValues: {
-                    //         display: searchStore.getValue('common', 'display'),
-                    //         order_by: searchStore.getValue('common', 'order_by'),
-                    //         filters: {
-                    //             brand: searchStore.getValue('filters', 'brand'),
-                    //             run_flat: searchStore.getValue('filters', 'run_flat'),
-                    //             light_truck: searchStore.getValue('filters', 'light_truck'),
-                    //             category: searchStore.getValue('filters', 'category')
-                    //         }
-                    //     },
-                    //     queryParams: queryParams,
-                    //     isInMile: locationsStore.getCurrentLocation() ? locationsStore.getCurrentLocation().country !== 'Canada' : false,
-                    //     itemsOnPage: searchStore.getValue('common', 'items_per_page')
-                    // };
-
                     var props = store.getProps();
-                    console.log(props);
                     content = <Results {...props} />;
                     break;
                 case 'summary':
-                    var props = {
-                        tire:         customerStore.getSelectedTire(),
-                        withOrderBtn: dealerStore.getStripeKey() !== null && !config.sa,
-                        callNumber:   locationsStore.getCurLocConfig() ? locationsStore.getCurLocConfig().call_number : null
-                    };
-                    props = _.merge(props, this.state.props);
+                    // var props = {
+                    //     callNumber:   locationsStore.getCurLocConfig() ? locationsStore.getCurLocConfig().call_number : null
+                    // };
+                    var props = store.getProps();
                     content = <Summary {...props} />;
                     break;
                 case 'appointment':

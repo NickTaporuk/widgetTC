@@ -33,6 +33,7 @@ define([
         },
 
         componentWillMount: function() {
+            this._extendTire(this.props.tire);
             this.setState({
                 selQuantity: this.props.tire.selected_quantity,
                 quantity: this.props.tire.quantity,
@@ -43,6 +44,7 @@ define([
 
         render: function() {
             var tire = this.props.tire;
+
             var tab = this.state.activeTab;
             var warranty = this.props.isInMile ? tire.mileage_rating : tire.kilometer_rating;
 
@@ -176,6 +178,44 @@ define([
             );
         },
 
+        _extendTire: function (tire) {
+            if (!tire.external_info) {
+                tire.external_info = {
+                    marketing: {},
+                    rating: {}
+                };
+            }
+
+            if (!tire.external_info.marketing) {
+                tire.external_info.marketing = {
+                    images: [],
+                    statement: ''
+                };
+            } else if (tire.external_info.marketing.features && tire.external_info.marketing.features.length > 0) {
+                tire.description = tire.external_info.marketing.features;
+            }
+
+            if (!tire.external_info.marketing.images) {
+                tire.external_info.marketing.images = [];
+            }
+
+            if (!tire.external_info.rating) {
+                tire.external_info.rating = {
+                    total_reviews: null,
+                    average_rating: null
+                };
+            }
+
+            if (tire.category == 'Not Defined') {
+                tire.category = 'Undefined Category';
+            }
+
+            var quantity = 4;
+            tire.selected_quantity = quantity <= tire.quantity ? quantity : tire.quantity;
+
+            // tire.is_in_stock = (showInStock && tire.is_in_stock);
+        },
+
         _getRatingBlock: function(rating, totalRevuew) {
             var info = this.props.tire.external_info;
             var rating = info.rating.average_rating;
@@ -239,11 +279,12 @@ define([
 
         _handleSelectClick: function(event) {
             event.preventDefault();
-            A.summaryPage.update({
+            //A.summaryPage.update({
+            A.route('summary', {
                 quantity: this.state.selQuantity,
-                tire_id: this.props.tire.id,
-                with_discount: this.props.tire.discount && this.props.tire.discount.added_by_default,
-                supplier: this.state.supplier
+                tire_id: this.state.supplier ? this.state.supplier.tire_id : this.props.tire.id,
+                with_discount: this.props.tire.discount && this.props.tire.discount.added_by_default
+                // supplier: this.state.supplier
             });
             // Act.Tire.select(this.props.tire, this.state.selQuantity, this.state.supplier);
         },
