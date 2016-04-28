@@ -28,6 +28,8 @@ define([
     Promise
 ) {
 
+    var lastState;
+
     return {
         displayName: 'Results',
 
@@ -37,8 +39,16 @@ define([
             };
         },
 
+        componentWillMount: function () {
+            if (lastState) {
+                this.setState(lastState);
+            }
+        },
+
         componentDidMount: function() {
-            this._init();
+            if (!this.state.ready) {
+                this._init();
+            }
         },
 
         componentDidUpdate: function(prevProps, prevState) {
@@ -48,6 +58,10 @@ define([
             if (this.state.page !== prevState.page) {
                 this._scrollToTop();
             }
+        },
+
+        componentWillUnmount: function () {
+            lastState = this.state;
         },
 
         render: function() {
@@ -217,6 +231,4 @@ define([
             Act.route('results', params);
         }
     }
-
-
-})
+});

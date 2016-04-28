@@ -5,8 +5,91 @@ define([
     dispatcher,
     _
 ) {
+    // var searchStore = {
+    //     getState: function () {
+    //
+    //     },
+    //     dispatchToken: dispatcher.register(function(payload) {
+    //         switch (payload.actionType) {
+    //             case 'search.fields.update':
+    //                 break;
+    //         }
+    //
+    //         searchStore.trigger('change');
+    //     })
+    // };
+    //
+    // var resultsStore = {
+    //     getState: function () {
+    //
+    //     },
+    //     dispatchToken: dispatcher.register(function(payload) {
+    //         switch (payload.actionType) {
+    //             case 'tire.quantity.change':
+    //                 break;
+    //         }
+    //
+    //         resultsStore.trigger('change');
+    //     })
+    // };
+    //
+    // var summaryStore = {
+    //     getState: function () {
+    //
+    //     },
+    //     dispatchToken: dispatcher.register(function(payload) {
+    //         switch (payload.actionType) {
+    //             case 'summary.param.change':
+    //                 break;
+    //         }
+    //
+    //         summaryStore.trigger('change');
+    //     })
+    // };
+    //
+    //
+    // var customerStore = {
+    //     getCustomer: function () {
+    //
+    //     },
+    //     dispatchToken: dispatcher.register(function(payload) {
+    //         switch (payload.actionType) {
+    //             case 'customer.param.change':
+    //                 break;
+    //         }
+    //
+    //         customerStore.trigger('change');
+    //     })
+    // };
+
+
     var appState = {
-        page: ''
+        page: '',
+
+        props: {}
+
+        //search: {
+            //selected values
+        //},
+
+        //results: {
+            //tires state
+        //},
+
+        //quote: {
+            //     tire_id: '',
+            //     with_discount: '',
+            //     custom_discount: '',
+            //     optional_services: ''
+        //},
+
+        //customer: {
+            //
+        //},
+
+        //order: {
+            //
+        //}
 
         // props: {                  //last page props saved here
             // results: {
@@ -122,8 +205,14 @@ define([
             return appState.page;
         },
 
-        getProps: function () {
-            return appState.props;
+        getProps: function (page) {
+            page =  page || appState.page;
+            return appState.props[page] ? appState.props[page] : null;
+        },
+
+        getProp: function(prop, page) {
+            page =  page || appState.page;
+            return appState.props[page] && appState.props[prop] ? appState.props[page][prop] : null;
         },
 
         dispatchToken: dispatcher.register(function(payload) {
@@ -140,7 +229,7 @@ define([
 
                     // page props (url params) need to be saved here
                     appState.page = payload.page;
-                    appState.props = payload.props;
+                    appState.props[payload.page] = payload.props;
                     break;
 
                 // case 'search.tab.change':

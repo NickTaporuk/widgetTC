@@ -23,6 +23,7 @@ define([
     Promise,
     _
 ) {
+    var lastState;
 
     return {
         displayName: 'Search',
@@ -32,29 +33,42 @@ define([
                 ready: false,
                 activeTab: 'size',
                 fieldOptions: {},
-                fieldValues: {}
+                fieldValues: {
+                    vehicle: {year: '', make: '', model: '', trim: '', car_tire_id: '', base_category: ''},
+                    size: {width: '', height: '', rim: '', load_index: '', speed_rating: '', base_category: ''}
+                }
+            }
+        },
+
+        componentWillMount: function () {
+            if (lastState) {
+                this.setState(lastState);
             }
         },
 
         componentDidMount: function() {
             var self = this;
+            if (!this.state.ready) {
+                Promise.all([
+                    Api.loadTireParameters(),
+                    Api.loadVehicleOptions(),
+                    Api.loadLocations()
+                ]).then(function (response) {
+                    self.setState({
+                        ready: true,
 
-            Promise.all([
-                Api.loadTireParameters(),
-                Api.loadVehicleOptions(),
-                Api.loadLocations()
-            ]).then(function(response) {
-                self.setState({
-                    ready: true,
+                        fieldOptions: _.merge(response[0], response[1]),
+                        locations: response[3],
 
-                    fieldOptions: _.merge(response[0], response[1]),
-                    locations: response[3],
-
-                    activeTab: searchStore.getActiveSection(),
-                    fieldValues: searchStore.getAllValues(),
-                    locations_id: locationsStore.getCurrentLocation() ? locationsStore.getCurrentLocation().id : null
+                        activeTab: searchStore.getActiveSection(),
+                        locations_id: locationsStore.getCurrentLocation() ? locationsStore.getCurrentLocation().id : null
+                    });
                 });
-            });
+            }
+        },
+
+        componentWillUnmount: function () {
+            lastState = this.state;
         },
         
         render: function() {
