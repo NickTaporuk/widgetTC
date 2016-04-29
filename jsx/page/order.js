@@ -12,7 +12,10 @@ define([
     'moment',
     'load!components/page/common/formField',
     'load!components/page/common/back',
-    'config'
+    'config',
+    'actions/api',
+    'load!stores/appStore',
+    'promise'
 ], function(
     React,
     cn,
@@ -27,13 +30,17 @@ define([
     moment,
     Field,
     Back,
-    config
+    config,
+    Api,
+    appStore,
+    Promise
 ) {
 
     return {
         getInitialState: function() {
             return {
-                disabled: false
+                disabled: false,
+                errors: {}
             };
         },
 
@@ -42,8 +49,36 @@ define([
         },
 
         componentDidMount: function() {
-            customerStore.bind('change', this._updateState);
-            vehicleStore.bind('change', this._updateState);
+            // var order = customerStore.getOrder();
+            // var values = customerStore.getCustomer();
+            //
+            // this.setState({
+            //     errors: customerStore.getValidationErrors(),
+            //     values: values,
+            //     status: order.status,
+            //     disabled: false,
+            //     options: vehicleStore.getAll(values.vehicle.year, values.vehicle.make, values.vehicle.model, values.vehicle.trim)
+            // });
+
+            var searchState = appStore.getPageState('search');
+            var vehicleValues = searchState ? searchState.fieldValues.vehicle : this.state.values.vehicle;
+            var summaryProps = appStore.getPageProps('summary');
+
+            Promise.all([
+                Api.loadVehicleOptions(vehicleValues),
+                Api.loadQuote(summaryProps.tire_id, summaryProps.quantity, summaryProps.optional_services, summaryProps.with_discount, summaryProps.custom_discount),
+                Api.orderCreate([summaryProps])
+            ]).then(function(responses){
+                self.setState({
+                    options: responses[0],
+                    quote: responses[1],
+                    order: responses[2],
+                    status: responses[2].status
+                })
+            });
+
+            // customerStore.bind('change', this._updateState);
+            // vehicleStore.bind('change', this._updateState);
 
             var self = this;
             // load stripe here
@@ -57,11 +92,16 @@ define([
         },
         
         componentWillUnmount: function() {
-            customerStore.unbind('change', this._updateState);
-            vehicleStore.unbind('change', this._updateState);    
+            appStore.savePageState(this);
+            // customerStore.unbind('change', this._updateState);
+            // vehicleStore.unbind('change', this._updateState);
         },
 
         render: function() {
+            if (!this.state.ready) {
+                return null;
+            }
+
             return (
                 <div>
                     <Back />
@@ -146,7 +186,7 @@ define([
                                     {this._getError('exp_year')}
                                 </div>
                                 
-                                <MainPrices quote={this.props.quote} order={this.props.order} />
+                                <MainPrices quote={this.state.quote} order={this.state.order} />
                                 
                                 <p className={cn('textcenter')}>
                                     <em>* Outstanding balance will be payable after installation.</em>

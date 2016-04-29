@@ -11,7 +11,11 @@ define([
     'load!components/page/common/mainPrices',
     'load!components/page/common/formField',
     'load!components/page/common/back',
-    'moment'
+    'actions/api',
+    'moment',
+    'load!stores/appStore',
+    'promise',
+    'lib/history'
 ], function(
     React,
     config,
@@ -25,48 +29,93 @@ define([
     MainPrices,
     Field,
     Back,
-    moment
+    Api,
+    moment,
+    appStore,
+    Promise,
+    history
 ) {
 
     var types = {
         email: {
-            submit: {action: A.emailPage.sendEmail, text: 'Send email'},
+            submit: {action: 'emailQuote', text: 'Send email'},
             back:   {to: config.sa ? 'summary' : 'quote', text: 'Back'}
         },
         print: {
-            submit: {action: A.printPage.print, text: 'Print quote'},
+            submit: {action: 'printQuote', text: 'Print quote'},
             back:   {to: config.sa ? 'summary' : 'quote', text: 'Back'}
         },
         request: {
-            submit: {action: A.requestPage.request, text: 'Request quote'},
+            submit: {action: 'requestQuote', text: 'Request quote'},
             back:   {to: 'results', text: 'Back to results'}
         },
         appointment: {
-            submit: {action: A.appointmentPage.sendAppointment, text: 'Send'},
+            submit: {action: 'sendAppointment', text: 'Send'},
             back:   {to: 'summary', text: 'Back to summary'}
         }
     };
 
     return {
-        componentWillMount: function() {
-            this._updateState(true);
+        displayName: 'quote_form',
+
+        getInitialState: function () {
+            return {
+                ready: false,
+                values: {
+                    name: '',
+                    email: '',
+                    phone: '',
+                    way_to_contact: '',
+                    preferred_time: '',
+                    notes: '',
+                    vehicle: {
+                        year: '',
+                        make: '',
+                        model: '',
+                        trim: ''
+                    }
+                },
+                errors: {}
+            }
         },
+
         componentDidMount: function() {
-            customerStore.bind('change', this._updateState);
-            vehicleStore.bind('change', this._updateState);
+            var self = this;
+            var searchState = appStore.getPageState('search');
+            var vehicleValues = searchState ? searchState.fieldValues.vehicle : this.state.values.vehicle;
+            var summaryProps = appStore.getPageProps('summary');
+
+            Promise.all([
+                Api.loadVehicleOptions(vehicleValues),
+                Api.loadTire(summaryProps.tire_id),
+                Api.loadQuote(summaryProps.tire_id, summaryProps.quantity, summaryProps.optional_services, summaryProps.with_discount, summaryProps.custom_discount),
+            ]).then(function (responses) {
+                var values = _.cloneDeep(self.state.values);
+                values.vehicle = vehicleValues;
+                self.setState({
+                    ready: true,
+                    values: values,
+                    options: responses[0],
+                    tire: responses[1],
+                    quote: responses[2]
+                });
+            });
         },
-        componentWillUnmount: function() {
-            customerStore.unbind('change', this._updateState);
-            vehicleStore.unbind('change', this._updateState);
+
+        componentWillUnmount: function () {
+            appStore.savePageState(this);
         },
 
         render: function() {
-            var tire = this.props.tire;
+            if (!this.state.ready) {
+                return null;
+            }
+
+            var tire = this.state.tire;
 
             return (
                 <div>
                     <Back />
-                    {/* this._getBackLink() */}
 
                     <div className={cn('summary_wrapper')}>
                         <form action="appointment-confirmation.php" className={cn('appointment_form')} onSubmit={this._handleFormSubmit}>
@@ -91,7 +140,7 @@ define([
                                                         inputProps: {'name': "preferred_time", 'readOnly': true},
                                                         dateFormat: "YYYY-MM-DD",
                                                         timeFormat: "HH:mm" 
-                                                }}
+                                               }}
                                         />
                                     :   null
                                 }
@@ -103,27 +152,27 @@ define([
                                 <div className={cn('control_wrapper')}>
                                     <label htmlFor={cn('vehicle_year')}>Vehicle Info</label>
                                     <div className={cn(['sixcol', 'field'])}>
-                                        <SelectField name="year" options={this.state.options.years} emptyDesc="- Year -" withWrapper={false} onChange={this._vehicleChange} value={this.state.values.vehicle.year} />
+                                        <SelectField name="year" options={this.state.options.year} emptyDesc="- Year -" withWrapper={false} onChange={this._vehicleChange} value={this.state.values.vehicle.year} />
                                     </div>
                                     <div className={cn(['sixcol', 'last', 'field'])}>
-                                        <SelectField name="make" options={this.state.options.makes} emptyDesc="- Make -" withWrapper={false} onChange={this._vehicleChange} value={this.state.values.vehicle.make} />
+                                        <SelectField name="make" options={this.state.options.make} emptyDesc="- Make -" withWrapper={false} onChange={this._vehicleChange} value={this.state.values.vehicle.make} />
                                     </div>
                                 </div>
 
                                 <div className={cn('control_wrapper')}>
                                     <div className={cn('row')}>
                                         <div className={cn(['sixcol', 'field'])}>
-                                            <SelectField name="model" options={this.state.options.models} emptyDesc="- Model -" withWrapper={false} onChange={this._vehicleChange} value={this.state.values.vehicle.model} />
+                                            <SelectField name="model" options={this.state.options.model} emptyDesc="- Model -" withWrapper={false} onChange={this._vehicleChange} value={this.state.values.vehicle.model} />
                                         </div>
                                         <div className={cn(['sixcol', 'last', 'field'])}>
-                                            <SelectField name="trim" options={this.state.options.trims} emptyDesc="- Trim -" withWrapper={false} onChange={this._vehicleChange} value={this.state.values.vehicle.trim} />
+                                            <SelectField name="trim" options={this.state.options.trim} emptyDesc="- Trim -" withWrapper={false} onChange={this._vehicleChange} value={this.state.values.vehicle.trim} />
                                         </div>
                                     </div>
                                     {this._getError('vehicle_info')}
                                 </div>
 
                                 {this.props.type !== 'request'
-                                    ?   <MainPrices quote={this.props.quote} />
+                                    ?   <MainPrices quote={this.state.quote} />
                                     :   <div className={cn('twelvecol')}>
                                             <div className={cn(['fivecol', 'quote_tire'])}>
                                                 <img src={tire.brand_logo} alt="Falken Tire" className={cn('result_brand_logo')} />
@@ -166,17 +215,21 @@ define([
             }
         },
 
-        _updateState: function(isInit) {
-            var values = customerStore.getCustomer();
-
+        _updateVehicleOptions: function(newOptions, newValues) {
+            var options = _.cloneDeep(this.state.options);
+            var values = _.cloneDeep(this.state.values);
+            values.vehicle = _.assign(values.vehicle, newValues);
+            if (newOptions.car_tire_id[0]) {
+                values.vehicle.car_tire_id = newOptions.car_tire_id[0].value;
+            }
             this.setState({
-                errors: isInit ? {} : customerStore.getValidationErrors(),
-                values: values,
-                options: vehicleStore.getAll(values.vehicle.year, values.vehicle.make, values.vehicle.model, values.vehicle.trim)
+                options: _.assign(options, newOptions),
+                values: values
             });
         },
 
         _handleFormSubmit: function(event) {
+            var self = this;
             event.preventDefault();
             var values = {
                 name: this.refs.name.value(),
@@ -192,7 +245,16 @@ define([
                 values.way_to_contact = this.refs.way_to_contact.value();
             }
 
-            types[this.props.type].submit.action(values);
+            var summaryProps = appStore.getPageProps('summary');
+            values = _.merge(summaryProps, values);
+
+            Api[types[this.props.type].submit.action](values).then(function(response) {
+                history.back();
+            }).catch(function(errors) {
+                self.setState({
+                    errors: errors
+                });
+            });
         },
 
         _getVehicleInfo: function() {
@@ -204,11 +266,11 @@ define([
         },
 
         _vehicleChange: function(event) {
+            var self = this;
             var fields = ['year', 'make', 'model', 'trim'];
             var fieldName = event.target.name;
             var index = fields.indexOf(fieldName);
 
-            // var value = event.traget.value;
             var values = this.state.values.vehicle;
             values[fieldName] = event.target.value;
             
@@ -219,7 +281,9 @@ define([
                 trim: index < 3 ? '' : values.trim
             };
 
-            Act.Vehicle.change(values, 'customer');
+            Api.loadVehicleOptions(values).then(function(options) {
+                self._updateVehicleOptions(options, values);
+            });
         }
     }
 

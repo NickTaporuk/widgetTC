@@ -5,11 +5,11 @@ define([
     'load!components/page/search',
     'load!components/page/results',
     'load!components/page/summary',
-    'load!components/page/appointment',
+    'load!components/page/quoteForm',
     'load!components/page/order',
     'load!components/page/confirmation',
     'load!components/page/quote',
-    'load!components/page/email',
+    'load!components/page/emailForm',
     'react',
     'load!stores/store',
     'load!stores/pageStore',
@@ -28,11 +28,11 @@ define([
     Search,
     Results,
     Summary,
-    Appointment,
+    QuoteForm,
     Order,
     Confirmation,
     Quote,
-    Email,
+    EmailForm,
     React,
     store,
     pageStore,
@@ -57,17 +57,14 @@ define([
         },
 
         componentWillMount: function() {
-            // this._changeState();
             this._updateState();
         },
 
         componentDidMount: function() {
-            // pageStore.bind('change', this._changeState);
             store.bind('change', this._updateState);
         },
 
         componentWillUnmount: function() {
-            // pageStore.unbind('change', this._changeState);
             store.unbind('change', this._updateState);
         },
 
@@ -86,6 +83,7 @@ define([
         _getContent: function() {
             var content = null;
 
+            var props = store.getProps();
             switch (this.state.name) {
                 case 'search':
                     var props = {
@@ -95,17 +93,28 @@ define([
                     content = <Search {...props} />;
                     break;
                 case 'results':
-                    var props = store.getProps();
                     content = <Results {...props} />;
                     break;
                 case 'summary':
                     // var props = {
                     //     callNumber:   locationsStore.getCurLocConfig() ? locationsStore.getCurLocConfig().call_number : null
                     // };
-                    var props = store.getProps();
                     content = <Summary {...props} />;
                     break;
-                case 'appointment':
+                case 'quote_form':
+                    content = <QuoteForm {...props} />;
+                    break;
+                case 'email_form':
+                    content = <EmailForm {...props} />;
+                    break;
+                case 'get_a_quote':
+                    content = <Quote {...props} />;
+                    break;
+                case 'order':
+                    content = <Order {...props} />;
+                    break;
+
+
                 case 'order':
                 case 'confirmation':
                     var props = {
@@ -127,18 +136,6 @@ define([
                         content = <Confirmation {...props} />;
                     }
                     break;
-                case 'quote':
-                    var props = {
-                        followUp: customerStore.getCustomerValue('follow_up')
-                    };
-                    content = <Quote {...props} />;
-                    break;
-                case 'email':
-                    var props = {
-                        quote: customerStore.getQuote()
-                    };
-                    content = <Email {...props} />;
-                    break;
                 case '':
                     content = <Preloader />;
                     break;
@@ -152,13 +149,6 @@ define([
                 name: store.getPage()
             });
         },
-
-        // _changeState: function() {
-        //     this.setState({
-        //         name: pageStore.getPageName(),
-        //         props: pageStore.getProps()
-        //     });
-        // },
 
         _scrollToTop: function() {
             var widget = document.getElementById(cn('widget'));

@@ -8,6 +8,7 @@ define([
     'load!stores/locationsStore',
     'load!components/elements/select',
     'actions/api',
+    'load!stores/appStore',
     'promise',
     'lodash'
 ], function(
@@ -20,13 +21,12 @@ define([
     locationsStore,
     SelectField,
     Api,
+    appStore,
     Promise,
     _
 ) {
-    var lastState;
-
     return {
-        displayName: 'Search',
+        displayName: 'search',
 
         getInitialState: function() {
             return  {
@@ -41,6 +41,7 @@ define([
         },
 
         componentWillMount: function () {
+            var lastState = appStore.getPageState(this);
             if (lastState) {
                 this.setState(lastState);
             }
@@ -68,7 +69,7 @@ define([
         },
 
         componentWillUnmount: function () {
-            lastState = this.state;
+            appStore.savePageState(this);
         },
         
         render: function() {

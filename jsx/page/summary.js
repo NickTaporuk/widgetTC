@@ -9,6 +9,7 @@ define([
     'isMobile',
     'load!components/page/common/back',
     'actions/api',
+    'load!stores/appStore',
     'promise'
 ], function(
     React,
@@ -21,24 +22,40 @@ define([
     isMobile,
     Back,
     Api,
+    appStore,
     Promise
 ) {
 
     return {
+        displayName: 'summary',
+
         getInitialState: function() {
             return {
                 ready: false
             };
         },
 
+        // componentWillMount: function () {
+        //     var lastState = appStore.getPageState(this);
+        //     if (lastState) {
+        //         this.setState(lastState);
+        //     }
+        // },
+
         componentDidMount: function() {
-            this._init();
+            if (!this.state.ready) {
+                this._init();
+            }
         },
 
         componentDidUpdate: function(prevProps, prevState) {
             if (!_.isEqual(this.props, prevProps)) {
                 this._init();
             }
+        },
+
+        componentWillUnmount: function () {
+            appStore.savePageState(this); //this.constructor.displayName, this.state);
         },
 
         render: function() {
@@ -324,7 +341,8 @@ define([
 
         _handleAppointmentClick: function(event) {
             event.preventDefault();
-            A.appointmentPage.update();
+            A.route('quote_form', {type: 'appointment'});
+            // A.appointmentPage.update();
         },
 
         _handleOrderClick: function(event) {
@@ -336,17 +354,20 @@ define([
 
         _handleQuoteClick: function(event) {
             event.preventDefault();
-            A.getAQuotePage.update();
+            A.route('get_a_quote');
+            //A.getAQuotePage.update();
         },
 
         _handleEmailClick: function(event) {
             event.preventDefault();
-            A.emailPage.update();
+            A.route('quote_form', {type: 'email'});
+            // A.emailPage.update();
         },
 
         _handlePrintClick: function(event) {
             event.preventDefault();
-            A.printPage.update();
+            A.route('quote_form', {type: 'print'});
+            // A.printPage.update();
         }
 
     }

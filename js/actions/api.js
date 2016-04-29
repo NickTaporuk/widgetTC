@@ -317,19 +317,9 @@ define([
         },
 
         sendAppointment: function(data) {
-            var dispatchError = function(errors) {
-                dispatcher.dispatch({
-                    actionType: constants.SEND_APPOINTMENT_ERROR,
-                    errors: errors
-                });
-            };
-
-            var validationErrors = validateParamsForQuote(data, ['name', 'email', 'phone']);  
+            var validationErrors = validateParamsForQuote(data, ['name', 'email', 'phone']);
             if (validationErrors) {
-                return Promise.reject(validationErrors).catch(function(response) {
-                    dispatchError(response);    
-                    throw new Error();
-                });
+                return Promise.reject(validationErrors);
             } else {
                 return ajax.make({
                     url: 'quote/appointment',
@@ -337,36 +327,21 @@ define([
                     data: data,
                     useGlobalError: false
                 }).then(function(response) {
-                    dispatcher.dispatch({
-                        actionType: constants.SEND_APPOINTMENT_SUCCESS,
-                        title: 'Thank you!', 
-                        content: response.notice
-                    });
+                    return response;
                 }).catch(function(response) {
                     if (response.error_code == 400001) {
-                        dispatchError(response.errors);
+                        return Promise.reject(response.errors);
                     } else {
                         ajax.error(response);
                     }
-                    throw new Error();
                 });
             }
         },
 
         printQuote: function(data) {
-            var dispatchError = function(errors) {
-                dispatcher.dispatch({
-                    actionType: constants.PRINT_QUOTE_ERROR,
-                    errors: errors
-                });
-            };
-
             var validationErrors = validateParamsForQuote(data, !config.sa && data.name !== undefined ? ['name', 'email', 'phone'] : []);
             if (validationErrors) {
-                return Promise.reject(validationErrors).catch(function(response) {
-                    dispatchError(response);
-                    throw new Error();
-                });
+                return Promise.reject(validationErrors);
             } else {
                 var WinPrint = window.open('', '', 'left=0,top=0,width=800,height=800,toolbar=0,scrollbars=0,status=0');
                 return ajax.make({
@@ -378,35 +353,22 @@ define([
                     WinPrint.focus();
                     WinPrint.document.write(response.data.html);
                     WinPrint.document.close();
-                    dispatcher.dispatch({
-                        actionType: constants.PRINT_QUOTE_SUCCESS
-                    });
+                    return response;
                 }).catch(function(response) {
                     WinPrint.close();
                     if (response.error_code == 400001) {
-                        dispatchError(response.errors);
+                        return Promise.reject(response.errors);
                     } else {
                         ajax.error(response);
                     }
-                    throw new Error();
                 });
             }
         },
 
         emailQuote: function(data) {
-            var dispatchError = function(errors) {
-                dispatcher.dispatch({
-                    actionType: constants.EMAIL_QUOTE_ERROR,
-                    errors: errors
-                });
-            };
-            
             var validationErrors = validateParamsForQuote(data, !config.sa && data.name !== undefined ? ['name', 'email', 'phone'] : ['email']);
             if (validationErrors) {
-                return Promise.reject(validationErrors).catch(function(response) {
-                    dispatchError(response);    
-                    throw new Error();
-                });
+                return Promise.reject(validationErrors);
             } else {
                 return ajax.make({
                     url: 'quote/email',
@@ -414,36 +376,26 @@ define([
                     data: data,
                     useGlobalError: false
                 }).then(function(response) {
-                    dispatcher.dispatch({
-                        actionType: constants.EMAIL_QUOTE_SUCCESS,
-                        title: response.notice,
-                        content: ''
-                    });
+                    // dispatcher.dispatch({
+                    //     actionType: constants.EMAIL_QUOTE_SUCCESS,
+                    //     title: response.notice,
+                    //     content: ''
+                    // });
+                    return response;
                 }).catch(function(response) {
                     if (response.error_code == 400001) {
-                        dispatchError(response.errors);
+                        return Promise.reject(response.errors);
                     } else {
                         ajax.error(response);
                     }
-                    throw new Error();
                 });
             }
         },
 
         requestQuote: function(data) {
-            var dispatchError = function(errors) {
-                dispatcher.dispatch({
-                    actionType: constants.REQUEST_QUOTE_ERROR,
-                    errors: errors
-                });
-            };
-
             var validationErrors = validateParamsForQuote(data, ['name', 'email', 'phone']);
             if (validationErrors) {
-                return Promise.reject(validationErrors).catch(function(response) {
-                    dispatchError(response);    
-                    throw new Error();
-                });
+                return Promise.reject(validationErrors);
             } else {
                 return ajax.make({
                     url: 'quote/request',
@@ -451,18 +403,18 @@ define([
                     data: data,
                     useGlobalError: false
                 }).then(function(response) {
-                    dispatcher.dispatch({
-                        actionType: constants.REQUEST_QUOTE_SUCCESS,
-                        title: 'Thank you!',
-                        content: response.notice
-                    });
+                    // dispatcher.dispatch({
+                    //     actionType: constants.REQUEST_QUOTE_SUCCESS,
+                    //     title: 'Thank you!',
+                    //     content: response.notice
+                    // });
+                    return response;
                 }).catch(function(response) {
                     if (response.error_code == 400001) {
-                        dispatchError(response.errors);
+                        return Promise.reject(response.errors);
                     } else {
                         ajax.error(response);
                     }
-                    throw new Error();
                 });
             }
         },

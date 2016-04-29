@@ -1,21 +1,65 @@
 define([
     'react',
     'classnames',
+    'config',
     'load!actions/act',
-    'load!components/page/common/back'
+    'load!components/page/common/back',
+    'actions/api',
+    'load!stores/appStore',
+    'promise'
 ], function(
     React,
     cn,
+    config,
     A,
-    Back
+    Back,
+    Api,
+    appStore,
+    Promise
 ) {
    
     return {
+        displayName: 'get_a_quote',
+
+        getInitialState: function () {
+            return {
+                ready: false
+            }
+        },
+
+        componentWillMount: function () {
+            var lastState = appStore.getPageState(this);
+            if (lastState) {
+                this.setState(lastState);
+            }
+        },
+
+        componentDidMount: function () {
+            var self = this;
+            if (!this.state.ready) {
+                Promise.all([
+                    Api.loadDealerConfig()
+                ]).then(function (responses) {
+                    self.setState({
+                        ready: true,
+                        follow_up: config.sa ? false : responses[0].default_quote_call_back
+                    });
+                });
+            }
+        },
+
+        shouldComponentUpdate: function() {
+            return false;
+        },
+
+        componentWillUnmount: function () {
+            appStore.savePageState(this);
+        },
+
         render: function() {
             return (
                 <div>
                     <Back />
-                    {/*<a href="#results" onClick={this._handleBackClick} className={cn('back_link')}><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE5C4;' }} />Back to summary</a>*/}
 
                     <div className={cn(['quote_wrapper', 'max_width'])}>
                         <div className={cn(['row'])}>
@@ -34,7 +78,7 @@ define([
                             </p>
                             <div className={cn('control_wrapper')}>
                                 <label>
-                                    <input type="checkbox" ref="follow_up" defaultChecked={this.props.followUp} /> Request a callback
+                                    <input type="checkbox" ref="follow_up" defaultChecked={this.state.follow_up} onChange={this._handleFollowUpChange} /> Request a callback
                                 </label>
                             </div>
                         </div>
@@ -43,22 +87,31 @@ define([
             );
         },
 
+        _handleFollowUpChange: function (event) {
+            this.setState({
+                follow_up: event.target.checked
+            });
+        },
 
         _handlePrintClick: function(event) {
             event.preventDefault();
             if ( this.refs.follow_up.checked ) {
-                A.printPage.update();
+                A.route('quote_form', {type: 'print'});
             } else {
-                A.printPage.print({follow_up: false});
+                var summaryProps = appStore.getPageProps('summary');
+                Api.printQuote(summaryProps).then(function(response) {
+                    history.back();
+                });
             }
         },
         
         _handleEmailClick: function(event) {
             event.preventDefault();
             if ( this.refs.follow_up.checked ) {
-                A.emailPage.update();
+                A.route('quote_form', {type: 'email'});
             } else {
-                A.emailOnlyPage.update();
+                A.route('email_form');
+                //A.emailOnlyPage.update();
             }  
         }
     }

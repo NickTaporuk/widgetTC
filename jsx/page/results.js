@@ -11,6 +11,7 @@ define([
     'load!components/page/results/pagination',
     'load!components/page/results/filterBlock',
     'load!components/page/common/back',
+    'load!stores/appStore',
     'promise'
 ], function (
     React,
@@ -25,13 +26,12 @@ define([
     Pagination,
     FilterBlock,
     Back,
+    appStore,
     Promise
 ) {
 
-    var lastState;
-
     return {
-        displayName: 'Results',
+        displayName: 'results',
 
         getInitialState: function() {
             return {
@@ -39,11 +39,12 @@ define([
             };
         },
 
-        componentWillMount: function () {
-            if (lastState) {
-                this.setState(lastState);
-            }
-        },
+        // componentWillMount: function () {
+        //     var lastState = appStore.getPageState(this);
+        //     if (lastState) {
+        //         this.setState(lastState);
+        //     }
+        // },
 
         componentDidMount: function() {
             if (!this.state.ready) {
@@ -61,7 +62,7 @@ define([
         },
 
         componentWillUnmount: function () {
-            lastState = this.state;
+            appStore.savePageState(this);
         },
 
         render: function() {
