@@ -169,14 +169,18 @@ define([
         },
 
         _init: function () {
-            var self = this;
-            var props = this.props;
-            // console.log(props);
-            Promise.all([
+            var self = this,
+                props = this.props,
+                resultsProps = appStore.getPageProps('results');
+            var promises = [
                 Api.loadTire(props.tire_id),
                 Api.loadQuote(props.tire_id, props.quantity, props.optional_services, props.with_discount, props.custom_discount),
                 Api.loadDealerConfig()
-            ]).then(function(responses) {
+            ];
+            if (resultsProps && resultsProps.location_id) {
+                promises.push(Api.loadLocationConfig(resultsProps.location_id));
+            }
+            Promise.all(promises).then(function(responses) {
                 var tire = responses[0];
                 var quote = responses[1];
                 var dealerConfig = responses[2];
@@ -184,7 +188,8 @@ define([
                     ready: true,
                     withOrderBtn: !config.sa && dealerConfig.ecommerce && dealerConfig.ecommerce.services && dealerConfig.ecommerce.services.stripe && dealerConfig.ecommerce.services.stripe.publishable_key,
                     quote: quote,
-                    tire: tire
+                    tire: tire,
+                    callNumber: responses[3] ? responses[3].call_number : null
                 });
             });
         },
@@ -205,8 +210,8 @@ define([
                     btns.order = <a href="#order" onClick={this._handleOrderClick} className={cn('brand_btn')}>Order Your Tires <i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE5C8;' }} /></a>
                 }
 
-                if (isMobile.any && this.props.callNumber) {
-                    btns.clickToCall = <a href={'tel:' + this.props.callNumber} className={cn('brand_btn_light', 'btn_small')}><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE0B0;' }} /> Call Us</a>
+                if (isMobile.any && this.state.callNumber) {
+                    btns.clickToCall = <a href={'tel:' + this.state.callNumber} className={cn('brand_btn_light', 'btn_small')}><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE0B0;' }} /> Call Us</a>
                 }
             }
             
@@ -342,32 +347,29 @@ define([
         _handleAppointmentClick: function(event) {
             event.preventDefault();
             A.route('quote_form', {type: 'appointment'});
-            // A.appointmentPage.update();
         },
 
         _handleOrderClick: function(event) {
             event.preventDefault();
-            var params = this._getParamsForQuote();
-            params.with_discount = this.state.quote.discount && this.state.quote.discount.applied;
-            A.orderPage.update(params);
+            // var params = this._getParamsForQuote();
+            // params.with_discount = this.state.quote.discount && this.state.quote.discount.applied;
+            A.route('order');
+            // A.orderPage.update(params);
         },
 
         _handleQuoteClick: function(event) {
             event.preventDefault();
             A.route('get_a_quote');
-            //A.getAQuotePage.update();
         },
 
         _handleEmailClick: function(event) {
             event.preventDefault();
             A.route('quote_form', {type: 'email'});
-            // A.emailPage.update();
         },
 
         _handlePrintClick: function(event) {
             event.preventDefault();
             A.route('quote_form', {type: 'print'});
-            // A.printPage.update();
         }
 
     }

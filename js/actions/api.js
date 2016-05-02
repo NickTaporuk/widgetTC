@@ -122,27 +122,20 @@ define([
         },
 
         loadLocationConfig: function(locationId) {
-            var dispatch = function(config) {
-                dispatcher.dispatch({
-                    actionType: constants.LOAD_LOCATION_CONFIG_SUCCESS,
-                    config: config
-                });
-            }
-            
             // we need location config only for mobile version (to gate call number) for now
             if (isMobile.any) {
                 return ajax.make({
                     url: 'location/' + locationId + '/config',
                     cache: true
                 }).then(function(response) {
-                    dispatch(response.data);
+                    return response.data;
                 });
             } else {
                 return Promise.resolve({
-                        call_number: null
-                    }).then(function(response) {
-                        dispatch(response);
-                    });
+                    call_number: null
+                }).then(function(response) {
+                    return response;
+                });
             }
         },
 
@@ -353,7 +346,7 @@ define([
                     WinPrint.focus();
                     WinPrint.document.write(response.data.html);
                     WinPrint.document.close();
-                    return response;
+                    return { title: response.notice, content: '' };
                 }).catch(function(response) {
                     WinPrint.close();
                     if (response.error_code == 400001) {
@@ -376,12 +369,7 @@ define([
                     data: data,
                     useGlobalError: false
                 }).then(function(response) {
-                    // dispatcher.dispatch({
-                    //     actionType: constants.EMAIL_QUOTE_SUCCESS,
-                    //     title: response.notice,
-                    //     content: ''
-                    // });
-                    return response;
+                    return { title: response.notice, content: '' };
                 }).catch(function(response) {
                     if (response.error_code == 400001) {
                         return Promise.reject(response.errors);
@@ -403,12 +391,7 @@ define([
                     data: data,
                     useGlobalError: false
                 }).then(function(response) {
-                    // dispatcher.dispatch({
-                    //     actionType: constants.REQUEST_QUOTE_SUCCESS,
-                    //     title: 'Thank you!',
-                    //     content: response.notice
-                    // });
-                    return response;
+                    return { title: 'Thank you!', content: response.notice };
                 }).catch(function(response) {
                     if (response.error_code == 400001) {
                         return Promise.reject(response.errors);
@@ -435,18 +418,9 @@ define([
         },
 
         orderCheckout: function(orderId, data) {
-            var dispatchError = function(errors) {
-                dispatcher.dispatch({
-                    actionType: constants.ORDER_CHECKOUT_ERROR,
-                    errors: errors
-                });
-            };
-
             var validationErrors = validateParamsForQuote(data, ['name', 'email', 'phone', 'vehicle_info']);
             if (validationErrors) {
-                return Promise.reject(validationErrors).catch(function(response) {
-                    dispatchError(response);    
-                });
+                return Promise.reject(validationErrors);
             } else {
                 return ajax.make({
                     url: 'order/' + orderId + '/checkout',
@@ -455,23 +429,16 @@ define([
                     useGlobalError: false
                 }).then(function(response) {
                     var orderInfo = response.data;
-                    orderInfo.actionType = constants.ORDER_CHECKOUT_SUCCESS;
-                    dispatcher.dispatch(orderInfo);
-
-                    // auto payment
-                    return Api.orderPayment(orderId, data.token, true).then(function(order) {
-                        return order;
-                    }).catch(function(r) {
-                        // if payment is not success return order received by checkout method
-                        return response.data;
-                    });
+                    //orderInfo.actionType = constants.ORDER_CHECKOUT_SUCCESS;
+                    //dispatcher.dispatch(orderInfo);
+                    return orderInfo;
                 }).catch(function(response) {
                     if (response.error_code == 400001) {
-                        dispatchError(response.errors);
+                        return Promise.reject(response.errors);
                     } else {
                         ajax.error(response);
                     }
-                    return response;
+                    // return response;
                 });
             }
         },
@@ -485,22 +452,14 @@ define([
             }).then(function(response) {
                 var info = response.data;
                 info.notice = response.notice;
-                info.actionType = constants.ORDER_PAYMENT_SUCCESS;
-                dispatcher.dispatch(info);
-
                 return info;
             }).catch(function(response) {
                 if (response.error_code == 400001) {
-                    dispatcher.dispatch({
-                        actionType: constants.ORDER_PAYMENT_ERROR,
-                        errors: {number: response.errors.token}
-                    });
+                    return Promise.reject({number: response.errors.token});
                 } else {
                     ajax.error(response);
                 }
-                if (throwError) {
-                    throw new Error();
-                }
+                // return response;
             });
         },
 
@@ -509,11 +468,7 @@ define([
                 url: 'tire/' + tireId + '/fullStock',
                 cache: true
             }).then(function(response) {
-                dispatcher.dispatch({
-                    actionType: constants.LOAD_FULL_STOCK_SUCCESS,
-                    stock: response.data.stock,
-                    tireId: tireId
-                });
+                return response.data.stock;
             });
         },
 
@@ -521,11 +476,7 @@ define([
             return ajax.make({
                 url: 'tire/' + tireId + '/stock'
             }).then(function(response) {
-                dispatcher.dispatch({
-                    actionType: constants.LOAD_STOCK_SUCCESS,
-                    branches: response.data.branches,
-                    tireId: tireId
-                }); 
+                return response.data.branches
             });
         },
 
@@ -558,5 +509,4 @@ define([
     };
 
     return Api;
-
 });

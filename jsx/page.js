@@ -86,19 +86,12 @@ define([
             var props = store.getProps();
             switch (this.state.name) {
                 case 'search':
-                    var props = {
-                        canChangeLocation: Object.keys(locationsStore.getLocations()).length > 1
-                    };
-
                     content = <Search {...props} />;
                     break;
                 case 'results':
                     content = <Results {...props} />;
                     break;
                 case 'summary':
-                    // var props = {
-                    //     callNumber:   locationsStore.getCurLocConfig() ? locationsStore.getCurLocConfig().call_number : null
-                    // };
                     content = <Summary {...props} />;
                     break;
                 case 'quote_form':
@@ -112,6 +105,11 @@ define([
                     break;
                 case 'order':
                     content = <Order {...props} />;
+                    break;
+                case 'confirmation':
+                    console.log('confirm!!!');
+                    content = 'OK!!!';
+                    // content = <Confirmation {...props} />;
                     break;
 
 

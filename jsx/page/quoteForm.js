@@ -83,13 +83,24 @@ define([
             var self = this;
             var searchState = appStore.getPageState('search');
             var vehicleValues = searchState ? searchState.fieldValues.vehicle : this.state.values.vehicle;
-            var summaryProps = appStore.getPageProps('summary');
 
-            Promise.all([
-                Api.loadVehicleOptions(vehicleValues),
-                Api.loadTire(summaryProps.tire_id),
-                Api.loadQuote(summaryProps.tire_id, summaryProps.quantity, summaryProps.optional_services, summaryProps.with_discount, summaryProps.custom_discount),
-            ]).then(function (responses) {
+
+            var promises;
+            if (this.props.type == 'request') {
+                promises = [
+                    Api.loadVehicleOptions(vehicleValues),
+                    Api.loadTire(this.props.tire_id)
+                ];
+            } else {
+                var summaryProps = appStore.getPageProps('summary');
+                promises = [
+                    Api.loadVehicleOptions(vehicleValues),
+                    Api.loadTire(summaryProps.tire_id),
+                    Api.loadQuote(summaryProps.tire_id, summaryProps.quantity, summaryProps.optional_services, summaryProps.with_discount, summaryProps.custom_discount),
+                ];
+            }
+
+            Promise.all(promises).then(function (responses) {
                 var values = _.cloneDeep(self.state.values);
                 values.vehicle = vehicleValues;
                 self.setState({
@@ -97,7 +108,7 @@ define([
                     values: values,
                     options: responses[0],
                     tire: responses[1],
-                    quote: responses[2]
+                    quote: responses[2] || null
                 });
             });
         },
@@ -172,7 +183,7 @@ define([
                                 </div>
 
                                 {this.props.type !== 'request'
-                                    ?   <MainPrices quote={this.state.quote} />
+                                    ?   this.state.quote ? <MainPrices quote={this.state.quote} /> : null
                                     :   <div className={cn('twelvecol')}>
                                             <div className={cn(['fivecol', 'quote_tire'])}>
                                                 <img src={tire.brand_logo} alt="Falken Tire" className={cn('result_brand_logo')} />
@@ -245,10 +256,19 @@ define([
                 values.way_to_contact = this.refs.way_to_contact.value();
             }
 
-            var summaryProps = appStore.getPageProps('summary');
-            values = _.merge(summaryProps, values);
+            var props;
+            if (this.props.type == 'request') {
+                props = _.cloneDeep(this.props);
+                delete props.type;
+            } else {
+                props = appStore.getPageProps('summary');
+            }
+            values = _.merge(props, values);
 
-            Api[types[this.props.type].submit.action](values).then(function(response) {
+            Api[types[this.props.type].submit.action](values).then(function(data) {
+                if (self.props.type !== 'print') {
+                    A.popup.show(data.title, data.content);
+                }
                 history.back();
             }).catch(function(errors) {
                 self.setState({

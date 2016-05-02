@@ -2,28 +2,26 @@ define([
     'react',
     'classnames',
     'config',
-    'load!actions/actions',
     'load!actions/act',
-    'load!stores/searchStore',
-    'load!stores/locationsStore',
     'load!components/elements/select',
+    'load!components/page/search/locations',
     'actions/api',
     'load!stores/appStore',
     'promise',
-    'lodash'
+    'lodash',
+    'lockr'
 ], function(
     React,
     cn,
     config,
-    Act,
     A,
-    searchStore,
-    locationsStore,
     SelectField,
+    Locations,
     Api,
     appStore,
     Promise,
-    _
+    _,
+    lockr
 ) {
     return {
         displayName: 'search',
@@ -35,7 +33,8 @@ define([
                 fieldOptions: {},
                 fieldValues: {
                     vehicle: {year: '', make: '', model: '', trim: '', car_tire_id: '', base_category: ''},
-                    size: {width: '', height: '', rim: '', load_index: '', speed_rating: '', base_category: ''}
+                    size: {width: '', height: '', rim: '', load_index: '', speed_rating: '', base_category: ''},
+                    part_number: {part_number: ''}
                 }
             }
         },
@@ -53,16 +52,14 @@ define([
                 Promise.all([
                     Api.loadTireParameters(),
                     Api.loadVehicleOptions(),
-                    Api.loadLocations()
+                    Api.loadLocations(),
+                    Api.loadDealerConfig()
                 ]).then(function (response) {
                     self.setState({
                         ready: true,
-
                         fieldOptions: _.merge(response[0], response[1]),
-                        locations: response[3],
-
-                        activeTab: searchStore.getActiveSection(),
-                        locations_id: locationsStore.getCurrentLocation() ? locationsStore.getCurrentLocation().id : null
+                        locations: response[2],
+                        activeTab: response[3].default_searching ? response[3].default_searching.replace('by_', '') : 'vehicle'
                     });
                 });
             }
@@ -73,7 +70,6 @@ define([
         },
         
         render: function() {
-
             if (!this.state.ready) {
                 return null;
             }
@@ -82,7 +78,7 @@ define([
                 <div className={cn('search_wrapper')} id={cn('search_wrapper')}>
                     <div className={cn('search_inner')}>
                         <form id={cn('search_by')} className={cn('search_by')} role="search" onSubmit={this._handleSubmit}>
-                            { this.props.canChangeLocation 
+                            { this.state.locations.length > 0
                                 ? <a href="#locations" onClick={this._handleLocationsClick} className={cn(['change_location', 'modal_open'])}><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE0C8;' }} />Change Location</a>
                                 : null
                             }
@@ -250,14 +246,10 @@ define([
             }
             if (this._isReadyForSearch()) {
                 var params = this.state.fieldValues[this.state.activeTab];
-                var curLocation = {
-                    id: 3586
-                } //locationsStore.getCurrentLocation();
-
-                if ( curLocation ) {
-                    params.location_id = curLocation.id;
+                var locationId = lockr.get('location_id');
+                if ( locationId ) {
+                    params.location_id = locationId;
                     A.route('results', params);
-                    // A.resultsPage.update(params);
                 } else {
                     this._handleLocationsClick();    
                 }
@@ -309,16 +301,25 @@ define([
             });
         },
 
+        _handleLocationSelect: function (locationId) {
+            lockr.set('location_id', locationId);
+            A.popup.close();
+            this._handleSubmit();
+        },
+
         _handleLocationsClick: function(event) {
             if (event) {
                 event.preventDefault();
             }
-            var self = this;
-            Act.Popup.show('locations', {
-                onLocationSelect: function() {
-                    self._handleSubmit();
-                }
-            });
+
+            A.popup.show(
+                'Please select a preferred location:',
+                <Locations
+                    locations={this.state.locations}
+                    location_id={lockr.get('location_id')}
+                    onSelect={this._handleLocationSelect} />,
+                'locations'
+            );
         }
     }
 

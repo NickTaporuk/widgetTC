@@ -4,8 +4,6 @@ define([
     'load!actions/actions',
     'load!actions/act',
     'lib/helper',
-    'load!stores/customerStore',
-    'load!stores/vehicleStore',
     'load!components/elements/select',
     'load!components/page/common/mainPrices',
     'validate',
@@ -22,8 +20,6 @@ define([
     Act,
     A,
     h,
-    customerStore,
-    vehicleStore,
     SelectField,
     MainPrices,
     validate,
@@ -39,46 +35,42 @@ define([
     return {
         getInitialState: function() {
             return {
+                ready: false,
                 disabled: false,
-                errors: {}
+                errors: {},
+                values: {
+                    vehicle: {}
+                }
             };
         },
 
-        componentWillMount: function() {
-            this._updateState();
-        },
+        // componentWillMount: function() {
+        //     this._updateState();
+        // },
 
         componentDidMount: function() {
-            // var order = customerStore.getOrder();
-            // var values = customerStore.getCustomer();
-            //
-            // this.setState({
-            //     errors: customerStore.getValidationErrors(),
-            //     values: values,
-            //     status: order.status,
-            //     disabled: false,
-            //     options: vehicleStore.getAll(values.vehicle.year, values.vehicle.make, values.vehicle.model, values.vehicle.trim)
-            // });
-
             var searchState = appStore.getPageState('search');
             var vehicleValues = searchState ? searchState.fieldValues.vehicle : this.state.values.vehicle;
             var summaryProps = appStore.getPageProps('summary');
+            summaryProps.id = summaryProps.tire_id;
+            delete summaryProps.tire_id;
+            // var summaryState = appStore.getPageState('summary');
 
             Promise.all([
                 Api.loadVehicleOptions(vehicleValues),
-                Api.loadQuote(summaryProps.tire_id, summaryProps.quantity, summaryProps.optional_services, summaryProps.with_discount, summaryProps.custom_discount),
-                Api.orderCreate([summaryProps])
+                Api.loadQuote(summaryProps.id, summaryProps.quantity, summaryProps.optional_services, summaryProps.with_discount, summaryProps.custom_discount),
+                Api.orderCreate({tires: [summaryProps]}),
+                Api.loadDealerConfig()
             ]).then(function(responses){
                 self.setState({
+                    ready: true,
                     options: responses[0],
                     quote: responses[1],
                     order: responses[2],
-                    status: responses[2].status
+                    status: responses[2].status,
+                    stripeKey: responses[3].ecommerce.services.stripe.publishable_key
                 })
             });
-
-            // customerStore.bind('change', this._updateState);
-            // vehicleStore.bind('change', this._updateState);
 
             var self = this;
             // load stripe here
@@ -93,8 +85,6 @@ define([
         
         componentWillUnmount: function() {
             appStore.savePageState(this);
-            // customerStore.unbind('change', this._updateState);
-            // vehicleStore.unbind('change', this._updateState);
         },
 
         render: function() {
@@ -136,20 +126,20 @@ define([
                                 <div className={cn('control_wrapper')}>
                                     <label htmlFor={cn('vehicle_year')}>Vehicle Info <span className="req">*</span></label>
                                     <div className={cn(['sixcol', 'field'])}>
-                                        <SelectField name="year" options={this.state.options.years} disabled={this.state.status == 'incomplete'} emptyDesc="- Year -" withWrapper={false} onChange={this._vehicleChange} value={this.state.values.vehicle.year} />
+                                        <SelectField name="year" options={this.state.options.year} disabled={this.state.status == 'incomplete'} emptyDesc="- Year -" withWrapper={false} onChange={this._vehicleChange} value={this.state.values.vehicle.year} />
                                     </div>
                                     <div className={cn(['sixcol', 'last', 'field'])}>
-                                        <SelectField name="make" options={this.state.options.makes} disabled={this.state.status == 'incomplete'} emptyDesc="- Make -" withWrapper={false} onChange={this._vehicleChange} value={this.state.values.vehicle.make} />
+                                        <SelectField name="make" options={this.state.options.make} disabled={this.state.status == 'incomplete'} emptyDesc="- Make -" withWrapper={false} onChange={this._vehicleChange} value={this.state.values.vehicle.make} />
                                     </div>
                                 </div>
 
                                 <div className={cn('control_wrapper')}>
                                     <div className={cn('row')}>
                                         <div className={cn(['sixcol', 'field'])}>
-                                            <SelectField name="model" options={this.state.options.models} disabled={this.state.status == 'incomplete'} emptyDesc="- Model -" withWrapper={false} onChange={this._vehicleChange} value={this.state.values.vehicle.model} />
+                                            <SelectField name="model" options={this.state.options.model} disabled={this.state.status == 'incomplete'} emptyDesc="- Model -" withWrapper={false} onChange={this._vehicleChange} value={this.state.values.vehicle.model} />
                                         </div>
                                         <div className={cn(['sixcol', 'last', 'field'])}>
-                                            <SelectField name="trim" options={this.state.options.trims} disabled={this.state.status == 'incomplete'} emptyDesc="- Trim -" withWrapper={false} onChange={this._vehicleChange} value={this.state.values.vehicle.trim} />
+                                            <SelectField name="trim" options={this.state.options.trim} disabled={this.state.status == 'incomplete'} emptyDesc="- Trim -" withWrapper={false} onChange={this._vehicleChange} value={this.state.values.vehicle.trim} />
                                         </div>
                                     </div>
                                     {this._getError('vehicle_info')}
@@ -226,21 +216,8 @@ define([
                 return null;
             }
         },
-        _updateState: function() {
-            var order = customerStore.getOrder();
-            var values = customerStore.getCustomer();
-
-            this.setState({
-                errors: customerStore.getValidationErrors(),
-                values: values,
-                status: order.status,
-                disabled: false,
-                options: vehicleStore.getAll(values.vehicle.year, values.vehicle.make, values.vehicle.model, values.vehicle.trim)
-            });
-        },
 
         _checkStripeValues: function(stripeValues) {
-
             if (!this._isStripeLoaded) {
                 Act.Popup.show('alert', {title: 'We are sorry.', content: 'Some scripts, needed for payment, has not been loaded. Please try again.'});
                 this.setState({'disabled': false});
@@ -292,7 +269,7 @@ define([
 
             if (this._checkStripeValues(stripeValues)) {
                 var self = this;
-                window.Stripe.setPublishableKey(this.props.stripeKey);
+                window.Stripe.setPublishableKey(this.state.stripeKey);
                 window.Stripe.card.createToken(stripeValues, function(status, response) {
                     if (response.error) {
                         if (response.error.type === 'card_error') {
@@ -313,7 +290,34 @@ define([
                             vehicle_info: self._getVehicleInfo()
                         };
 
-                        A.orderPage.payment(values);
+                        var payment = function() {
+                            Api.orderPayment(self.state.order.order_id, values.token).then(function(response) {
+                                self.setState({
+                                    order: response
+                                });
+                                A.route('confirmation');
+                            }).catch(function (errors) {
+                                self.setState({
+                                    errors: errors,
+                                    disabled: false
+                                })
+                            });
+                        };
+                        if (self.state.status === 'incomplete') {
+                            payment();
+                        } else {
+                            Api.orderCheckout(self.state.order.order_id, values).then(function (response) {
+                                self.setState({
+                                    status: response.status
+                                });
+                                payment();
+                            }).catch(function (errors) {
+                                self.setState({
+                                    errors: errors,
+                                    disabled: false
+                                })
+                            });
+                        }
                     }
                 });
             } else {
@@ -334,7 +338,6 @@ define([
             var fieldName = event.target.name;
             var index = fields.indexOf(fieldName);
 
-            // var value = event.traget.value;
             var values = this.state.values.vehicle;
             values[fieldName] = event.target.value;
             
@@ -345,7 +348,13 @@ define([
                 trim: index < 3 ? '' : values.trim
             };
 
-            Act.Vehicle.change(values, 'customer');
+            var self = this;
+
+            Api.loadVehicleOptions(values, fieldName).then(function(options) {
+                self.setState({
+                    options: options
+                })
+            });
         }
     }
 

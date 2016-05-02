@@ -15,7 +15,7 @@ define([
 
         render: function() {
             var quote = this.props.quote;
-            var order = this.props.order;
+
 
             var recyclingFee = null;
             if (quote.recycling_fee) {
@@ -65,18 +65,18 @@ define([
                             </tr>
 
                             {
-                                order
+                                this.props.order
                                 ?   <tr>
                                         <td>What you pay today:</td>
-                                        <td>${h.priceFormat(order.deposit_payment)}</td>
+                                        <td>${h.priceFormat(this.props.order.tires[0].prices.deposit_payment)}</td>
                                     </tr>
                                 :   null
                             }
 
-                            {   order
+                            {   this.props.order
                                 ?   <tr className={cn('light')}>
                                         <td>Outstanding Balance:</td>
-                                        <td>${h.priceFormat(order.outstanding_balance)}</td>
+                                        <td>${h.priceFormat(this.props.order.tires[0].prices.outstanding_balance)}</td>
                                     </tr>
                                 :   null
                             }

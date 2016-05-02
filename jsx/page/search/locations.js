@@ -46,6 +46,7 @@ define([
         _handleSelectClick: function(id, event) {
             event.preventDefault();
             this.props.onSelect(id);
+            
         }
     }
 });

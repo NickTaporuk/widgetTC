@@ -183,7 +183,7 @@ define(['config', 'promise'], function(config, Promise) {
 
 			return new Promise(function(resolve, reject) {
 				
-				var data = params.data || {}
+				var data = params.data || {};
 				if (params.cache) {
 
 					var response = getFromCache(url, data); 

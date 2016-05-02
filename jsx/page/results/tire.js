@@ -2,7 +2,6 @@ define([
     'react',
     'config',
     'classnames',
-    'load!actions/actions',
     'load!actions/act',
     'lib/helper',
     'load!components/page/results/tire/offerInfo',
@@ -13,7 +12,6 @@ define([
     React,
     config,
     cn,
-    Act,
     A,
     h,
     OfferInfo,
@@ -279,29 +277,29 @@ define([
 
         _handleSelectClick: function(event) {
             event.preventDefault();
-            //A.summaryPage.update({
             A.route('summary', {
                 quantity: this.state.selQuantity,
                 tire_id: this.state.supplier ? this.state.supplier.tire_id : this.props.tire.id,
                 with_discount: this.props.tire.discount && this.props.tire.discount.added_by_default
-                // supplier: this.state.supplier
             });
-            // Act.Tire.select(this.props.tire, this.state.selQuantity, this.state.supplier);
         },
 
         _handleGetQuoteClick: function(event) {
             event.preventDefault();
-            A.requestPage.update({
-                tire_id: this.props.tire.id,
-                quantity: this.state.selQuantity,
-                supplier: this.state.supplier
-            })
-            //Act.Quote.requestForm(this.props.tire.id, this.state.selQuantity, this.state.supplier);
+            A.route('quote_form', {
+                type: 'request',
+                tire_id: this.state.supplier ? this.state.supplier.tire_id : this.props.tire.id,
+                quantity: this.state.selQuantity
+            });
         },
 
         _handleEnlargeClick: function(event) {
             event.preventDefault();
-            Act.Tire.enlargeImage(this.props.tire.external_info.marketing.images[0], this.props.tire.model);
+            A.popup.show(
+                this.props.tire.model,
+                <img src={this.props.tire.external_info.marketing.images[0]} />
+            );
+            //Act.Tire.enlargeImage(this.props.tire.external_info.marketing.images[0], this.props.tire.model);
         }
     }
 

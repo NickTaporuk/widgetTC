@@ -5,55 +5,41 @@ define([
     dispatcher,
     constants
 ) {
-    var name = '';
-    var props = {};
-    var hidden = true;
+    var hidden = true,
+        name = '',
+        title = '',
+        content = '';
 
     var popupStore = {
-        getPopupName: function() {
-            return name;
-        },
-        getProps: function() {
-            return props;
-        },
         isHidden: function() {
             return hidden;
+        },
+
+        getName: function () {
+            return name;
+        },
+
+        getTitle: function () {
+            return title;
+        },
+
+        getContent: function () {
+            return content;
         },
 
         dispatchToken:  dispatcher.register(function(payload) {
             var change = false;
             switch (payload.actionType) {
-                case 'popup.update':
-                    name = payload.name || 'search';
-                    props = payload.props || {};
+                case 'popup.show':
+                    name = payload.name;
+                    title = payload.title;
+                    content = payload.content;
                     hidden = false;
                     change = true;
                     break;
-                case 'locations.current.change':
+
                 case 'popup.close':
                     hidden = true;
-                    change = true;
-                    break;
-
-                case constants.SEND_APPOINTMENT_SUCCESS:
-                case constants.EMAIL_QUOTE_SUCCESS:
-                case constants.REQUEST_QUOTE_SUCCESS:
-                    name = 'alert';
-                    props = {
-                        title: payload.title,
-                        content: payload.content
-                    };
-                    hidden = false;
-                    change = true;
-                    break;
-
-                case 'tire.enlarge':
-                    name = 'alert';
-                    props = {
-                        title: payload.model,
-                        image: payload.image
-                    };
-                    hidden = false;
                     change = true;
                     break;
 

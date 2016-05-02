@@ -1,19 +1,15 @@
 define([
     'react',
     'classnames',
-    'load!stores/stockStore',
-    'load!actions/actions',
-    'load!stores/reviewsStore'
+    'actions/api'
 ], function (
     React,
     cn,
-    stockStore,
-    Act,
-    reviewsStore
+    Api
 ) {
 
     return {
-        displayName: 'Stock',
+        displayName: 'stock',
 
         getInitialState: function() {
             return {
@@ -31,12 +27,7 @@ define([
         },
  
         componentDidMount: function() {
-            stockStore.bind('change', this._updateState);
             this._load(this.props.load);
-        },
-
-        componentWillUnmount: function() {
-            stockStore.unbind('change', this._updateState);    
         },
 
         componentWillReceiveProps: function(nextProps) {
@@ -81,21 +72,13 @@ define([
 
         _load: function(need) {
             if (need && this.state.suppliers.length == 0) {
-                Act.Tire.loadFullStock(this.props.tire.id);
+                var self = this;
+                Api.loadFullStock(this.props.tire.id).then(function (suppliers) {
+                    self.setState({
+                        suppliers: suppliers
+                    });
+                });
             }
-        },
-
-         _updateState: function() {
-            var state = {};
-            if (this.state.suppliers.length == 0) {
-                state.suppliers = stockStore.getFullStock(this.props.tire.id);
-            }
-
-            if (this.state.branchesFor) {
-                state.branches = stockStore.getBranches(this.state.branchesFor.tire_id);
-            }
-
-            this.setState(state);
         },
 
         _hangleBackClick: function(event) {
@@ -109,12 +92,13 @@ define([
             event.preventDefault();
             var index = event.target.href.replace(/^[^#]+#/, '');
             var supplier = this.state.suppliers[index];
-            
-            Act.Tire.loadStock(supplier.tire_id);
+            var self = this;
 
-            this.setState({
-                branches: [],
-                branchesFor: supplier
+            Api.loadStock(supplier.tire_id).then(function (branches) {
+                self.setState({
+                    branches: branches,
+                    branchesFor: supplier
+                })
             });
         },
 
