@@ -19,13 +19,13 @@ define([
 ) {
 
     ajax.beforeSend = function() {
-        dispatcher.sub.dispatch({
+        dispatcher.ajax.dispatch({
             actionType: constants.BEFORE_REQUEST
         });
     };
 
     ajax.complete = function() {
-        dispatcher.sub.dispatch({
+        dispatcher.ajax.dispatch({
             actionType: constants.RESPONSE_RECEIVED
         });
     };

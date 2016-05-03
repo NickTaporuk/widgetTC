@@ -2,13 +2,11 @@ define([
     'react',
     'classnames', 
     'load!stores/ajaxStore',
-    'load!stores/store',
     'config'
 ], function(
     React,
     cn,
     ajaxStore,
-    store,
     config
 ) {
     return {
@@ -32,7 +30,7 @@ define([
 
         render: function() {
             return (
-                <div className={cn('loader')} style={ {display: this.state.loader && store.getPage() !== '' ? 'block' : 'none' } }>
+                <div className={cn('loader')} style={ {display: this.state.loader ? 'block' : 'none' } }>
                     <img src={config.imagesFolder + 'loader.gif'} alt="Loading" />
                 </div>
             )

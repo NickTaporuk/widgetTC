@@ -18,7 +18,7 @@ define([
             return finishCount;
         },
 
-        dispatchToken: dispatcher.sub.register(function(payload) {
+        dispatchToken: dispatcher.ajax.register(function(payload) {
             change = false;
             switch (payload.actionType) {
                 case constants.BEFORE_REQUEST:

@@ -52,15 +52,11 @@ define([
                             403012: 'Sorry, widget is unavailable from your IP',
                             403013: 'Sorry, widget is unavailable from this Domain'
                         };
-                        props = {
-                            title: (errors[error.error_code] ? errors[error.error_code] : error.notice),
-                            content: ''
-                        };
+                        title = (errors[error.error_code] ? errors[error.error_code] : error.notice);
+                        content = '';
                     } else {
-                        props = {
-                            title: 'Sorry, an error has been occurred ):',
-                            content: 'Please try again later!'
-                        };
+                        title = 'Sorry, an error has been occurred ):';
+                        content = 'Please try again later!';
                     }
                     hidden = false;
                     change = true;

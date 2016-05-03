@@ -285,7 +285,7 @@ define([], function(){
   };
 
   var dispatcher = new Dispatcher();
-  dispatcher.sub = new Dispatcher();
+  dispatcher.ajax = new Dispatcher();
 
   return dispatcher;
   

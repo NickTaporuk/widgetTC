@@ -1,6 +1,12 @@
-define(['react', 'config', 'load!stores/ajaxStore'], function(React, config, ajaxStore) {
-
-
+define([
+    'react',
+    'config',
+    'load!stores/ajaxStore'
+], function(
+    React,
+    config,
+    ajaxStore
+) {
 
     return {
         getInitialState: function () {
