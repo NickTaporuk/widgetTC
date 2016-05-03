@@ -36,6 +36,7 @@ define([
                     <Top />
                     <div className={cn('wrapper')}>
                         <Header />
+                        <Preloader />
                         <Page />
                     </div>
                 </div>

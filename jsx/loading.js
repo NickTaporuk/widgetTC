@@ -2,13 +2,13 @@ define([
     'react',
     'classnames', 
     'load!stores/ajaxStore',
-    'load!stores/pageStore',
+    'load!stores/store',
     'config'
 ], function(
     React,
     cn,
     ajaxStore,
-    pageStore,
+    store,
     config
 ) {
     return {
@@ -32,7 +32,7 @@ define([
 
         render: function() {
             return (
-                <div className={cn('loader')} style={ {display: this.state.loader && pageStore.getPageName() !== '' ? 'block' : 'none' } }>
+                <div className={cn('loader')} style={ {display: this.state.loader && store.getPage() !== '' ? 'block' : 'none' } }>
                     <img src={config.imagesFolder + 'loader.gif'} alt="Loading" />
                 </div>
             )
@@ -40,7 +40,7 @@ define([
 
         _updateStatus: function() {
             this.setState({
-                loader: ajaxStore.isInProcess()
+                loader: ajaxStore.isInProcess() &&  ajaxStore.getFinishCount() > 0
             });
         }
 

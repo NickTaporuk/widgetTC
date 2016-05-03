@@ -7,10 +7,15 @@ define([
 ) {
 
     var ajaxCount = 0;
+    var finishCount = 0;
 
     var ajaxStore = {
         isInProcess: function() {
             return ajaxCount > 0;
+        },
+
+        getFinishCount: function() {
+            return finishCount;
         },
 
         dispatchToken: dispatcher.sub.register(function(payload) {
@@ -24,6 +29,7 @@ define([
                 case constants.RESPONSE_RECEIVED: 
                     ajaxCount--;
                     if (ajaxCount === 0) {
+                        finishCount++;
                         change = true;
                     }
                     break;

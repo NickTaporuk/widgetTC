@@ -408,11 +408,6 @@ define([
                 method: 'post',
                 data: data
             }).then(function(response) {
-                var orderInfo = response.data;
-                orderInfo.actionType = constants.ORDER_CREATE_SUCCESS;
-
-                dispatcher.dispatch(orderInfo);
-
                 return response.data;
             });
         },
@@ -428,17 +423,13 @@ define([
                     data: data,
                     useGlobalError: false
                 }).then(function(response) {
-                    var orderInfo = response.data;
-                    //orderInfo.actionType = constants.ORDER_CHECKOUT_SUCCESS;
-                    //dispatcher.dispatch(orderInfo);
-                    return orderInfo;
+                    return response.data;
                 }).catch(function(response) {
                     if (response.error_code == 400001) {
                         return Promise.reject(response.errors);
                     } else {
                         ajax.error(response);
                     }
-                    // return response;
                 });
             }
         },
@@ -459,7 +450,6 @@ define([
                 } else {
                     ajax.error(response);
                 }
-                // return response;
             });
         },
 

@@ -1,7 +1,6 @@
 define([
     'reactDOM',
     'lib/helper',
-    'load!components/preloader',
     'load!components/page/search',
     'load!components/page/results',
     'load!components/page/summary',
@@ -24,7 +23,6 @@ define([
 ], function(
     ReactDOM,
     h,
-    Preloader,
     Search,
     Results,
     Summary,
@@ -47,7 +45,7 @@ define([
 ) {
 
     var Page = {
-        displayName: 'Page',
+        displayName: 'page',
 
         getInitialState: function() {
             return {
@@ -112,7 +110,6 @@ define([
                     // content = <Confirmation {...props} />;
                     break;
 
-
                 case 'order':
                 case 'confirmation':
                     var props = {
@@ -135,7 +132,7 @@ define([
                     }
                     break;
                 case '':
-                    content = <Preloader />;
+                    content = null;
                     break;
             }
 
