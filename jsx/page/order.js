@@ -33,6 +33,8 @@ define([
 ) {
 
     return {
+        displayName: 'order',
+
         getInitialState: function() {
             return {
                 ready: false,
@@ -44,13 +46,20 @@ define([
             };
         },
 
-        // componentWillMount: function() {
-        //     this._updateState();
-        // },
+        componentWillMount: function() {
+            var lastState = appStore.getPageState(this);
+            if (lastState) {
+                this.setState({
+                    values: lastState.values
+                });
+            }
+        },
 
         componentDidMount: function() {
             var searchState = appStore.getPageState('search');
-            var vehicleValues = searchState ? searchState.fieldValues.vehicle : this.state.values.vehicle;
+            var vehicleValues = Object.keys(this.state.values.vehicle).length > 0
+                ? this.state.values.vehicle
+                : (searchState ? searchState.fieldValues.vehicle : {});
             var summaryProps = appStore.getPageProps('summary');
             summaryProps.id = summaryProps.tire_id;
             delete summaryProps.tire_id;
@@ -62,9 +71,13 @@ define([
                 Api.orderCreate({tires: [summaryProps]}),
                 Api.loadDealerConfig()
             ]).then(function(responses){
+                var values = _.cloneDeep(self.state.values);
+                values.vehicle = vehicleValues;
+
                 self.setState({
                     ready: true,
                     options: responses[0],
+                    values: values,
                     quote: responses[1],
                     order: responses[2],
                     status: responses[2].status,
@@ -111,10 +124,10 @@ define([
                             </fieldset>
                             <fieldset className={cn(['sixcol', 'col_left', 'order_fields'])}>
 
-                                <Field type="text" name="name" defaultValue={this.state.values.name} ref="name" label="Your Name" required={true} error={this._getError('name')} disabled={this.state.status == 'incomplete'} />
-                                <Field type="email" name="email" defaultValue={this.state.values.email} ref="email" label="Email Address" required={true} error={this._getError('email')} disabled={this.state.status == 'incomplete'} />
-                                <Field type="tel" name="phone" defaultValue={this.state.values.phone} ref="phone" label="Phone Number" required={true} error={this._getError('phone')} disabled={this.state.status == 'incomplete'} />
-                                <Field type="datetime" ref="datetime" name="datetime" defaultValue={this.state.values.preferred_time} label="Preferred Date and Time" disabled={this.state.status == 'incomplete'} error={this._getError('preferred_time')} 
+                                <Field type="text" name="name" onChange={this._fieldChange} defaultValue={this.state.values.name} ref="name" label="Your Name" required={true} error={this._getError('name')} disabled={this.state.status == 'incomplete'} />
+                                <Field type="email" name="email" onChange={this._fieldChange} defaultValue={this.state.values.email} ref="email" label="Email Address" required={true} error={this._getError('email')} disabled={this.state.status == 'incomplete'} />
+                                <Field type="tel" name="phone" onChange={this._fieldChange} defaultValue={this.state.values.phone} ref="phone" label="Phone Number" required={true} error={this._getError('phone')} disabled={this.state.status == 'incomplete'} />
+                                <Field type="datetime" ref="datetime" name="datetime" onChange={this._fieldChange} defaultValue={this.state.values.preferred_time} label="Preferred Date and Time" disabled={this.state.status == 'incomplete'} error={this._getError('preferred_time')}
                                        custom={{
                                                 isValidDate: this._isValidDate,
                                                 inputProps: {'name': "preferred_time", 'readOnly': true},
@@ -145,7 +158,7 @@ define([
                                     {this._getError('vehicle_info')}
                                 </div>
                                 
-                                <Field type="textarea" name="notes" defaultValue={this.state.values.notes} ref="notes" label="Notes" error={this._getError('notes')} disabled={this.state.status == 'incomplete'} />
+                                <Field type="textarea" name="notes" onChange={this._fieldChange} defaultValue={this.state.values.notes} ref="notes" label="Notes" error={this._getError('notes')} disabled={this.state.status == 'incomplete'} />
                             </fieldset>
                             <div className={cn(['sixcol', 'last', 'col_right', 'order_info'])}>
                                 
@@ -188,6 +201,14 @@ define([
                     </div>
                 </div>
             );
+        },
+
+        _fieldChange: function(event) {
+            var values = _.cloneDeep(this.state.values);
+            values[event.target.name] = event.target.value;
+            this.setState({
+                values: values
+            });
         },
 
         _isValidDate: function( current ) {
@@ -254,6 +275,17 @@ define([
             var errors = validate(stripeValues, constraints);
             this.setState({errors: (errors || {})});
             return (errors === undefined);
+        },
+
+        _getValues: function () {
+            return {
+                name: this.refs.name.value(),
+                email: this.refs.email.value(),
+                phone: this.refs.phone.value(),
+                preferred_time: this.refs.datetime.value(),
+                notes: this.refs.notes.value(),
+                vehicle: this.state.values.vehicle
+            };
         },
 
         _handleFormSubmit: function(event) {
@@ -338,21 +370,22 @@ define([
             var fieldName = event.target.name;
             var index = fields.indexOf(fieldName);
 
-            var values = this.state.values.vehicle;
-            values[fieldName] = event.target.value;
-            
-            var values = {
-                year: values.year,
-                make: index < 1 ? '' : values.make,
-                model: index < 2 ? '' : values.model,
-                trim: index < 3 ? '' : values.trim
+            var values = _.cloneDeep(this.state.values);
+            values.vehicle[fieldName] = event.target.value;
+
+            values.vehicle = {
+                year: values.vehicle.year,
+                make: index < 1 ? '' : values.vehicle.make,
+                model: index < 2 ? '' : values.vehicle.model,
+                trim: index < 3 ? '' : values.vehicle.trim
             };
 
             var self = this;
 
-            Api.loadVehicleOptions(values, fieldName).then(function(options) {
+            Api.loadVehicleOptions(values.vehicle, fieldName).then(function(options) {
                 self.setState({
-                    options: options
+                    options: options,
+                    values: values
                 })
             });
         }

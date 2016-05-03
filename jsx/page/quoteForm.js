@@ -79,10 +79,21 @@ define([
             }
         },
 
+        componentWillMount: function() {
+            var lastState = appStore.getPageState(this);
+            if (lastState) {
+                this.setState({
+                    values: lastState.values
+                });
+            }
+        },
+
         componentDidMount: function() {
             var self = this;
             var searchState = appStore.getPageState('search');
-            var vehicleValues = searchState ? searchState.fieldValues.vehicle : this.state.values.vehicle;
+            var vehicleValues = Object.keys(this.state.values.vehicle).length > 0
+                ? this.state.values.vehicle
+                : (searchState ? searchState.fieldValues.vehicle : {});
 
 
             var promises;
@@ -132,12 +143,12 @@ define([
                         <form action="appointment-confirmation.php" className={cn('appointment_form')} onSubmit={this._handleFormSubmit}>
                             
                             <fieldset className={cn(['sixcol', 'col_left', 'appointment_fields'])}>
-                                <Field type="text" name="name" defaultValue={this.state.values.name} ref="name" label={ config.sa ? 'Customer Name' : 'Your Name' } required={!config.sa} error={this._getError('name')} />
-                                <Field type="email" name="email" defaultValue={this.state.values.email} ref="email" label="Email Address" required={!config.sa || this.props.type === 'email'} error={this._getError('email')} />
-                                <Field type="tel" name="phone" defaultValue={this.state.values.phone} ref="phone" label="Phone Number" required={!config.sa} error={this._getError('phone')} />
+                                <Field type="text" name="name" onChange={this._fieldChange} defaultValue={this.state.values.name} ref="name" label={ config.sa ? 'Customer Name' : 'Your Name' } required={!config.sa} error={this._getError('name')} />
+                                <Field type="email" name="email" onChange={this._fieldChange} defaultValue={this.state.values.email} ref="email" label="Email Address" required={!config.sa || this.props.type === 'email'} error={this._getError('email')} />
+                                <Field type="tel" name="phone" onChange={this._fieldChange} defaultValue={this.state.values.phone} ref="phone" label="Phone Number" required={!config.sa} error={this._getError('phone')} />
 
                                 { this.props.type === 'appointment'
-                                    ?   <Field type="select" name="way_to_contact" defaultValue={this.state.values.way_to_contact} ref="way_to_contact" label="Best way to contact" 
+                                    ?   <Field type="select" name="way_to_contact" onChange={this._fieldChange} defaultValue={this.state.values.way_to_contact} ref="way_to_contact" label="Best way to contact"
                                             custom={{
                                                 options: [{value: 'phone', description: 'Phone'}, {value: 'email', description: 'Email'}]
                                             }}
@@ -145,7 +156,7 @@ define([
                                     :   null
                                 }
                                 { this.props.type === 'appointment'
-                                    ?   <Field type="datetime" ref="datetime" name="datetime" defaultValue={this.state.values.preferred_time} label="Preferred Date and Time" error={this._getError('preferred_time')} 
+                                    ?   <Field type="datetime" ref="datetime" name="datetime" onChange={this._fieldChange} defaultValue={this.state.values.preferred_time} label="Preferred Date and Time" error={this._getError('preferred_time')}
                                                custom={{
                                                         isValidDate: this._isValidDate,
                                                         inputProps: {'name': "preferred_time", 'readOnly': true},
@@ -155,7 +166,7 @@ define([
                                         />
                                     :   null
                                 }
-                                <Field type="textarea" name="notes" defaultValue={this.state.values.notes} ref="notes" label="Notes" error={this._getError('notes')} />
+                                <Field type="textarea" name="notes" onChange={this._fieldChange} defaultValue={this.state.values.notes} ref="notes" label="Notes" error={this._getError('notes')} />
                             </fieldset>
 
                             <div className={cn(['sixcol', 'last', 'right', 'col_right', 'appointment_info'])}>
@@ -205,6 +216,14 @@ define([
 
                 </div>
             );
+        },
+
+        _fieldChange: function(event) {
+            var values = _.cloneDeep(this.state.values);
+            values[event.target.name] = event.target.value;
+            this.setState({
+                values: values
+            });
         },
 
         _isValidDate: function( current ) {
