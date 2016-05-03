@@ -245,10 +245,21 @@ define([
                 event.preventDefault();
             }
             if (this._isReadyForSearch()) {
-                var params = this.state.fieldValues[this.state.activeTab];
+                var params = _.cloneDeep(this.state.fieldValues[this.state.activeTab]);
                 var locationId = lockr.get('location_id');
                 if ( locationId ) {
                     params.location_id = locationId;
+
+                    if (params.base_category) {
+                        this.state.fieldOptions.base_category.map(function (baseCat) {
+                            if (baseCat.value == params.base_category) {
+                                params.filters = {};
+                                params.filters.category = baseCat.categories;
+                            }
+                        });
+                        delete params.base_category;
+                    }
+
                     A.route('results', params);
                 } else {
                     this._handleLocationsClick();    
