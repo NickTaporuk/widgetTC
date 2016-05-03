@@ -6,8 +6,9 @@ define([
     'moment',
     'isMobile',
     'load!actions/actions',
-    'load!stores/reviewsStore',
-    'load!components/page/results/tire/stars'
+    'load!components/page/results/tire/stars',
+    'actions/api',
+    'lodash'
 ], function (
     React,
     ReactDOM,
@@ -16,8 +17,9 @@ define([
     moment,
     isMobile,
     Act,
-    reviewsStore,
-    Stars
+    Stars,
+    Api,
+    _
 ) {
 
     
@@ -34,21 +36,15 @@ define([
  
         componentWillMount: function() {
             this._updateStateBaseOnProps(this.props);
-            this._updateState();
         },
 
         componentDidMount: function() {
-            reviewsStore.bind('change', this._updateState);
-            this._load(this.props.load);
-        },
-
-        componentWillUnmount: function() {
-            reviewsStore.unbind('change', this._updateState);    
+            this._init(this.props.load);
         },
 
         componentWillReceiveProps: function(nextProps) {
             this._updateStateBaseOnProps(nextProps);
-            this._load(nextProps.load);
+            this._init(nextProps.load);
         },
 
         componentDidUpdate: function() {
@@ -97,9 +93,20 @@ define([
             );
         },
 
-        _load: function(need) {
+        _load: function (offset) {
+            var self = this;
+            var reviews = _.cloneDeep(self.state.reviews);
+            Api.loadReviews(this.props.tireId, offset).then(function(data) {
+                self.setState({
+                    reviews: offset ? reviews.concat(data.reviews) : data.reviews,
+                    totalReviews: data.nb_results
+                });
+            });
+        },
+
+        _init: function(need) {
             if (need && !this.state.totalReviews) {
-                Act.Tire.loadRewiews(this.props.tireId);
+                this._load(0);
             }
         },
 
@@ -107,20 +114,11 @@ define([
             this.setState({
                 scrollToTop: props.scrollToTop
             });
-
-
-        },
-
-        _updateState: function() {
-            this.setState({
-                reviews: reviewsStore.getReviews(this.props.tireId),
-                totalReviews: reviewsStore.getTotalReviews(this.props.tireId)
-            });
         },
 
         _handleMoreClick: function(event) {
             event.preventDefault();
-            Act.Tire.loadRewiews(this.props.tireId, this.state.reviews.length);
+            this._load(this.state.reviews.length);
         }
 
     }
