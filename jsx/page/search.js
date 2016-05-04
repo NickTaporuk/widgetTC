@@ -78,7 +78,7 @@ define([
                 <div className={cn('search_wrapper')} id={cn('search_wrapper')}>
                     <div className={cn('search_inner')}>
                         <form id={cn('search_by')} className={cn('search_by')} role="search" onSubmit={this._handleSubmit}>
-                            { this.state.locations.length > 0
+                            { this.state.locations.length > 1
                                 ? <a href="#locations" onClick={this._handleLocationsClick} className={cn(['change_location', 'modal_open'])}><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE0C8;' }} />Change Location</a>
                                 : null
                             }
