@@ -27,7 +27,11 @@ define([
             var self = this;
 
             var summaryProps = appStore.getPageProps('summary');
-            var locationId = appStore.getPageProps('results').location_id;
+
+            var tireParams = h.base64Decode(summaryProps.tire_id).split('||');
+            var locationId = tireParams[3];
+
+            // var locationId = appStore.getPageProps('results').location_id;
 
             Promise.all([
                 Api.loadTire(summaryProps.tire_id),

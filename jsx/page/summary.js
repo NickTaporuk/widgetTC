@@ -170,26 +170,29 @@ define([
 
         _init: function () {
             var self = this,
-                props = this.props,
-                resultsProps = appStore.getPageProps('results');
+                props = this.props;
+
+            var tireParams = h.base64Decode(props.tire_id).split('||');
+            var locationId = tireParams[3];
+
             var promises = [
                 Api.loadTire(props.tire_id),
                 Api.loadQuote(props.tire_id, props.quantity, props.optional_services, props.with_discount, props.custom_discount),
-                Api.loadDealerConfig()
+                Api.loadDealerConfig(),
+                Api.loadLocationConfig(locationId)
             ];
-            if (resultsProps && resultsProps.location_id) {
-                promises.push(Api.loadLocationConfig(resultsProps.location_id));
-            }
+
             Promise.all(promises).then(function(responses) {
                 var tire = responses[0];
                 var quote = responses[1];
                 var dealerConfig = responses[2];
+
                 self.setState({
                     ready: true,
                     withOrderBtn: !config.sa && dealerConfig.ecommerce && dealerConfig.ecommerce.services && dealerConfig.ecommerce.services.stripe && dealerConfig.ecommerce.services.stripe.publishable_key,
                     quote: quote,
                     tire: tire,
-                    callNumber: responses[3] ? responses[3].call_number : null
+                    callNumber: responses[3].call_number
                 });
             });
         },
