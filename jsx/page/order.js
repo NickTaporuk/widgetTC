@@ -50,6 +50,12 @@ define([
                 this.setState({
                     values: lastState.values
                 });
+            } else {
+                var values = _.cloneDeep(this.state.values);
+                values.preferred_time = moment().add(1, 'd').minutes(0).hour(13).format('YYYY-MM-DD HH:mm');
+                this.setState({
+                    values: values
+                });
             }
         },
 
