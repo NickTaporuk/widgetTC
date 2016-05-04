@@ -2,28 +2,45 @@ define([
     'react',
     'classnames', 
     'config',
-    'load!stores/dealerStore'
+    'actions/api',
+    'promise'
 ], function(
     React,
     cn, 
     config,
-    dealerStore
+    Api,
+    Promise
 ) {
 
     return {
         displayName: 'Top',
 
-        componentWillMount: function() {
-            this._updateState();
+        getInitialState: function() {
+            return {
+                ready: false
+            }
         },
+
         componentDidMount: function() {
-            if (config.sa) dealerStore.bind('change', this._updateState);
-        },
-        componentWillUnmount: function() {
-            if (config.sa) dealerStore.unbind('change', this._updateState);    
+            var self = this;
+            Promise.all([
+                Api.loadDealerInfo(),
+                Api.loadDealerConfig()
+            ]).then(function (responses) {
+                self.setState({
+                    ready: true,
+                    companyName: responses[0].company_name,
+                    logo: responses[0].logo,
+                    showTCLogo: responses[1].show_tireconnect_logo
+                });
+            });
         },
 
         render: function() {
+            if (!this.state.ready) {
+                return null;
+            }
+
             if (config.sa) {
                 return (
                     <div className={cn(['twelvecol', 'instore_header'])}>
@@ -37,19 +54,19 @@ define([
                     </div>
                 );
             } else {
-                var showTCLogo = dealerStore.getShowTCLogo();
-                return showTCLogo ? <p className={cn('powered_by')}>Powered by <img src={config.imagesFolder + 'tireconnect-logo.png'} alt="TireConnect" /></p> : null;
+                console.log('sdfsf', this.state);
+                return this.state.showTCLogo ? <p className={cn('powered_by')}>Powered by <img src={config.imagesFolder + 'tireconnect-logo.png'} alt="TireConnect" /></p> : null;
             }
-        },
+        }
 
-        _updateState: function() {
-            if (config.sa) {
-                this.setState({
-                    'companyName': dealerStore.getCompanyName(),
-                    'logo': dealerStore.getLogo()
-                });
-            }
-        },
+        // _updateState: function() {
+        //     if (config.sa) {
+        //         this.setState({
+        //             'companyName': dealerStore.getCompanyName(),
+        //             'logo': dealerStore.getLogo()
+        //         });
+        //     }
+        // },
     };
 
 });

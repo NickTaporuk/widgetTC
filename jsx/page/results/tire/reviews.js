@@ -5,7 +5,6 @@ define([
     'lib/helper',
     'moment',
     'isMobile',
-    'load!actions/actions',
     'load!components/page/results/tire/stars',
     'actions/api',
     'lodash'
@@ -16,7 +15,6 @@ define([
     h,
     moment,
     isMobile,
-    Act,
     Stars,
     Api,
     _

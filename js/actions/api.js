@@ -267,10 +267,7 @@ define([
                 url: 'dealer/list',
                 cache: true
             }).then(function(response) {
-                dispatcher.dispatch({
-                    actionType: constants.LOAD_DEALER_INFO_SUCCESS,
-                    info: response.data.dealers[0]
-                });
+                return response.data.dealers[0];
             });
         },
 
