@@ -172,7 +172,8 @@ define([
             return ajax.make({
                 url: 'tire/' + method,
                 data: searchParams,
-                method: 'post'
+                method: 'post',
+                oneTimeCache: true
             }).then(function(response) {
                 return response.data;
             });
@@ -180,7 +181,8 @@ define([
 
         loadTire: function(tireId) {
             return ajax.make({
-                url: 'tire/' + tireId
+                url: 'tire/' + tireId,
+                oneTimeCache: true
             }).then(function(response){
                 return response.data;
             });
@@ -292,7 +294,8 @@ define([
                     with_discount: withDiscount || false,
                     custom_discount: customDiscount || null,
                     track: track || null
-                }
+                },
+                oneTimeCache: true
             }).then(function(response) {
                 var quote = response.data;
                 quote.tire_id = tireId;

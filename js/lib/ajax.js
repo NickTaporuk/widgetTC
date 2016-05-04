@@ -116,7 +116,7 @@ define(['config', 'promise'], function(config, Promise) {
 		    }
 		  }
 		  return str.join("&");
-		}
+		};
 
 		$private.isObject = function isObject( data ) {
 		  return '[object Object]' === Object.prototype.toString.call( data );
@@ -135,6 +135,7 @@ define(['config', 'promise'], function(config, Promise) {
 
 		// ---- cache ----
 		var cache = {};
+		var oneTimeCache = {};
 
 		var getKeyForCache = function(url, data) {
 			return (url + JSON.stringify(data)).replace(/[^a-zA-Z0-9]/g, '');
@@ -147,6 +148,17 @@ define(['config', 'promise'], function(config, Promise) {
 		var getFromCache = function(url, data) {
 			var response = cache[getKeyForCache(url, data)]; 
 			return response || null;
+		};
+
+		var addToOneTimeCache = function(url, data, response) {
+			oneTimeCache[url] = {
+				key: getKeyForCache(url, data),
+				response: response
+			};
+		};
+
+		var getFromOneTimeCache = function(url, data) {
+			return oneTimeCache[url] && oneTimeCache[url].key == getKeyForCache(url, data) ? oneTimeCache[url].response : null;
 		};
 		// ---- END cache ----
 
@@ -184,14 +196,18 @@ define(['config', 'promise'], function(config, Promise) {
 			return new Promise(function(resolve, reject) {
 				
 				var data = params.data || {};
-				if (params.cache) {
 
-					var response = getFromCache(url, data); 
-					if (response) {
-						resolve(response);
-						always(response);
-						return;
-					}
+				var responseFromCache = '';
+				if (params.oneTimeCache) {
+					responseFromCache = getFromOneTimeCache(url, data);
+				} else if (params.cache) {
+					responseFromCache = getFromCache(url, data);
+
+				}
+				if (responseFromCache) {
+					resolve(responseFromCache);
+					always(responseFromCache);
+					return;
 				}
 
 				switch (params.method || 'get') {
@@ -204,9 +220,12 @@ define(['config', 'promise'], function(config, Promise) {
 				}
 
 				a.done(function(response, xhr) {
-					if (params.cache) {
+					if (params.oneTimeCache) {
+						addToOneTimeCache(url, data, response);
+					} else if (params.cache) {
 						addToCache(url, data, response);
 					}
+
 					resolve(response, xhr);
 				});
 
