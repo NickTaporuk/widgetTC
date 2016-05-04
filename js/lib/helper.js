@@ -120,7 +120,7 @@ define(['config'], function(config) {
                     obj[string] = isNaN(parseInt(val)) ? val : val * 1;
                 }
                 return obj;
-            }
+            };
 
             var i = 0,
                 retObj = {},

@@ -30,43 +30,11 @@ define([
 
     var actions = {
         init: function () {
-            // var curLocId = locationsStore.getCurLocId();
-
-            // var promises = [
-                // Api.loadLocations()
-                // Api.loadTireParameters(),
-                // Api.getVehicleOptions(),
-                // Api.loadDealerConfig(),
-                // Api.loadDealerInfo()
-            // ];
-
-            // if (curLocId) {
-            //     promises.push(Api.loadLocationConfig(curLocId));
-            // }
-
-            // Promise.all(promises).then(function () {
-            //     start();
-            // });
-
             start();
         },
-
-        route: function(url, params) {
-            // console.log(params);
-
-            // modes:
-            // - 1: new (page init steps need to be done before show page)
-            // - 2: after navigation  (prev/next btn),
-            // - 3: show last (page init steps will be skiped and last params of the page will be used)
-
-
-            // var needInit = true;
-            // if (visitedPages[url]) {
-                // params = visitedPages[url];
-                // needInit = false;
-            // }
-
-            // actions[url + 'Page'].update(params, needInit);
+        route: function(url, params, changeUrl) {
+            params = params || null;
+            changeUrl = changeUrl === undefined ? true : changeUrl;
 
             dispatcher.dispatch({
                 actionType: 'page.update',
@@ -74,8 +42,9 @@ define([
                 props: params
             });
 
-            // visitedPages[url] = params;
-            setUrl(url, params);
+            if (changeUrl) {
+                setUrl(url, params);
+            }
         },
 
         popup: {
@@ -94,16 +63,7 @@ define([
                 });
             }
 
-        },
-
-        confirmationPage: {
-            update: function (entryParams, afterNav) {
-                dispatcher.dispatch({
-                    actionType: 'confirmation.page.update',
-                    notice: entryParams.notice
-                });
-            }
-        },
+        }
     };
 
     var visitedPages = {};
@@ -111,7 +71,7 @@ define([
     function setUrl(page, params) {
         visitedPages[page] = params || true;
 
-        var path = '#!' + page + (params ? '?' + h.objToQuery(params) : '');
+        var path = '#!' + page + (params && Object.keys(params).length > 0 ? '?' + h.objToQuery(params) : '');
 
         var state = {
             page: page,

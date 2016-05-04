@@ -1,35 +1,35 @@
 define([
     'react',
     'classnames',
-    'load!stores/pageStore'
+    'load!stores/store'
 ], function(
     React,
     cn,
-    pageStore
+    store
 ) {
 
     return {
-        displayName: 'Header',
+        displayName: 'header',
 
         componentWillMount: function() {
-            this._updateStatus();
+            this._updateState();
         },
         componentDidMount: function() {
-            pageStore.bind('change', this._updateStatus);
+            store.bind('change', this._updateState);
         },
         componentWillUnmount: function() {
-            pageStore.unbind('change', this._updateStatus);    
+            store.unbind('change', this._updateState);
         },
 
         render: function() {
             var header;
-            switch (pageStore.getPageName()) {
+            switch (this.state.page) {
                 case 'confirmation':
-                    var props = this.state.props;
+                    var props = store.getProps();
                     header = <div>
                                 <h2 className={cn('textcenter')}>Thank you!</h2>
                                 <p className={cn('textcenter')} dangerouslySetInnerHTML={{ __html: props.notice.replace(/(?:\r\n|\r|\n)/g, "<br />")}} />
-                            </div>
+                            </div>;
                     break;
 
                 default:
@@ -68,10 +68,9 @@ define([
             return step;
         },
 
-        _updateStatus: function() {
+        _updateState: function() {
             this.setState({
-                page: pageStore.getPageName(),
-                props: pageStore.getProps()
+                page: store.getPage(),
             });
         }
     };

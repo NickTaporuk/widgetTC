@@ -105,32 +105,9 @@ define([
                     content = <Order {...props} />;
                     break;
                 case 'confirmation':
-                    console.log('confirm!!!');
-                    content = 'OK!!!';
-                    // content = <Confirmation {...props} />;
+                    content = <Confirmation {...props} />;
                     break;
 
-                case 'order':
-                case 'confirmation':
-                    var props = {
-                        quote: customerStore.getQuote(),
-                        tire: customerStore.getSelectedTire(),
-                        order: customerStore.getOrder(),
-                        stripeKey: dealerStore.getStripeKey(),
-                        vehicleInfo: searchStore.getActiveSection() == 'vehicle'
-                            ? searchStore.getValue('vehicle', 'year') + ' ' + searchStore.getValue('vehicle', 'make') + ' ' + searchStore.getValue('vehicle', 'model') + ' ' + searchStore.getValue('vehicle', 'trim')
-                            : null
-                    };
-                    if (this.state.name == 'appointment') {
-                        props.type = this.state.props.type;
-                        content = <Appointment {...props} />;
-                    } else if (this.state.name == 'order') {
-                        content = <Order {...props} />;
-                    } else if (this.state.name == 'confirmation') {
-                        props.location = locationsStore.getCurrentLocation();
-                        content = <Confirmation {...props} />;
-                    }
-                    break;
                 case '':
                     content = null;
                     break;

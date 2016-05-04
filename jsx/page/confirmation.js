@@ -3,22 +3,57 @@ define([
     'classnames',
     'load!actions/act',
     'lib/helper',
-    'config'
+    'config',
+    'load!stores/appStore',
+    'promise'
 ], function(
     React,
     cn,
     A,
     h,
-    config
+    config,
+    appStore,
+    Promise
 ) {
 
     return {
+        getInitialState: function() {
+            return {
+                ready: false
+            }
+        },
+
+        componentDidMount: function() {
+            var self = this;
+
+            var summaryProps = appStore.getPageProps('summary');
+            var locationId = appStore.getPageProps('results').location_id;
+
+            Promise.all([
+                Api.loadTire(summaryProps.tire_id),
+                Api.loadQuote(summaryProps.tire_id, summaryProps.quantity, summaryProps.optional_services, summaryProps.with_discount, summaryProps.custom_discount),
+                Api.loadLocation(locationId)
+            ]).then(function(responses){
+                self.setState({
+                    ready: true,
+                    tire: responses[0],
+                    quote: responses[1],
+                    location: responses[2],
+                    order: appStore.getPageState('order').order
+                })
+            });
+        },
 
         render: function() {
-            var tire = this.props.tire;
-            var quote = this.props.quote;
-            var order = this.props.order;
-            var location = this.props.location;
+            if (!this.state.ready) {
+                return null;
+            }
+
+            var tire = this.state.tire;
+            var quote = this.state.quote;
+            var order = this.state.order;
+            var orderPrices = this.state.order.tires[0].prices;
+            var location = this.state.location;
 
             var recyclingFee = null;
             if (quote.recycling_fee) {
@@ -101,14 +136,14 @@ define([
                                         <td>${h.priceFormat(quote.total.price)}</td>
                                     </tr>
                                     <tr>
-                                        <td>{ order.payment_percentage + '% Deposit Paid' }</td>
-                                        <td>${h.priceFormat(order.deposit_payment)}</td>
+                                        <td>{ orderPrices.payment_percentage + '% Deposit Paid' }</td>
+                                        <td>${h.priceFormat(orderPrices.deposit_payment)}</td>
                                     </tr>
                                 </tbody>
                                 <tfoot>
                                     <tr>
                                         <td>Outstanding Balance:</td>
-                                        <td>${h.priceFormat(order.outstanding_balance)}</td>
+                                        <td>${h.priceFormat(orderPrices.outstanding_balance)}</td>
                                     </tr>
                                 </tfoot>
                             </table>
@@ -167,7 +202,7 @@ define([
         },
 
          _getDiscountBlock: function() {
-            var discount = this.props.quote.discount && this.props.quote.discount.applied ? this.props.quote.discount.total_value : null;
+            var discount = this.state.quote.discount && this.state.quote.discount.applied ? this.state.quote.discount.total_value : null;
             if (!discount) {
                 return null;
             }
@@ -194,7 +229,7 @@ define([
 
         _handleToStartClick: function(event) {
             event.preventDefault();
-            A.searchPage.update();
+            A.route('search');
         },
 
         _handelPrintClick: function(event) {

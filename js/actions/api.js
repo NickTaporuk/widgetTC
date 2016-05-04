@@ -478,12 +478,7 @@ define([
                 data: { offset: offset, limit: 5 },
                 cache: true
             }).then(function(response) {
-                dispatcher.dispatch({
-                    actionType: constants.LOAD_REVIEWS_SUCCESS,
-                    data: response.data,
-                    tireId: tireId,
-                    offset: offset
-                });
+                return response.data;
             });
         },
 

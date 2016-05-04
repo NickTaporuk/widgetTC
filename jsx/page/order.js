@@ -1,7 +1,6 @@
 define([
     'react',
     'classnames',
-    'load!actions/actions',
     'load!actions/act',
     'lib/helper',
     'load!components/elements/select',
@@ -17,7 +16,6 @@ define([
 ], function(
     React,
     cn,
-    Act,
     A,
     h,
     SelectField,
@@ -240,12 +238,12 @@ define([
 
         _checkStripeValues: function(stripeValues) {
             if (!this._isStripeLoaded) {
-                Act.Popup.show('alert', {title: 'We are sorry.', content: 'Some scripts, needed for payment, has not been loaded. Please try again.'});
+                A.Popup.show('We are sorry.', 'Some scripts, needed for payment, has not been loaded. Please try again.');
                 this.setState({'disabled': false});
                 return false;
             }
             if (!window.Stripe || !window.Stripe.setPublishableKey) {
-                Act.Popup.show('alert', {title: 'We are sorry.', content: 'Scripts needed for payment has not been found.'});
+                A.Popup.show('We are sorry.', 'Scripts needed for payment has not been found.');
                 this.setState({'disabled': false});
                 return false;
             }
@@ -327,7 +325,7 @@ define([
                                 self.setState({
                                     order: response
                                 });
-                                A.route('confirmation');
+                                A.route('confirmation', {notice: response.notice}, false);
                             }).catch(function (errors) {
                                 self.setState({
                                     errors: errors,
