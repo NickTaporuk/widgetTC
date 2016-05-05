@@ -135,7 +135,8 @@ define([
 
         _checkValues: function (checkedValues) {
             if (this.props.data.required_brands) {
-                checkedValues = _.union(this.props.data.required_brands, checkedValues);
+                var requiredBrands = _.intersection(this.props.data.required_brands, this.state.allValues);
+                checkedValues = _.union(checkedValues, requiredBrands);
             }
 
             this.setState({
