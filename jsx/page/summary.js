@@ -248,7 +248,8 @@ define([
             var isOptional = isOptional || false,
                 services = [];
 
-            servicesInfo.map(function(info, i){
+            Object.keys(servicesInfo).map(function(i){
+                var info = servicesInfo[i];
                 var toggleCell = null;
 
                 if (isOptional) {
@@ -290,7 +291,9 @@ define([
 
         _getActiveOptServicesKeys: function() {
             var keys = [];
-            this.state.quote.optional_services.map(function(service) {
+            var self = this;
+            Object.keys(this.state.quote.optional_services).map(function(i) {
+                var service = self.state.quote.optional_services[i];
                 if (service.applied) {
                     keys.push(service.key);
                 }

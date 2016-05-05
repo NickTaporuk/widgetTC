@@ -85,10 +85,19 @@ define([
 
             } else {
                 // generate message if offer is not active:
-                
-                var msgOfferSpend = '', msgOfferVal = '';
+                var msgOfferSpend = '', msgOfferVal = '', msgOfferSpendMoreDef = '';
                 if (offer.minimum_qualifiers.amount) {
-                    msgOfferSpend = 'Spend $' + offer.minimum_qualifiers.amount + (offer.minimum_qualifiers.pre_tax ? ' before' : ' after') + ' taxes ';
+                    msgOfferSpend = 'Spend $' + offer.minimum_qualifiers.amount + ' ';
+                    if (offer.minimum_qualifiers.pre_tax && offer.minimum_qualifiers.with_disposal_fee) {
+                        msgOfferSpend += 'before taxes,';
+                        msgOfferSpendMoreDef = 'but including fees';
+                    } else if (offer.minimum_qualifiers.pre_tax && !offer.minimum_qualifiers.with_disposal_fee) {
+                        msgOfferSpend += 'before taxes';
+                    } else if (!offer.minimum_qualifiers.pre_tax && offer.minimum_qualifiers.with_disposal_fee) {
+                        msgOfferSpend += 'after taxes and fees'
+                    } else if (!offer.minimum_qualifiers.pre_tax && !offer.minimum_qualifiers.with_disposal_fee) {
+                        msgOfferSpend += 'after taxes';
+                    }
                 } else {
                     msgOfferSpend = 'Purchase ' + offer.minimum_qualifiers.quantity + ' tires ';
                 }
@@ -98,7 +107,13 @@ define([
                     var value = offer.per_tire ? offer.value : offer.total_value; // rebate need only total value and rebate have no per_tire option
                     msgOfferVal = 'to receive $' + value + ' ' + type + (offer.per_tire ? ' per tire.' : '.');
                 }
-                whiteBlock = <div className={cn('discount_wrapper')}><strong>{msgOfferSpend}<br />{msgOfferVal}</strong></div>;
+                whiteBlock = <div className={cn('discount_wrapper')}>
+                    <strong>
+                        {msgOfferSpend}<br />
+                        {msgOfferSpendMoreDef}{msgOfferSpendMoreDef ? <br /> : null}
+                        {msgOfferVal}
+                    </strong>
+                </div>;
 
             }
 
