@@ -45,19 +45,26 @@ define([
         render: function() {
             var list = [];
 
-            this.props.params.map(function(option, i) {
+            this.props.data.parameters.map(function(option, i) {
                 list.push((
                     <li key={i}>
                         <label>
-                            <input type="checkbox" name={this.props.name} value={option.value} onChange={this._handleFieldChange} checked={ (this.state.checkedValues.indexOf(option.value) !== -1) } /> {option.description + ' (' + option.count + ')'}
+                            <input
+                                type="checkbox"
+                                name={this.props.name}
+                                value={option.value}
+                                onChange={this._handleFieldChange}
+                                checked={ (this.state.checkedValues.indexOf(option.value) !== -1) }
+                                disabled={ this.props.data.required_brands ? this.props.data.required_brands.indexOf(option.value) !== -1 : false }
+                            />
+                            {option.description + ' (' + option.count + ')'}
                         </label>
                     </li>
                 ));
             }.bind(this));
 
-
             var allCheckbox = null;
-            if (this.props.params.length > 1 && this.props.allDesc) {
+            if (this.props.data.parameters.length > 1 && this.props.allDesc) {
                 allCheckbox = <li>
                     <label className={cn('filters_all')}>
                         <input type="checkbox" defaultChecked={true} onClick={this._handleAllClick} /> {this.props.allDesc}
@@ -83,7 +90,7 @@ define([
 
         _setStateFromProps: function(props, init) {
             var allValues = [];
-            props.params.forEach(function(param, i) {
+            props.data.parameters.forEach(function(param, i) {
                 allValues.push(param.value);
             }, this);
 
@@ -110,11 +117,8 @@ define([
                     return el == value;
                 });
             }
-            this.setState({
-                checkedValues: checkedValues
-            });
 
-            this.props.onChange(this.props.name, checkedValues, event);
+            this._checkValues(checkedValues);
         },
 
         _handleAllClick: function(event) {
@@ -125,12 +129,20 @@ define([
             } else {
                 checkedValues = [];    
             }
-            
+
+            this._checkValues(checkedValues);
+        },
+
+        _checkValues: function (checkedValues) {
+            if (this.props.data.required_brands) {
+                checkedValues = _.union(this.props.data.required_brands, checkedValues);
+            }
+
             this.setState({
                 checkedValues: checkedValues
-            });            
+            });
 
-            this.props.onChange(this.props.name, checkedValues, event);
+            this.props.onChange(this.props.name, checkedValues);
         }
     }
 

@@ -39,13 +39,6 @@ define([
             };
         },
 
-        // componentWillMount: function () {
-        //     var lastState = appStore.getPageState(this);
-        //     if (lastState) {
-        //         this.setState(lastState);
-        //     }
-        // },
-
         componentDidMount: function() {
             if (!this.state.ready) {
                 this._init();
@@ -155,6 +148,10 @@ define([
                 } else {
                     queryParams = self.props.width + '/' + self.props.height + 'R' + self.props.rim;
                 }
+                
+                if (dealerConfig.client_type == 3 && results.filters.brand) {
+                    results.filters.brand.required_brands = ['Bridgestone', 'Firestone', 'Fuzion'];
+                }
 
                 var state = {
                     ready: true,
@@ -193,7 +190,7 @@ define([
                     filtersInfo.forEach(function(info, i) {
                         if (this.state.filters[info.key].parameters.length > 1) {
                             filters.push((
-                                <FilterBlock key={i} by={info.desc} topDirection={ !this.state.totalCount } name={info.key} allDesc={info.all} defaultValue={ values[info.key] ? _.toArray(values[info.key]) : [] } params={ this.state.filters[info.key].parameters } onChange={this._handleFilterChange} />
+                                <FilterBlock key={i} by={info.desc} topDirection={ !this.state.totalCount } name={info.key} allDesc={info.all} defaultValue={ values[info.key] ? _.toArray(values[info.key]) : [] } data={ this.state.filters[info.key] } onChange={this._handleFilterChange} />
                             ));
                         }
                     }, this);
