@@ -55,8 +55,8 @@ define([
                         title = (errors[error.error_code] ? errors[error.error_code] : error.notice);
                         content = '';
                     } else {
-                        title = 'Sorry, an error has been occurred ):';
-                        content = 'Please try again later!';
+                        title = 'Sorry, an error has been occurred.';
+                        content = "Please notify us at support@tireconnect.ca or 1 888 792 7072 ext 100.<br />We would love to fix this for you.";
                     }
                     hidden = false;
                     change = true;
