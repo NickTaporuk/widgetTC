@@ -59,7 +59,7 @@ define([
                     name: '',
                     email: '',
                     phone: '',
-                    way_to_contact: '',
+                    way_to_contact: 'phone',
                     preferred_time: '',
                     notes: '',
                     vehicle: {
