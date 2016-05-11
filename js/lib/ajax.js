@@ -134,8 +134,8 @@ define(['config', 'promise'], function(config, Promise) {
 		var self = this;
 
 		// ---- cache ----
-		var cache = {};
-		var oneTimeCache = {};
+		var cache = {},
+			oneTimeCache = {};
 
 		var getKeyForCache = function(url, data) {
 			return (url + JSON.stringify(data)).replace(/[^a-zA-Z0-9]/g, '');
@@ -160,25 +160,28 @@ define(['config', 'promise'], function(config, Promise) {
 		var getFromOneTimeCache = function(url, data) {
 			return oneTimeCache[url] && oneTimeCache[url].key == getKeyForCache(url, data) ? oneTimeCache[url].response : null;
 		};
-		// ---- END cache ----
 
-		var ajaxCounter = 0;
+		// ---- END cache ----
+		var inProcessPromises = {};
+
+		var inProcess = function (url, data, val) {
+			if (val) {
+				inProcessPromises[getKeyForCache(url, data)] = val;
+			} else {
+				return inProcessPromises[getKeyForCache(url, data)] || false;
+			}
+		};
 
 		this.beforeSend = function(){};
 		this.error = function(e){};  
 		this.complete = function(){};
 
-	
-		this.isBusy = function() {
-			return ajaxCounter > 0;
-		};
-
 		this.make = function(params) {
-			var url = config.apiBaseUrl + params.url + (/\?/.test(params.url) ? '&' : '?') + 'key=' + config.apikey + (config.sessionId ? '&session_id=' + config.sessionId : '')
+			var url = config.apiBaseUrl + params.url + (/\?/.test(params.url) ? '&' : '?') + 'key=' + config.apikey + (config.sessionId ? '&session_id=' + config.sessionId : '');
+			var data = params.data || {};
 			var a;
 
 			self.beforeSend();
-			ajaxCounter++;
 
 			var ajax_a = new Ajax();
 
@@ -189,13 +192,17 @@ define(['config', 'promise'], function(config, Promise) {
 			};
 
 			var always = function(response, xhrObject) {
-				ajaxCounter--;
+				inProcess(url, data, false);
 				params.complete ? params.complete(response, xhrObject) : self.complete(response, xhrObject);
 			};
 
-			return new Promise(function(resolve, reject) {
-				
-				var data = params.data || {};
+
+			// if (inProcess(url, data)) {
+				// return inProcess(url, data);
+			// };
+
+			var promise = new Promise(function(resolve, reject) {
+				// self.beforeSend();
 
 				var responseFromCache = '';
 				if (params.oneTimeCache) {
@@ -240,6 +247,10 @@ define(['config', 'promise'], function(config, Promise) {
 				a.always(always);
 
 			});
+
+			inProcess(url, data, promise);
+
+			return promise;
 		}
 	}
 

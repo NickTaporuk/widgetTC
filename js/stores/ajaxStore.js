@@ -19,7 +19,7 @@ define([
         },
 
         dispatchToken: dispatcher.ajax.register(function(payload) {
-            change = false;
+            var change = false;
             switch (payload.actionType) {
                 case constants.BEFORE_REQUEST:
                     ajaxCount++;

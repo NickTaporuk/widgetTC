@@ -320,7 +320,7 @@ define([
                     data: data,
                     useGlobalError: false
                 }).then(function(response) {
-                    return response;
+                    return { title: response.notice, content: '' };
                 }).catch(function(response) {
                     if (response.error_code == 400001) {
                         return Promise.reject(response.errors);

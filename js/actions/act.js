@@ -2,8 +2,6 @@ define([
     'dispatcher',
     'promise',
     'load!stores/store',
-    'load!stores/popupStore',
-    'actions/api',
     'lib/helper',
     'lib/history',
     'lodash',
@@ -12,8 +10,6 @@ define([
     dispatcher,
     Promise,
     store,
-    popupStore,
-    Api,
     h,
     history,  // history must be used to fill appStore
     _,
@@ -80,20 +76,6 @@ define([
 
     function execute(page, params, afterNav) {
         actions.route(page, params);
-
-        // switch (page) {
-        //     case '':
-        //         actions.searchPage.update(params, afterNav);
-        //         break;
-        //     case 'get_a_quote':
-        //         actions.getAQuotePage.update(params, afterNav);
-        //         break;
-        //     case 'email_only':
-        //         actions.emailOnlyPage.update(params, afterNav);
-        //         break;
-        //     default:
-        //         actions[page + 'Page'].update(params, afterNav);
-        // }
     }
 
     history.bind('popstate', function (state) {

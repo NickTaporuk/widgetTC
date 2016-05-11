@@ -57,15 +57,6 @@ define([
                 return this.state.showTCLogo ? <p className={cn('powered_by')}>Powered by <img src={config.imagesFolder + 'tireconnect-logo.png'} alt="TireConnect" /></p> : null;
             }
         }
-
-        // _updateState: function() {
-        //     if (config.sa) {
-        //         this.setState({
-        //             'companyName': dealerStore.getCompanyName(),
-        //             'logo': dealerStore.getLogo()
-        //         });
-        //     }
-        // },
     };
 
 });
