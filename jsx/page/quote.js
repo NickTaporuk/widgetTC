@@ -48,8 +48,8 @@ define([
             }
         },
 
-        shouldComponentUpdate: function() {
-            return false;
+        shouldComponentUpdate: function(nextProps, nextState) {
+            return nextState.ready !== this.state.ready;
         },
 
         componentWillUnmount: function () {
@@ -57,6 +57,10 @@ define([
         },
 
         render: function() {
+            if (!this.state.ready) {
+                return null;
+            }
+
             return (
                 <div>
                     <Back />
