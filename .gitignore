@@ -1,5 +1,5 @@
-components/.module-cache/
-bower_components/
+js/components/.module-cache/
+js/bower_components/
 node_modules/
 components/
 .sass-cache/
