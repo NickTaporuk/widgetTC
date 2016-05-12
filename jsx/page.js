@@ -37,8 +37,7 @@ define([
 
         getInitialState: function() {
             return {
-                name: '',
-                props: {}
+                name: ''
             }
         },
 
@@ -54,10 +53,8 @@ define([
             store.unbind('change', this._updateState);
         },
 
-        componentDidUpdate: function() {
-            if (this.state.props.lastScrollPos) {
-                window.scrollTo(0, this.state.props.lastScrollPos);
-            } else {
+        componentDidUpdate: function(prevProps, prevState) {
+            if (prevState.name !== this.state.name) {
                 this._scrollToTop();
             }
         },

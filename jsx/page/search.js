@@ -61,6 +61,9 @@ define([
                         locations: response[2],
                         activeTab: response[3].default_searching ? response[3].default_searching.replace('by_', '') : 'vehicle'
                     });
+                    if (response[2].length == 1) {
+                        lockr.set('location_id', response[2][0].id);
+                    }
                 });
             }
         },
