@@ -291,13 +291,15 @@ define([
 
         _getActiveOptServicesKeys: function() {
             var keys = [];
-            var self = this;
-            Object.keys(this.state.quote.optional_services).map(function(i) {
-                var service = self.state.quote.optional_services[i];
-                if (service.applied) {
-                    keys.push(service.key);
-                }
-            });
+            if (this.state.quote.optional_services) {
+                var self = this;
+                Object.keys(this.state.quote.optional_services).map(function (i) {
+                    var service = self.state.quote.optional_services[i];
+                    if (service.applied) {
+                        keys.push(service.key);
+                    }
+                });
+            }
 
             return keys;
         },

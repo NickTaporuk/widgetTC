@@ -1,11 +1,11 @@
 define([
     'react',
     'classnames',
-    'load!stores/store'
+    'load!stores/pageStore'
 ], function(
     React,
     cn,
-    store
+    pageStore
 ) {
 
     return {
@@ -15,17 +15,17 @@ define([
             this._updateState();
         },
         componentDidMount: function() {
-            store.bind('change', this._updateState);
+            pageStore.bind('change', this._updateState);
         },
         componentWillUnmount: function() {
-            store.unbind('change', this._updateState);
+            pageStore.unbind('change', this._updateState);
         },
 
         render: function() {
             var header;
             switch (this.state.page) {
                 case 'confirmation':
-                    var props = store.getProps();
+                    var props = pageStore.getProps();
                     header = <div>
                                 <h2 className={cn('textcenter')}>Thank you!</h2>
                                 <p className={cn('textcenter')} dangerouslySetInnerHTML={{ __html: props.notice.replace(/(?:\r\n|\r|\n)/g, "<br />")}} />
@@ -70,7 +70,7 @@ define([
 
         _updateState: function() {
             this.setState({
-                page: store.getPage(),
+                page: pageStore.getPage(),
             });
         }
     };

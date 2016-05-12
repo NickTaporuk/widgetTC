@@ -10,7 +10,7 @@ define([
     'load!components/page/quote',
     'load!components/page/emailForm',
     'react',
-    'load!stores/store',
+    'load!stores/pageStore',
     'classnames',
     'config',
     'lodash'
@@ -26,7 +26,7 @@ define([
     Quote,
     EmailForm,
     React,
-    store,
+    pageStore,
     cn,
     config,
     _
@@ -46,11 +46,11 @@ define([
         },
 
         componentDidMount: function() {
-            store.bind('change', this._updateState);
+            pageStore.bind('change', this._updateState);
         },
 
         componentWillUnmount: function() {
-            store.unbind('change', this._updateState);
+            pageStore.unbind('change', this._updateState);
         },
 
         componentDidUpdate: function(prevProps, prevState) {
@@ -66,7 +66,7 @@ define([
         _getContent: function() {
             var content = null;
 
-            var props = store.getProps();
+            var props = pageStore.getProps();
             switch (this.state.name) {
                 case 'search':
                     content = <Search {...props} />;
@@ -103,7 +103,7 @@ define([
 
         _updateState: function () {
             this.setState({
-                name: store.getPage()
+                name: pageStore.getPage()
             });
         },
 

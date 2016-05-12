@@ -29,6 +29,7 @@ define([
     appStore,
     Promise
 ) {
+    var lastScrollPos;
 
     return {
         displayName: 'results',
@@ -40,21 +41,24 @@ define([
         },
 
         componentDidMount: function() {
-            if (!this.state.ready) {
-                this._init();
-            }
+            // if (this.props.afterNav) {
+            //     console.log('sddsf', lastScrollPos);
+            //     window.scrollTo(0, lastScrollPos);
+            // }
+            this._init();
         },
 
         componentDidUpdate: function(prevProps, prevState) {
             if ( !_.isEqual(this.props, prevProps) ) {
                 this._init();
             }
-            if (this.state.page !== prevState.page) {
+            if (prevState.page && this.state.page !== prevState.page) {
                 this._scrollToTop();
             }
         },
 
         componentWillUnmount: function () {
+            lastScrollPos = h.getScrollPos()[1];
             appStore.savePageState(this);
         },
 

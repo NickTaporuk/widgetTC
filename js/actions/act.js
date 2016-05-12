@@ -1,7 +1,7 @@
 define([
     'dispatcher',
     'promise',
-    'load!stores/store',
+    'load!stores/pageStore',
     'lib/helper',
     'lib/history',
     'lodash',
@@ -9,7 +9,7 @@ define([
 ], function(
     dispatcher,
     Promise,
-    store,
+    pageStore,
     h,
     history,  // history must be used to fill appStore
     _,
@@ -57,6 +57,8 @@ define([
     var visitedPages = {};
 
     function setUrl(page, params) {
+        // var params = _.cloneDeep(params);
+        // delete params.afterNav;
         visitedPages[page] = params || true;
 
         var path = '#!' + page + (params && Object.keys(params).length > 0 ? '?' + h.objToQuery(params) : '');
@@ -81,6 +83,7 @@ define([
     history.bind('popstate', function (state) {
         var page = state && state.page ? state.page : null,
             params = state && state.params ? state.params : {};
+            // params.afterNav = true;
 
         execute(page, params, true);
     });
