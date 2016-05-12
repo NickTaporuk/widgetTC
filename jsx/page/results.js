@@ -153,6 +153,13 @@ define([
                     results.filters.brand.required_brands = ['Bridgestone', 'Firestone', 'Fuzion'];
                 }
 
+                var displayOptions = _.cloneDeep(tireParameters.display);
+                if (!self.props.car_tire_id) {
+                    _.remove(displayOptions, function (item) {
+                        return item.value == 'oem';
+                    });
+                }
+
                 var state = {
                     ready: true,
                     page: results.page,
@@ -161,7 +168,7 @@ define([
                     filters: results.filters,
 
                     fieldOptions: {
-                        display: tireParameters.display,
+                        display: displayOptions,
                         order_by: tireParameters.order_by
                     },
 
