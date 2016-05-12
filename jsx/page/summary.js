@@ -241,7 +241,7 @@ define([
         },
 
         _getServicesBlock: function(servicesInfo, isOptional) {
-            if (servicesInfo.length == 0) {
+            if (!servicesInfo || servicesInfo.length == 0) {
                 return null;
             }
 
