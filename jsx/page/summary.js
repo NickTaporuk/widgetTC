@@ -44,7 +44,7 @@ define([
 
         componentDidMount: function() {
             if (!this.state.ready) {
-                this._init();
+                this._init(true);
             }
         },
 
@@ -168,7 +168,7 @@ define([
             );
         },
 
-        _init: function () {
+        _init: function (track) {
             var self = this,
                 props = this.props;
 
@@ -177,7 +177,7 @@ define([
 
             var promises = [
                 Api.loadTire(props.tire_id),
-                Api.loadQuote(props.tire_id, props.quantity, props.optional_services, props.with_discount, props.custom_discount),
+                Api.loadQuote(props.tire_id, props.quantity, props.optional_services, props.with_discount, props.custom_discount, track || null),
                 Api.loadDealerConfig(),
                 Api.loadLocationConfig(locationId)
             ];
@@ -361,10 +361,7 @@ define([
 
         _handleOrderClick: function(event) {
             event.preventDefault();
-            // var params = this._getParamsForQuote();
-            // params.with_discount = this.state.quote.discount && this.state.quote.discount.applied;
             A.route('order');
-            // A.orderPage.update(params);
         },
 
         _handleQuoteClick: function(event) {

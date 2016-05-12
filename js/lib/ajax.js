@@ -1,4 +1,4 @@
-define(['config', 'promise'], function(config, Promise) {
+define(['config', 'promise', 'lodash'], function(config, Promise, _) {
 	function Ajax() {
 		var $public = {};
 		var $private = {};
@@ -133,44 +133,46 @@ define(['config', 'promise'], function(config, Promise) {
 	var widgetAjax = function() {
 		var self = this;
 
-		// ---- cache ----
-		var cache = {},
-			oneTimeCache = {};
+        var caching = function(url, params) {
 
-		var getKeyForCache = function(url, data) {
-			return (url + JSON.stringify(data)).replace(/[^a-zA-Z0-9]/g, '');
-		};
+            var getKey = function() {
+                return (url + JSON.stringify(params)).replace(/[^a-zA-Z0-9]/g, '');
+            };
 
-		var addToCache = function(url, data, response) {
-			cache[getKeyForCache(url, data)] = response;
-		};
+            this.addToCache = function(response) {
+                caching.cache[getKey()] = response;
+            };
 
-		var getFromCache = function(url, data) {
-			var response = cache[getKeyForCache(url, data)]; 
-			return response || null;
-		};
+            this.getFromCache = function() {
+                var response = caching.cache[getKey()];
+                return response || null;
+            };
 
-		var addToOneTimeCache = function(url, data, response) {
-			oneTimeCache[url] = {
-				key: getKeyForCache(url, data),
-				response: response
-			};
-		};
+            this.addToOneTimeCache = function(response) {
+                caching.oneTimeCache[url] = {
+                    key: getKey(),
+                    response: response
+                };
+            };
 
-		var getFromOneTimeCache = function(url, data) {
-			return oneTimeCache[url] && oneTimeCache[url].key == getKeyForCache(url, data) ? oneTimeCache[url].response : null;
-		};
+            this.getFromOneTimeCache = function() {
+                return caching.oneTimeCache[url] && caching.oneTimeCache[url].key == getKey()
+                    ? caching.oneTimeCache[url].response : null;
+            };
 
-		// ---- END cache ----
-		var inProcessPromises = {};
+        };
+        caching.cache = {};
+        caching.oneTimeCache = {};
 
-		var inProcess = function (url, data, val) {
-			if (val) {
-				inProcessPromises[getKeyForCache(url, data)] = val;
-			} else {
-				return inProcessPromises[getKeyForCache(url, data)] || false;
-			}
-		};
+		// var inProcessPromises = {};
+
+		// var inProcess = function (url, data, val) {
+		// 	if (val) {
+		// 		inProcessPromises[getKeyForCache(url, data)] = val;
+		// 	} else {
+		// 		return inProcessPromises[getKeyForCache(url, data)] || false;
+		// 	}
+		// };
 
 		this.beforeSend = function(){};
 		this.error = function(e){};  
@@ -192,7 +194,7 @@ define(['config', 'promise'], function(config, Promise) {
 			};
 
 			var always = function(response, xhrObject) {
-				inProcess(url, data, false);
+				// inProcess(url, data, false);
 				params.complete ? params.complete(response, xhrObject) : self.complete(response, xhrObject);
 			};
 
@@ -202,15 +204,22 @@ define(['config', 'promise'], function(config, Promise) {
 			// };
 
 			var promise = new Promise(function(resolve, reject) {
-				// self.beforeSend();
+
+                var cacheResponseFor = _.cloneDeep(data);
+                if (params.ignoreInCache) {
+                    params.ignoreInCache.map(function(param) {
+                        delete cacheResponseFor[param];
+                    });
+                }
+                var cache = new caching(url, cacheResponseFor);
 
 				var responseFromCache = '';
 				if (params.oneTimeCache) {
-					responseFromCache = getFromOneTimeCache(url, data);
+                    responseFromCache = cache.getFromOneTimeCache();
 				} else if (params.cache) {
-					responseFromCache = getFromCache(url, data);
-
+					responseFromCache = cache.getFromCache();
 				}
+
 				if (responseFromCache) {
 					resolve(responseFromCache);
 					always(responseFromCache);
@@ -228,9 +237,9 @@ define(['config', 'promise'], function(config, Promise) {
 
 				a.done(function(response, xhr) {
 					if (params.oneTimeCache) {
-						addToOneTimeCache(url, data, response);
+                        cache.addToOneTimeCache(response);
 					} else if (params.cache) {
-						addToCache(url, data, response);
+                        cache.addToCache(response);
 					}
 
 					resolve(response, xhr);
@@ -248,7 +257,7 @@ define(['config', 'promise'], function(config, Promise) {
 
 			});
 
-			inProcess(url, data, promise);
+			// inProcess(url, data, promise);
 
 			return promise;
 		}

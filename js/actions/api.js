@@ -295,7 +295,8 @@ define([
                     custom_discount: customDiscount || null,
                     track: track || null
                 },
-                oneTimeCache: true
+                oneTimeCache: true,
+                ignoreInCache: ['track']
             }).then(function(response) {
                 var quote = response.data;
                 quote.tire_id = tireId;
