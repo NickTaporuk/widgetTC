@@ -214,7 +214,7 @@ define([
                 }
 
                 if (isMobile.any && this.state.callNumber) {
-                    btns.clickToCall = <a href={'tel:' + this.state.callNumber} className={cn('brand_btn_light', 'btn_small')}><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE0B0;' }} /> Call Us</a>
+                    btns.clickToCall = <a href={'tel:' + this.state.callNumber} onClick={this._handleCallClick} className={cn('brand_btn_light', 'btn_small')}><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE0B0;' }} /> Call Us</a>
                 }
             }
             
@@ -311,6 +311,10 @@ define([
                 with_discount: discount && discount.tried_to_apply,
                 custom_discount: discount && discount.is_custom ? discount.total_value : null
             }
+        },
+
+        _handleCallClick: function() {
+            Api.callQuote(this.props.tire_id);
         },
 
         _handleServiceClick: function(serviceKey, event) {

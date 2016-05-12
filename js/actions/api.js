@@ -379,6 +379,17 @@ define([
                 });
             }
         },
+        
+        callQuote: function(tireId) {
+            return ajax.make({
+                url: 'quote/call',
+                method: 'post',
+                data: { tire_id: tireId },
+                useGlobalError: false
+            }).catch(function (response) {
+                return;
+            });
+        },
 
         requestQuote: function(data) {
             var validationErrors = validateParamsForQuote(data, ['name', 'email', 'phone']);
