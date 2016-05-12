@@ -12,7 +12,8 @@ define([
     'config',
     'actions/api',
     'load!stores/appStore',
-    'promise'
+    'promise',
+    'lodash'
 ], function(
     React,
     cn,
@@ -27,7 +28,8 @@ define([
     config,
     Api,
     appStore,
-    Promise
+    Promise,
+    _
 ) {
 
     return {
@@ -104,6 +106,12 @@ define([
             appStore.savePageState(this);
         },
 
+        componentDidUpdate: function(prevProps, prevState) {
+            if (Object.keys(this.state.errors).length > 0 && !this.state.disabled && !_.isEqual(this.state.errors, prevState.errors)) {
+                this._scrollToError();
+            }
+        },
+
         render: function() {
             if (!this.state.ready) {
                 return null;
@@ -166,7 +174,7 @@ define([
                             </fieldset>
                             <div className={cn(['sixcol', 'last', 'col_right', 'order_info'])}>
                                 
-                                <Field type="text" name="card_number" defaultValue="" ref="card_number" label="Credit Card Number" required={true} error={this._getError('number')} 
+                                <Field type="text" name="card_number" defaultValue="" ref="number" label="Credit Card Number" required={true} error={this._getError('number')} 
                                     custom={{
                                         autoComplete: 'off',
                                         pattern: "\\d*",
@@ -174,7 +182,7 @@ define([
                                     }}
                                 />
 
-                                <Field type="text" name="cvc_number" defaultValue="" ref="cvc_number" label="VC Number" required={true} error={this._getError('cvc')} 
+                                <Field type="text" name="cvc_number" defaultValue="" ref="cvc" label="VC Number" required={true} error={this._getError('cvc')} 
                                     note="(3 digit security code on the back of the card)"
                                     custom={{
                                         autoComplete: 'off',
@@ -297,8 +305,8 @@ define([
             this.setState({'disabled': true});
 
             var stripeValues = {
-                number: this.refs.card_number.value(),
-                cvc: this.refs.cvc_number.value(),
+                number: this.refs.number.value(),
+                cvc: this.refs.cvc.value(),
                 exp_month: this.refs.exp_month.value,
                 exp_year: this.refs.exp_year.value 
             };
@@ -310,7 +318,7 @@ define([
                     if (response.error) {
                         if (response.error.type === 'card_error') {
                             var errors = {};
-                            errors[response.error.param] = [response.error.message];
+                            errors[(response.error.param ? response.error.param : 'number')] = [response.error.message];
                             self.setState({'errors': errors, 'disabled': false});
                         } else {
                             self.setState({'errors': {'global': [response.error.message]}, 'disabled': false});    
@@ -358,6 +366,19 @@ define([
                 });
             } else {
                 this.setState({'disabled': false});
+            }
+        },
+
+        _scrollToError: function(errors) {
+            var fields = Object.keys(this.state.errors);
+            if (fields.length > 0) {
+                var field = fields[0];
+                if (field == 'vehicle_info') {
+                    field = 'vehicle_year';
+                }
+                if (this.refs[field]) {
+                    h.scrollToTop( this.refs[field].getDOMNode() );
+                }
             }
         },
 

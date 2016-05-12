@@ -12,7 +12,8 @@ define([
     'moment',
     'load!stores/appStore',
     'promise',
-    'lib/history'
+    'lib/history',
+    'lodash'
 ], function(
     React,
     config,
@@ -27,7 +28,8 @@ define([
     moment,
     appStore,
     Promise,
-    history
+    history,
+    _
 ) {
 
     var types = {
@@ -126,6 +128,11 @@ define([
 
         componentWillUnmount: function () {
             appStore.savePageState(this);
+        },
+        componentDidUpdate: function(prevProps, prevState) {
+            if (Object.keys(this.state.errors).length > 0 && !_.isEqual(this.state.errors, prevState.errors)) {
+                this._scrollToError();
+            }
         },
 
         render: function() {
@@ -258,6 +265,19 @@ define([
             });
         },
 
+        _scrollToError: function(errors) {
+            var fields = Object.keys(this.state.errors);
+            if (fields.length > 0) {
+                var field = fields[0];
+                if (field == 'vehicle_info') {
+                    field = 'vehicle_year';
+                }
+                if (this.refs[field]) {
+                    h.scrollToTop( this.refs[field].getDOMNode() );
+                }
+            }
+        },
+
         _handleFormSubmit: function(event) {
             var self = this;
             event.preventDefault();
@@ -325,5 +345,4 @@ define([
             });
         }
     }
-
 });
