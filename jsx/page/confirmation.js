@@ -172,7 +172,8 @@ define([
             var isOptional = isOptional || false,
                 services = [];
 
-            Object.keys(servicesInfo).map(function(info, i) {
+            Object.keys(servicesInfo).map(function(key, i) {
+                var info = servicesInfo[key];
                 if (!isOptional || info.applied) {
                     services.push((
                         <tr key={i}>
