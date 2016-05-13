@@ -294,6 +294,9 @@ define([
             if (this.refs.way_to_contact) {
                 values.way_to_contact = this.refs.way_to_contact.value();
             }
+            if (['email', 'print'].indexOf(this.props.type) !== -1) {
+                values.follow_up = true;
+            }
 
             var props;
             if (this.props.type == 'request') {
