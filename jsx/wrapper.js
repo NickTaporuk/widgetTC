@@ -23,6 +23,12 @@ define([
     var component = {
         displayName: 'Wrapper',
 
+        getInitialState: function() {
+            return {
+                ready: false
+            }
+        },
+
         componentDidMount: function() {
             this._checkContainerWidth();
             if (window.addEventListener) {
@@ -30,10 +36,14 @@ define([
             } else {
               window.attachEvent('onresize', this._checkContainerWidth);
             }
+            var self = this;
             Api.loadDealerConfig().then(function(response) {
                 if (response.colors && response.colors.color1) {
                     changeColorScheme('#' + response.colors.color1, '#' + response.colors.color2);
                 }
+                self.setState({
+                    ready: true
+                });
             });
         },
 
@@ -42,7 +52,7 @@ define([
                 <div id={cn('widget')}>
                     <Top />
                     <div className={cn('wrapper')}>
-                        <Header />
+                        {this.state.ready ? <Header /> : null}
                         <Preloader />
                         <Page />
                     </div>
