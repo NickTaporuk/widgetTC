@@ -23,7 +23,7 @@ define([
         isReturnedUser: null,
         sa: false,
         wlUrl: 'https://wl.tireconnect.ca',
-        apiBaseUrl:  'https://wl.tireconnect.ca/api/v1/',
+        apiBaseUrl: 'https://wl.tireconnect.ca/api/v1/',
 
         // methods to change params
         setParam: function(param, value) {

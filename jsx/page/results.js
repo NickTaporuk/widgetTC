@@ -133,56 +133,59 @@ define([
         _init: function () {
             var self = this;
 
-            Promise.all([
-                Api.searchTires(this.props),
-                Api.loadTireParameters(),
-                Api.loadLocation(this.props.location_id),
-                Api.loadDealerConfig()
-            ]).then(function (responses) {
-                var results = responses[0];
-                var tireParameters = responses[1];
-                var location = responses[2];
-                var dealerConfig = responses[3];
+            Api.loadDealerConfig().then(function(dealerConfig){
+                var searchParams = _.cloneDeep(self.props);
+                searchParams.items_per_page = dealerConfig.items_per_page;
 
-                var queryParams = '';
-                if (self.props.car_tire_id) {
-                    queryParams = self.props.year + ' ' + self.props.make + ' ' + self.props.model + ' ' + self.props.trim;
-                } else if (self.props.part_number) {
-                    queryParams = self.props.part_number;
-                } else {
-                    queryParams = self.props.width + '/' + self.props.height + 'R' + self.props.rim;
-                }
-                
-                if (dealerConfig.client_type == 3 && results.filters.brand) {
-                    results.filters.brand.required_brands = ['Bridgestone', 'Firestone', 'Fuzion'];
-                }
+                Promise.all([
+                    Api.searchTires(searchParams),
+                    Api.loadTireParameters(),
+                    Api.loadLocation(self.props.location_id)
+                ]).then(function (responses) {
+                    var results = responses[0];
+                    var tireParameters = responses[1];
+                    var location = responses[2];
 
-                var displayOptions = _.cloneDeep(tireParameters.display);
-                if (!self.props.car_tire_id) {
-                    _.remove(displayOptions, function (item) {
-                        return item.value == 'oem';
-                    });
-                }
+                    var queryParams = '';
+                    if (self.props.car_tire_id) {
+                        queryParams = self.props.year + ' ' + self.props.make + ' ' + self.props.model + ' ' + self.props.trim;
+                    } else if (self.props.part_number) {
+                        queryParams = self.props.part_number;
+                    } else {
+                        queryParams = self.props.width + '/' + self.props.height + 'R' + self.props.rim;
+                    }
 
-                var state = {
-                    ready: true,
-                    page: results.page,
-                    tires: results.tires,
-                    totalCount: results.nb_results,
-                    filters: results.filters,
+                    if (dealerConfig.client_type == 3 && results.filters.brand) {
+                        results.filters.brand.required_brands = ['Bridgestone', 'Firestone', 'Fuzion'];
+                    }
 
-                    fieldOptions: {
-                        display: displayOptions,
-                        order_by: tireParameters.order_by
-                    },
+                    var displayOptions = _.cloneDeep(tireParameters.display);
+                    if (!self.props.car_tire_id) {
+                        _.remove(displayOptions, function (item) {
+                            return item.value == 'oem';
+                        });
+                    }
 
-                    isInMile: location.country !== 'Canada',
-                    itemsOnPage: dealerConfig.items_per_page,
+                    var state = {
+                        ready: true,
+                        page: results.page,
+                        tires: results.tires,
+                        totalCount: results.nb_results,
+                        filters: results.filters,
 
-                    queryParams: queryParams
-                };
+                        fieldOptions: {
+                            display: displayOptions,
+                            order_by: tireParameters.order_by
+                        },
 
-                self.setState(state);
+                        isInMile: location.country !== 'Canada',
+                        itemsOnPage: dealerConfig.items_per_page,
+
+                        queryParams: queryParams
+                    };
+
+                    self.setState(state);
+                });
             });
         },
 
