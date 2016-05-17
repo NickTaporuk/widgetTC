@@ -1,15 +1,15 @@
 window.TCWidget = {
     overlayNode: null,
-    init: function(params) {
+    init: function (params) {
         requirejs.config({
-            baseUrl: './js/', 
+            baseUrl: './js/',
             paths: {
                 lockr: 'bower_components/lockr/lockr',
                 classnames: 'lib/classnames'
             }
         });
 
-        requirejs(['config', 'lib/helper', 'lockr', 'classnames'], function(config, h, lockr, cn) {
+        requirejs(['config', 'lib/helper', 'lockr', 'classnames'], function (config, h, lockr, cn) {
             if (!params.apikey) {
                 throw new Error('Api key is required');
             } else {
@@ -26,20 +26,20 @@ window.TCWidget = {
                 container: params.container
             });
             if (params.sa) {
-              config.setParam('sa', params.sa);
+                config.setParam('sa', params.sa);
             }
             if (params.scriptPlace) {
-              config.setParam('scriptPlace', params.scriptPlace);
+                config.setParam('scriptPlace', params.scriptPlace);
             }
             if (params.apiBaseUrl) {
-              config.setParam('apiBaseUrl', params.apiBaseUrl); 
+                config.setParam('apiBaseUrl', params.apiBaseUrl);
             }
 
             h.loadCss(config.mainCss);
             h.loadCss('https://fonts.googleapis.com/icon?family=Material+Icons');
 
             requirejs.config({
-                baseUrl: './js/', 
+                baseUrl: './js/',
                 paths: {
                     isMobile: 'bower_components/isMobile/isMobile',
                     lodash: 'bower_components/lodash/lodash',
@@ -56,45 +56,45 @@ window.TCWidget = {
                 }
             });
 
-            requirejs(['react', 'reactDOM', 'load!components/wrapper', 'load!actions/act', 'load!components/overlay', 'classnames', 'actions/api'], 
-            function(React, ReactDOM, Wrapper, Act, Overlay, cn, Api) {
-                
-                var render = function() {
-                    var container = document.getElementById(params.container);
+            requirejs(['react', 'reactDOM', 'load!components/wrapper', 'load!actions/act', 'load!components/overlay', 'classnames', 'actions/api'],
+                function (React, ReactDOM, Wrapper, Act, Overlay, cn, Api) {
 
-                    if (!self.overlayNode) {
-                        // append overlays (popup/message/loading/shadow) to the end of body
-                        var body = document.getElementsByTagName('body')[0];
-                        self.overlayNode = document.createElement("div");
-                        self.overlayNode.id = cn('widget_outer');
-                        body.appendChild(self.overlayNode);
-                    }
+                    var render = function () {
+                        var container = document.getElementById(params.container);
 
-                    ReactDOM.unmountComponentAtNode(container); // needed if init has been called again
-                    ReactDOM.unmountComponentAtNode(self.overlayNode); // needed if init has been called again
+                        if (!self.overlayNode) {
+                            // append overlays (popup/message/loading/shadow) to the end of body
+                            var body = document.getElementsByTagName('body')[0];
+                            self.overlayNode = document.createElement("div");
+                            self.overlayNode.id = cn('widget_outer');
+                            body.appendChild(self.overlayNode);
+                        }
 
-                    ReactDOM.render(
-                        React.createElement(Wrapper),
-                        container
-                    );
+                        ReactDOM.unmountComponentAtNode(container); // needed if init has been called again
+                        ReactDOM.unmountComponentAtNode(self.overlayNode); // needed if init has been called again
 
-                    ReactDOM.render(
-                        React.createElement(Overlay),
-                        self.overlayNode
-                    );
-                };
+                        ReactDOM.render(
+                            React.createElement(Wrapper),
+                            container
+                        );
 
-                render();
+                        ReactDOM.render(
+                            React.createElement(Overlay),
+                            self.overlayNode
+                        );
+                    };
 
-                if (!config.sessionId) {
-                    Api.setSession().then(function(sessionId) {
-                        config.setParam('sessionId', sessionId);
+                    render();
+
+                    if (!config.sessionId) {
+                        Api.setSession().then(function (sessionId) {
+                            config.setParam('sessionId', sessionId);
+                            Act.init();
+                        });
+                    } else {
                         Act.init();
-                    });
-                } else {
-                    Act.init();
-                }
-            });
+                    }
+                });
         });
     }
-}
+};

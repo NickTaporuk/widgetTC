@@ -1,17 +1,24 @@
 ({
 	baseUrl: "./js",
 	// mainConfigFile: "build_config.js",
-	// name: "bower_components/almond/almond",
 	name: "bower_components/requirejs/require",
+	onBuildWrite: function(name, path, contents) {
+		if (name.indexOf('requirejs') !== -1) {
+			contents = contents.replace('require,', 'require = {skipDataMain : true},');
+		}
+		return contents;
+	},
 	include: ['app'],
 	findNestedDependencies: true,
 	// optimize: "none",
 	optimize: 'uglify2',
 	preserveLicenseComments: false,
 	out: "js/widget.js",
-	wrap: {
+    wrap: {
         start: "(function() {",
         end: "}());"
+        // startFile: 'start.frag',
+        // endFile: 'end.frag'
     },
 	paths: {
 	  'isMobile': 'bower_components/isMobile/isMobile',

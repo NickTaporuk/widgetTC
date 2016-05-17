@@ -37,7 +37,7 @@ var localSettings = {
 	}
 };
 var serverSettings = {
-	apikey: params.live ? '7c86a13e1b0cb7f6cc1b2f2a4a569bec' : '9c1fa27907c8d18be1f2a0a7cfbec3e2',
+	apikey: params.live ? '2c01c3b742b8f13f4219b6469579ae5a' : '9c1fa27907c8d18be1f2a0a7cfbec3e2',
 	scriptPlace: params.live ? 'https://app.tireconnect.ca' : 'https://dev.tireconnect.ca/app',
 	apiBaseUrl: params.live ? 'https://wl.tireconnect.ca/api2.php/' : 'https://dev.tireconnect.ca/api2.php/'
 };
@@ -52,7 +52,6 @@ var settings = {
 
 
 requirejs([ (params.optim ? (settings.scriptPlace + '/js/widget.js') : 'app') ], function() {
-	
 	TCWidget.init({
 	  apikey: settings.apikey,
 	  container: 'content',
