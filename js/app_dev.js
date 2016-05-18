@@ -53,10 +53,12 @@ var settings = {
 
 requirejs([ (params.optim ? (settings.scriptPlace + '/js/widget.js') : 'app') ], function() {
 	TCWidget.init({
-	  apikey: settings.apikey,
-	  container: 'content',
-	  sa: params.sa,
-	  scriptPlace: settings.scriptPlace,
-	  apiBaseUrl:  settings.apiBaseUrl
+	  // apikey: settings.apikey,
+        apikey: '538fc2453c0e1f8415b82ec9f81f0985',
+        locationId: 1,
+	    container: 'content',
+	    sa: params.sa,
+	    scriptPlace: settings.scriptPlace,
+	    apiBaseUrl:  settings.apiBaseUrl
 	});
 });

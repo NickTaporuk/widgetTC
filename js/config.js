@@ -19,6 +19,7 @@ define([
         prefix: 'tcwlw_',
         allowUrl: true,
         apikey: null,
+        locationId: null,
         sessionId: null,
         isReturnedUser: null,
         sa: false,

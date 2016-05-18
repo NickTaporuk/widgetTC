@@ -80,7 +80,6 @@ define([
     var style = null; //color scheme style element
     function changeColorScheme(color1, color2) {
         if (style !== null) {
-            console.log(style, color1, color2);
             document.head.removeChild(style);
             style = null;
         }

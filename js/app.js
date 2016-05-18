@@ -34,6 +34,12 @@ window.TCWidget = {
             if (params.apiBaseUrl) {
                 config.setParam('apiBaseUrl', params.apiBaseUrl);
             }
+            if (params.locationId) {
+                config.setParam('locationId', params.locationId);
+            }
+            if (params.allowUrl !== undefined) {
+                config.setParam('allowUrl', params.allowUrl);
+            }
 
             h.loadCss(config.mainCss);
             h.loadCss('https://fonts.googleapis.com/icon?family=Material+Icons');
