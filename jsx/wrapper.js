@@ -163,7 +163,7 @@ define([
             // '#widget a:focus, ' +
             // '#widget_outer a:focus, ' +
             '#widget_outer a:hover',
-            'color: ' + color2
+            'color: ' + color1
         );
 
         //bg color2
