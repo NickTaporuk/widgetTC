@@ -127,7 +127,7 @@ define([
         },
 
         componentWillUnmount: function () {
-            appStore.savePageState(this);
+            appStore.savePageData(this);
         },
         componentDidUpdate: function(prevProps, prevState) {
             if (Object.keys(this.state.errors).length > 0 && !_.isEqual(this.state.errors, prevState.errors)) {

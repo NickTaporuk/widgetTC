@@ -103,7 +103,7 @@ define([
         },
         
         componentWillUnmount: function() {
-            appStore.savePageState(this);
+            appStore.savePageData(this);
         },
 
         componentDidUpdate: function(prevProps, prevState) {

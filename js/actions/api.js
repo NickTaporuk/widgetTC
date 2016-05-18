@@ -290,7 +290,7 @@ define([
                 data: {
                     tire_id: tireId,
                     quantity: quantity,
-                    optional_services: services || 'use_default',
+                    optional_services: services,
                     with_discount: withDiscount || false,
                     custom_discount: customDiscount || null,
                     track: track || null

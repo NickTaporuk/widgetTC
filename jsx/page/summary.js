@@ -35,13 +35,6 @@ define([
             };
         },
 
-        // componentWillMount: function () {
-        //     var lastState = appStore.getPageState(this);
-        //     if (lastState) {
-        //         this.setState(lastState);
-        //     }
-        // },
-
         componentDidMount: function() {
             if (!this.state.ready) {
                 this._init(true);
@@ -55,7 +48,11 @@ define([
         },
 
         componentWillUnmount: function () {
-            appStore.savePageState(this); //this.constructor.displayName, this.state);
+            appStore.savePageState(this, this.state);
+
+            var props = _.cloneDeep(this.props);
+            props.optional_services = this._getActiveOptServicesKeys();
+            appStore.savePageProps(this, props);
         },
 
         render: function() {

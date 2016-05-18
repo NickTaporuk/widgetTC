@@ -59,7 +59,7 @@ define([
 
         componentWillUnmount: function () {
             lastScrollPos = h.getScrollPos()[1];
-            appStore.savePageState(this);
+            appStore.savePageData(this);
         },
 
         render: function() {

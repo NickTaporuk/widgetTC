@@ -46,7 +46,7 @@ define([
         },
 
         componentWillUnmount: function () {
-            appStore.savePageState(this);
+            appStore.savePageData(this);
         },
 
         render: function() {

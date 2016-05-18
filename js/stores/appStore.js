@@ -18,9 +18,17 @@ define([
             return pageProps[page] ? _.cloneDeep(pageProps[page]) : null;
         },
 
-        savePageState: function (pageComponent) {
-            pageState[pageComponent.constructor.displayName] = pageComponent.state;
-            pageProps[pageComponent.constructor.displayName] = pageComponent.props;
+        savePageData: function (pageComponent) {
+            store.savePageState(pageComponent, pageComponent.state);
+            store.savePageProps(pageComponent, pageComponent.props);
+        },
+
+        savePageState: function (pageComponent, state) {
+            pageState[pageComponent.constructor.displayName] = state;
+        },
+
+        savePageProps: function (pageComponent, props) {
+            pageProps[pageComponent.constructor.displayName] = props;
         }
     };
 

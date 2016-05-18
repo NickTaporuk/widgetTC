@@ -280,7 +280,8 @@ define([
             A.route('summary', {
                 quantity: this.state.selQuantity,
                 tire_id: this.state.supplier ? this.state.supplier.tire_id : this.props.tire.id,
-                with_discount: this.props.tire.discount && this.props.tire.discount.added_by_default
+                with_discount: this.props.tire.discount && this.props.tire.discount.added_by_default,
+                optional_services: 'use_default'
             });
         },
 
