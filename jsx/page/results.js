@@ -78,7 +78,7 @@ define([
             this.state.tires.map(function(tire, i) {
                 var tKey = i + curTime;
                 tires.push((
-                    <Tire key={tKey} tire={tire} isInMile={this.state.isInMile} isTop={(i < 3 && this.state.page == 1)} />
+                    <Tire key={tKey} defaultQuantity={this.state.defaultSelectedQuantity} tire={tire} isInMile={this.state.isInMile} isTop={(i < 3 && this.state.page == 1)} />
                 ));
             }.bind(this));
 
@@ -180,6 +180,8 @@ define([
 
                         isInMile: location.country !== 'Canada',
                         itemsOnPage: dealerConfig.items_per_page,
+
+                        defaultSelectedQuantity: dealerConfig.default_selected_quantity,
 
                         queryParams: queryParams
                     };

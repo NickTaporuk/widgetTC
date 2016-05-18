@@ -208,10 +208,8 @@ define([
                 tire.category = 'Undefined Category';
             }
 
-            var quantity = 4;
+            var quantity = this.props.defaultQuantity;
             tire.selected_quantity = quantity <= tire.quantity ? quantity : tire.quantity;
-
-            // tire.is_in_stock = (showInStock && tire.is_in_stock);
         },
 
         _getRatingBlock: function(rating, totalRevuew) {
