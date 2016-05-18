@@ -51,10 +51,10 @@ define([
                 var items = [];
                 tire.description.map(function(desc, i){
                     if (typeof desc === 'object') {
-                        items.push(<h5 key={i+'h'}>{desc.feature}</h5>);
-                        items.push(<p key={i+'d'}>{desc.benefit}</p>);
+                        items.push(<h5 key={i+'h'} dangerouslySetInnerHTML={{ __html: desc.feature}} />);
+                        items.push(<p key={i+'d'} dangerouslySetInnerHTML={{ __html: desc.benefit}} />);
                     } else {
-                        items.push(<li key={i}>{desc}</li>);
+                        items.push(<li key={i} dangerouslySetInnerHTML={{ __html: desc}} />);
                     }
                 });
                 features = <div className={cn('tab_cont')} aria-hidden={!(tab == 'features')}><ul>{items}</ul></div>;
