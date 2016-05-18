@@ -62,10 +62,12 @@ window.TCWidget = {
                 }
             });
 
-            requirejs(['react', 'reactDOM', 'load!components/wrapper', 'load!actions/act', 'load!components/overlay', 'classnames', 'actions/api'],
-                function (React, ReactDOM, Wrapper, Act, Overlay, cn, Api) {
+            requirejs(['react', 'reactDOM', 'load!components/wrapper', 'load!actions/act', 'load!components/overlay', 'classnames', 'actions/api', 'ajax'],
+                function (React, ReactDOM, Wrapper, Act, Overlay, cn, Api, ajax) {
 
                     var render = function () {
+                        ajax.clearCache();
+
                         var container = document.getElementById(params.container);
 
                         if (!self.overlayNode) {

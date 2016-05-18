@@ -178,7 +178,12 @@ define(['config', 'promise', 'lodash'], function(config, Promise, _) {
 		this.error = function(e){};  
 		this.complete = function(){};
 
-		this.make = function(params) {
+        this.clearCache = function() {
+            caching.cache = {};
+            caching.oneTimeCache = {};
+        };
+        
+        this.make = function(params) {
 			var url = config.apiBaseUrl + params.url + (/\?/.test(params.url) ? '&' : '?') + 'key=' + config.apikey + (config.sessionId ? '&session_id=' + config.sessionId : '');
 			var data = params.data || {};
 			var a;

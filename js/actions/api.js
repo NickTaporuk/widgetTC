@@ -217,7 +217,7 @@ define([
             if (values.trim) {
                 promises.push(ajax.make({
                     url: 'vehicle/tireSizes',
-                    data: values,
+                    data: {year: values.year, make: values.make, model: values.model, trim: values.trim},
                     cache: true
                 }).then(function(response) {
                     var options = [];
@@ -234,7 +234,7 @@ define([
             if (values.model) {
                 promises.push(ajax.make({
                     url: 'vehicle/trims',
-                    data: values,
+                    data: {year: values.year, make: values.make, model: values.model},
                     cache: true
                 }).then(function(response) {
                     allOptions.trim = prepareVehicleResponse(response);
@@ -244,7 +244,7 @@ define([
             if (values.make) {
                 promises.push(ajax.make({
                     url: 'vehicle/models',
-                    data: values,
+                    data: {year: values.year, make: values.make},
                     cache: true
                 }).then(function(response) {
                     allOptions.model = prepareVehicleResponse(response);
@@ -254,7 +254,7 @@ define([
             if (values.year) {
                 promises.push(ajax.make({
                     url: 'vehicle/makes',
-                    data: values,
+                    data: {year: values.year},
                     cache: true
                 }).then(function(response) {
                     allOptions.make = prepareVehicleResponse(response);
@@ -342,6 +342,34 @@ define([
                 if (quote.discount) {
                     quote.discount.tried_to_apply = withDiscount;
                     quote.discount.is_custom = customDiscount ? true : false;
+                }
+
+                var objToArr = ['services', 'optional_services'];
+                for (var i = 0; i < 2; i++) {
+                    var objName = objToArr[i];
+                    if (quote[objName]) {
+                        if (!_.isArray(quote[objName])) {
+                            var services = [];
+                            Object.keys(quote[objName]).map(function(service) {
+                                quote[objName][service].key = service;
+                                services.push(quote[objName][service]);
+                            });
+                            quote[objName] = services;
+                        }
+                    } else {
+                        quote[objName] = [];
+                    }
+                }
+
+                if (quote.shop_supply_fee && Object.keys(quote.shop_supply_fee).length > 0) {
+                    quote.services.push({
+                        name: quote.shop_supply_fee.name,
+                        description: '',
+                        link: '',
+                        total_price: quote.shop_supply_fee.total_value
+                    });
+
+                    delete quote.shop_supply_fee;
                 }
 
                 return quote;
