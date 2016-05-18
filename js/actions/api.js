@@ -306,6 +306,32 @@ define([
                     quote.discount.is_custom = customDiscount ? true : false;
                 }
 
+                var objToArr = ['services', 'optional_services'];
+                for (var i = 0; i < 2; i++) {
+                    var objName = objToArr[i];
+                    if (quote[objName]) {
+                        if (!_.isArray(quote[objName])) {
+                            var services = [];
+                            Object.keys(quote[objName]).map(function(service) {
+                                quote[objName][service].key = service;
+                                services.push(quote[objName][service]);
+                            });
+                            quote[objName] = services;
+                        }
+                    } else {
+                        quote[objName] = [];
+                    }
+                }
+
+                if (quote.shop_supply_fee && Object.keys(quote.shop_supply_fee).length > 0) {
+                    quote.services.push({
+                        name: quote.shop_supply_fee.name,
+                        description: '',
+                        link: '',
+                        total_price: quote.shop_supply_fee.total_value
+                    });
+                }
+
                 return quote;
             });
         },
