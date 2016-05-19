@@ -30,8 +30,6 @@ define([
         },
 
         componentDidMount: function() {
-            console.log(config);
-
             this._checkContainerWidth();
             if (window.addEventListener) {
               window.addEventListener('resize', this._checkContainerWidth, false);
