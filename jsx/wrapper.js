@@ -30,6 +30,8 @@ define([
         },
 
         componentDidMount: function() {
+            console.log(config);
+
             this._checkContainerWidth();
             if (window.addEventListener) {
               window.addEventListener('resize', this._checkContainerWidth, false);
@@ -49,7 +51,7 @@ define([
 
         render: function() {
             return (
-                <div id={cn('widget')}>
+                <div id={cn('widget')} className={ this._checkInStore(config.sa) }>
                     <Top />
                     <div className={cn('wrapper')}>
                         {this.state.ready ? <Header /> : null}
@@ -59,9 +61,12 @@ define([
                 </div>
             );
         },
-
+        _checkInStore: function(sa) {
+            return (sa === true ) ? cn('stand-alone') : cn('web');
+        },
         _checkContainerWidth: function() {
-            var el = ReactDOM.findDOMNode(this)
+            var el = ReactDOM.findDOMNode(this);
+            console.log('el:',el);
             var tireconnect = el.parentElement,
                 tireconnectWidth = tireconnect.offsetWidth;
 
