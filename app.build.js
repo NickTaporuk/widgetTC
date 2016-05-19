@@ -12,6 +12,11 @@
 	findNestedDependencies: true,
 	// optimize: "none",
 	optimize: 'uglify2',
+	// uglify2: {
+	// 	compress: {
+	// 		unsafe: true
+	// 	}
+	// },
 	preserveLicenseComments: false,
 	out: "js/widget.js",
     wrap: {

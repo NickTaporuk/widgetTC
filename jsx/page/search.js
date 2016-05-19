@@ -42,6 +42,7 @@ define([
         componentWillMount: function () {
             var lastState = appStore.getPageState(this);
             if (lastState) {
+                lastState.ready = false;
                 this.setState(lastState);
             }
         },

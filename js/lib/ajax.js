@@ -136,7 +136,8 @@ define(['config', 'promise', 'lodash'], function(config, Promise, _) {
         var caching = function(url, params) {
 
             var getKey = function() {
-                return (url + JSON.stringify(params)).replace(/[^a-zA-Z0-9]/g, '');
+                // return (url + JSON.stringify(params)).replace(/[^a-zA-Z0-9]/g, '');
+				return caching.getKey(url, params);
             };
 
             this.addToCache = function(response) {
@@ -163,16 +164,19 @@ define(['config', 'promise', 'lodash'], function(config, Promise, _) {
         };
         caching.cache = {};
         caching.oneTimeCache = {};
+		caching.getKey = function(url, params) {
+			return (url + JSON.stringify(params)).replace(/[^a-zA-Z0-9]/g, '');
+		};
 
-		// var inProcessPromises = {};
+		var inProcessPromises = {};
 
-		// var inProcess = function (url, data, val) {
-		// 	if (val) {
-		// 		inProcessPromises[getKeyForCache(url, data)] = val;
-		// 	} else {
-		// 		return inProcessPromises[getKeyForCache(url, data)] || false;
-		// 	}
-		// };
+		var inProcess = function (url, data, val) {
+			if (val !== undefined) {
+				inProcessPromises[caching.getKey(url, data)] = val;
+			} else {
+				return inProcessPromises[caching.getKey(url, data)] || false;
+			}
+		};
 
 		this.beforeSend = function(){};
 		this.error = function(e){};  
@@ -188,6 +192,10 @@ define(['config', 'promise', 'lodash'], function(config, Promise, _) {
 			var data = params.data || {};
 			var a;
 
+			if (inProcess(url, data)) {
+				return inProcess(url, data);
+			};
+
 			self.beforeSend();
 
 			var ajax_a = new Ajax();
@@ -199,14 +207,9 @@ define(['config', 'promise', 'lodash'], function(config, Promise, _) {
 			};
 
 			var always = function(response, xhrObject) {
-				// inProcess(url, data, false);
+				inProcess(url, data, false);
 				params.complete ? params.complete(response, xhrObject) : self.complete(response, xhrObject);
 			};
-
-
-			// if (inProcess(url, data)) {
-				// return inProcess(url, data);
-			// };
 
 			var promise = new Promise(function(resolve, reject) {
 
@@ -256,13 +259,13 @@ define(['config', 'promise', 'lodash'], function(config, Promise, _) {
 					} else {
 						reject(response, xhrObject);
 					}
-				})
+				});
 
 				a.always(always);
 
 			});
 
-			// inProcess(url, data, promise);
+			inProcess(url, data, promise);
 
 			return promise;
 		}
