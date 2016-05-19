@@ -93,11 +93,10 @@ define([
         componentDidMount: function() {
             var self = this;
             var searchState = appStore.getPageState('search');
-            var vehicleValues = Object.keys(this.state.values.vehicle).length > 0
+            var vehicleValues = this.state.values.vehicle.year
                 ? this.state.values.vehicle
                 : (searchState ? searchState.fieldValues.vehicle : {});
-
-
+            
             var promises;
             if (this.props.type == 'request') {
                 promises = [
