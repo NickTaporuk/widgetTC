@@ -3,7 +3,7 @@ define([
     'classnames',
     'config',
     'load!actions/act',
-    'load!components/elements/select',
+    'load!components/page/search/select',
     'load!components/page/search/locations',
     'actions/api',
     'load!stores/appStore',

@@ -151,6 +151,17 @@
 	// Media
 
 	@include respond-to(smaller-screen) {
+      /* GWL-957*/
+      .tcwlw_fields_wrapper {
+        .tcwlw_number_widget {
+          line-height: 2;
+          @include top(-0.6);
+          @include left(-0.1);
+          @include width(2);
+          @include height(2);
+        }
+      }
+      /*END GWL-957*/
 		.tcwlw_search_by {
 			.tcwlw_tab {
 				width: 100%;
@@ -180,13 +191,13 @@
 				margin-right: 0;
 				padding: 0;
 
-				&:before {
+/*				&:before {
 					line-height: 2;
 					@include top(-0.6);
 					@include left(-0.1);
 					@include width(2);
 					@include height(2);
-				}
+				}*/
 
 				> label {
 					@include margin-top(-0.1);
