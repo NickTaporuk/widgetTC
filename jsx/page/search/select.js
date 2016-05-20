@@ -11,12 +11,6 @@ define([
     return {
         getDefaultProps: function() {
             return {
-                required: false,
-                emptyDesc: '- Select -',
-                disabled: false,
-                value: null,
-                defaultValue: null,
-                onChange: null,
                 withWrapper: false
             }
         },
@@ -30,15 +24,7 @@ define([
                         <label htmlFor={cn(name)}>{this.props.label + ' '}{req}</label>
                         <div>
                             <span className={cn('number_widget')}>{this.props.number}</span>
-                            <SelectField
-                                options={this.props.options}
-                                value={this.props.value}
-                                onChange={this.props.onChange}
-                                name={this.props.name}
-                                label={this.props.label}
-                                required={true}
-                                withWrapper={false}
-                            />
+                            <SelectField {...this.props} />
                         </div>
                     </div>
                 );
