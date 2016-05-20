@@ -191,14 +191,6 @@
 				margin-right: 0;
 				padding: 0;
 
-/*				&:before {
-					line-height: 2;
-					@include top(-0.6);
-					@include left(-0.1);
-					@include width(2);
-					@include height(2);
-				}*/
-
 				> label {
 					@include margin-top(-0.1);
 					@include padding(0, 0, 0.1, 2);
