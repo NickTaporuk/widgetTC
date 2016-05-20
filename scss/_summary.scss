@@ -10,6 +10,13 @@
       p {
         @include margin($baseSpacing/4, 0, $baseSpacing/4);
       }
+
+      table {
+        td,
+        th {
+          @include padding($baseSpacing/6);
+        }
+      }
 		.tcwlw_discount_row,
 		.tcwlw_rebate_row {
 			@include font-size(1);

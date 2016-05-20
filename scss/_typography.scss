@@ -157,7 +157,7 @@
 
 		td,
 		th {
-			@include padding($baseSpacing/6);
+			@include padding($baseSpacing/3);
 			text-align: left;
 
 			&:last-child {
