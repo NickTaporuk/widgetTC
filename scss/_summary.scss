@@ -6,8 +6,10 @@
 
 #tcwlw_widget {
 	.tcwlw_summary_wrapper {
-		//@include padding-top($baseSpacing/2);
-		
+		@include padding-top($baseSpacing/6);
+      p {
+        @include margin($baseSpacing/4, 0, $baseSpacing/4);
+      }
 		.tcwlw_discount_row,
 		.tcwlw_rebate_row {
 			@include font-size(1);
