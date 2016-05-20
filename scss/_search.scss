@@ -48,6 +48,25 @@
 		@include margin-bottom($baseSpacing/2);
 		z-index: 2;
 	}
+/* GWL-957*/
+.tcwlw_fields_wrapper {
+  .tcwlw_number_widget {
+    background: $gray;
+    @include font-size($baseFontSize);
+    font-weight: bold;
+    line-height: 2.1;
+    color: white;
+    position: absolute;
+    @include top(-0.4);
+    left: 0;
+    @include width(2.2);
+    @include height(2.2);
+    @include rounded(50%);
+    display: block;
+    text-align: center;
+  }
+}
+/*END GWL-957*/
 
 	.tcwlw_fields_wrapper {
 		padding-left: 8px;
@@ -63,24 +82,6 @@
 			display: inline-block;
 			@include ie7-inline-block();
 			vertical-align: top;
-			counter-increment: steps-counter;
-
-			&:before {
-				content: counter(steps-counter);
-				background: $secondaryColor;
-				@include font-size($baseFontSize);
-				font-weight: bold;
-				line-height: 2.1;
-				color: white;
-				position: absolute;
-				@include top(-0.4);
-				left: 0;
-				@include width(2.2);
-				@include height(2.2);
-				@include rounded(50%);
-				display: block;
-				text-align: center;
-			}
 
 			p {
 				color: $grayDarkest;
@@ -89,10 +90,6 @@
 			select {
 				@include margin-bottom($baseSpacing);
 			}
-		}
-
-		.tcwlw_fields_wrapper_2 {
-			counter-reset: steps-counter 3;
 		}
 	}
 

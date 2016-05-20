@@ -169,7 +169,8 @@ define([
         //bg color2
         addCSSRule(
             '#widget .bg_color, ' +
-            '#widget .fields_wrapper .field:before',
+            '#widget .fields_wrapper .tcwlw_number_widget',
+            // '#widget .fields_wrapper .tcwlw_number_widget',
             'background-color: '+ color2
         );
 

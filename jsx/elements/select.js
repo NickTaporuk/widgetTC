@@ -41,9 +41,9 @@ define([
                 req = <span className="req">*</span>;
             }
 
-            var select = <select onChange={this.props.onChange} value={this.props.value} ref={name} id={cn(name)} name={name} disabled={disabled} defaultValue={this.props.defaultValue}>
+            var select = <div><span className={cn('number_widget')}>{this.props.number}</span><select onChange={this.props.onChange} value={this.props.value} ref={name} id={cn(name)} name={name} disabled={disabled} defaultValue={this.props.defaultValue}>
                             {options}
-                        </select>;
+                        </select></div>;
 
             if (this.props.withWrapper) {
                 return (
