@@ -157,7 +157,7 @@
 
 		td,
 		th {
-			@include padding($baseSpacing/3);
+			@include padding($baseSpacing/6);
 			text-align: left;
 
 			&:last-child {
@@ -234,7 +234,7 @@
 		position: relative;
 		width: 100%;
 		// @include max-width(78);
-		@include margin-bottom($baseSpacing);
+		//@include margin-bottom($baseSpacing);
 		margin-left: auto;
 		margin-right: auto;
 		overflow: auto;
