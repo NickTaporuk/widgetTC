@@ -101,6 +101,15 @@ define([
 
     Api = {
         loadLocations: function() {
+            if (config.locationId) {
+                return ajax.make({
+                    url: 'location/' + config.locationId,
+                    cache: true
+                }).then(function (response) {
+                    return [response.data];
+                });
+            }
+
             return ajax.make({
                 url: 'location/list',
                 cache: true
@@ -265,22 +274,51 @@ define([
         },
 
         loadDealerInfo: function() {
-            return ajax.make({
-                url: 'dealer/list',
-                cache: true
-            }).then(function(response) {
-                return response.data.dealers[0];
-            });
+            var load = function(dealerId) {
+                return ajax.make({
+                    url: 'dealer/list',
+                    cache: true
+                }).then(function(response) {
+                    if (dealerId && response.data.dealers.length > 1) {
+                        var dealerInfo;
+                        response.data.dealers.map(function(dealer) {
+                            if (dealer.id == dealerId) {
+                                dealerInfo = dealer;
+                            }
+                        });
+                        return dealerInfo;
+                    }
+                    return response.data.dealers[0];
+                });
+            };
+
+            if (config.locationId) {
+                return Api.loadLocation(config.locationId).then(function(location) {
+                    return load(location.dealer_id);
+                });
+            }
+
+            return load();
         },
 
         loadDealerConfig: function() {
-            return ajax.make({
-                url: 'dealer/config',
-                data: {wdg:true},
-                cache: true
-            }).then(function(response) {
-                return response.data;
-            });
+            var load = function(dealerId) {
+                return ajax.make({
+                    url: 'dealer/' + (dealerId ? dealerId+'/' : '') + 'config',
+                    data: {wdg:true},
+                    cache: true
+                }).then(function(response) {
+                    return response.data;
+                });
+            };
+
+            if (config.locationId) {
+                return Api.loadLocation(config.locationId).then(function(location) {
+                    return load(location.dealer_id);
+                });
+            }
+
+            return load();
         },
 
         loadQuote: function(tireId, quantity, services, withDiscount, customDiscount, track) {
