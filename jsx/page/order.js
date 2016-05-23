@@ -292,7 +292,6 @@ define([
 
         _isStripeLoaded: false,
         _getError: function(fieldName) {
-            console.log('fieldName:',this.state.errors);
             if (this.state.errors[fieldName]) {
                 return <span className={cn(['message', 'error', 'appointment_fields'])}>
                     <i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE000;' }} /> {Array.isArray(this.state.errors[fieldName]) ? this.state.errors[fieldName][0] : this.state.errors[fieldName]}
@@ -334,7 +333,6 @@ define([
             };
 
             var errors = validate(stripeValues, constraints);
-            console.log('errors:',errors);
             this.setState({errors: (errors || {})});
             return (errors === undefined);
         },
@@ -351,7 +349,6 @@ define([
         },
 
         _handleFormSubmit: function(event) {
-            console.log('this.refs:',this.refs);
             event.preventDefault();
             this.setState({'disabled': true});
 
