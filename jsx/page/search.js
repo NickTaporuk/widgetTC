@@ -3,7 +3,7 @@ define([
     'classnames',
     'config',
     'load!actions/act',
-    'load!components/elements/select',
+    'load!components/page/search/select',
     'load!components/page/search/locations',
     'actions/api',
     'load!stores/appStore',
@@ -126,34 +126,46 @@ define([
                                         options={this.state.fieldOptions.year}
                                         value={this.state.fieldValues.vehicle.year} onChange={this._handleVehicleChange}
                                         name="year" label="Choose Year"
-                                        className={cn(['field'])} required={true} />
+                                        className={cn(['field'])} required={true}
+                                        number="1"
+                            />
                             <SelectField 
                                         options={this.state.fieldOptions.make}
                                         value={this.state.fieldValues.vehicle.make} onChange={this._handleVehicleChange}
                                         name="make" label="Choose Make" required={true}
-                                        className={cn(['field'])} disabled={this.state.fieldOptions.make.length <= 0} />
+                                        className={cn(['field'])} disabled={this.state.fieldOptions.make.length <= 0}
+                                        number="2"
+                            />
                             <SelectField 
                                         options={this.state.fieldOptions.model}
                                         defaultValue={this.state.fieldValues.vehicle.model} onChange={this._handleVehicleChange}
                                         name="model" label="Choose Model"
-                                        className={cn(['field'])} disabled={this.state.fieldOptions.model.length <= 0} required="1" />
+                                        className={cn(['field'])} disabled={this.state.fieldOptions.model.length <= 0} required="1"
+                                        number="3"
+                            />
                         </div>
                         <div className={cn(['sixcol', 'last', 'fields_wrapper_2'])}>
                             <SelectField 
                                         options={this.state.fieldOptions.trim}
                                         value={this.state.fieldValues.vehicle.trim} onChange={this._handleVehicleChange}
                                         name="trim" label="Choose Trim"
-                                        className={cn(['field'])} disabled={this.state.fieldOptions.trim.length <= 0} required="1" />
+                                        className={cn(['field'])} disabled={this.state.fieldOptions.trim.length <= 0} required="1"
+                                        number="4"
+                            />
                             <SelectField 
                                         options={this.state.fieldOptions.car_tire_id}
                                         value={this.state.fieldValues.vehicle.car_tire_id} onChange={this._handleFieldChange}
                                         name="car_tire_id" label="Tire Size"
-                                        className={cn(['field'])} disabled={this.state.fieldOptions.car_tire_id.length <= 0} required="1" emptyDesc={false}/>
+                                        className={cn(['field'])} disabled={this.state.fieldOptions.car_tire_id.length <= 0} required="1" emptyDesc={false}
+                                        number="5"
+                            />
                             <SelectField 
                                         options={this.state.fieldOptions.base_category}
                                         value={this.state.fieldValues.vehicle.base_category} onChange={this._handleFieldChange}
                                         name="vehicle_base_category" label="Tire Category"
-                                        className={cn(['field'])} emptyDesc="All Tires" />
+                                        className={cn(['field'])} emptyDesc="All Tires"
+                                        number="6"
+                            />
                         </div>
                         
                         <button type="submit" disabled={!this._isReadyForSearch()} className={cn(['btn', 'brand_btn'])}><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE8B6;' }} /> Find Your Tires</button>
@@ -166,34 +178,46 @@ define([
                                         options={this.state.fieldOptions.width}
                                         value={this.state.fieldValues.size.width} onChange={this._handleFieldChange}
                                         name="size_width" label="Choose Width"  
-                                        className={cn(['field'])} required="1" />
-                            <SelectField 
+                                        className={cn(['field'])} required="1"
+                                        number="1"
+                            />
+                            <SelectField
                                         options={this.state.fieldOptions.height}        
                                         value={this.state.fieldValues.size.height} onChange={this._handleFieldChange}  
                                         name="size_height" label="Choose Height" required="1" 
-                                        className={cn(['last', 'field'])} />
+                                        className={cn(['last', 'field'])}
+                                        number="2"
+                            />
                             <SelectField 
                                         options={this.state.fieldOptions.rim}           
                                         value={this.state.fieldValues.size.rim} onChange={this._handleFieldChange} 
                                         name="size_rim" label="Choose Rim"    
-                                        className={cn(['field'])} required="1" />
+                                        className={cn(['field'])} required="1"
+                                        number="3"
+                            />
                         </div>
                         <div className={cn(['sixcol', 'last', 'fields_wrapper_2'])}>
                             <SelectField 
                                         options={this.state.fieldOptions.speed_rating} 
                                         value={this.state.fieldValues.size.speed_rating} onChange={this._handleFieldChange} 
                                         name="size_speed_rating" label="Speed Rating" 
-                                        className={cn(['field'])}  />
+                                        className={cn(['field'])}
+                                        number="4"
+                            />
                             <SelectField 
                                         options={this.state.fieldOptions.load_index} 
                                         value={this.state.fieldValues.size.load_index} onChange={this._handleFieldChange} 
                                         name="size_load_index" label="Load Index" 
-                                        className={cn(['last', 'field'])} />
+                                        className={cn(['last', 'field'])}
+                                        number="5"
+                            />
                             <SelectField 
                                         options={this.state.fieldOptions.base_category} 
                                         value={this.state.fieldValues.size.base_category} onChange={this._handleFieldChange} 
                                         name="size_base_category" label="Tire Category"
-                                        className={cn(['last', 'field'])} emptyDesc="All Tires" />
+                                        className={cn(['last', 'field'])} emptyDesc="All Tires"
+                                        number="6"
+                            />
                         </div>
 
                         <button type="submit" disabled={!this._isReadyForSearch()} className={cn(['btn', 'brand_btn'])}><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE8B6;' }} /> Find Your Tires</button>
