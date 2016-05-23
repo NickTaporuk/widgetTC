@@ -42,12 +42,16 @@ define([
                 errors: {},
                 values: {
                     vehicle: {}
-                }
+                },
+                yearForSelect:{},
+                monthForSelect:{},
+                vehicle: {year: '', month: ''},
+                mapSelect:{month:[1,12],year:[2016,2050]}
             };
         },
 
         componentWillMount: function() {
-            var lastState = appStore.getPageState(this);
+            var lastState   = appStore.getPageState(this);
             if (lastState) {
                 this.setState({
                     values: lastState.values
@@ -62,7 +66,10 @@ define([
         },
 
         componentDidMount: function() {
-            var searchState = appStore.getPageState('search');
+            var searchState = appStore.getPageState('search'),
+                yearSelect  = this._initForSelect(this.state.mapSelect.year),
+                monthSelect = this._initForSelect(this.state.mapSelect.month);
+
             var vehicleValues = Object.keys(this.state.values.vehicle).length > 0
                 ? this.state.values.vehicle
                 : (searchState ? searchState.fieldValues.vehicle : {});
@@ -87,10 +94,11 @@ define([
                     quote: responses[1],
                     order: responses[2],
                     status: responses[2].status,
-                    stripeKey: responses[3].ecommerce.services.stripe.publishable_key
+                    stripeKey: responses[3].ecommerce.services.stripe.publishable_key,
+                    yearForSelect   : yearSelect,
+                    monthForSelect  : monthSelect
                 })
             });
-
             var self = this;
             // load stripe here
             if (typeof window.Stripe == 'undefined') {
@@ -144,7 +152,7 @@ define([
                                                 isValidDate: this._isValidDate,
                                                 inputProps: {'name': "preferred_time", 'readOnly': true},
                                                 dateFormat: "YYYY-MM-DD",
-                                                timeFormat: "HH:mm" 
+                                                timeFormat: "HH:mm"
                                         }}
                                 />
 
@@ -169,22 +177,22 @@ define([
                                     </div>
                                     {this._getError('vehicle_info')}
                                 </div>
-                                
+
                                 <Field type="textarea" name="notes" onChange={this._fieldChange} defaultValue={this.state.values.notes} ref="notes" label="Notes" error={this._getError('notes')} disabled={this.state.status == 'incomplete'} />
                             </fieldset>
                             <div className={cn(['sixcol', 'last', 'col_right', 'order_info'])}>
-                                
-                                <Field type="text" name="card_number" defaultValue="" ref="number" label="Credit Card Number" required={true} error={this._getError('number')} 
-                                    custom={{
+
+                                <Field type="text" name="card_number" defaultValue="" ref="number" label="Credit Card Number" required={true} error={this._getError('number')}
+                                       custom={{
                                         autoComplete: 'off',
                                         pattern: "\\d*",
                                         maxLength: 16
                                     }}
                                 />
 
-                                <Field type="text" name="cvc_number" defaultValue="" ref="cvc" label="VC Number" required={true} error={this._getError('cvc')} 
-                                    note="(3 digit security code on the back of the card)"
-                                    custom={{
+                                <Field type="text" name="cvc_number" defaultValue="" ref="cvc" label="VC Number" required={true} error={this._getError('cvc')}
+                                       note="(3 digit security code on the back of the card)"
+                                       custom={{
                                         autoComplete: 'off',
                                         pattern: "\\d*",
                                         className: cn('sixcol'),
@@ -194,15 +202,41 @@ define([
 
                                 <div className={cn(['control_wrapper', 'order_expiration'])}>
                                     <label htmlFor={cn('order_expiration_month')}>Expiration Date (MM/YYYY) <span className="req">*</span></label>
-                                    <input type="text" id={cn('order_expiration_month')} className={cn('sixcol')} maxLength="2" pattern="\d*" required ref="exp_month" defaultValue="" />
-                                    <input type="text" id={cn('order_expiration_year')} className={cn(['sixcol', 'last'])} maxLength="4" pattern="\d*" required ref="exp_year" defaultValue="" />
-                                    <div style={{clear: 'both'}} />
+
+                                <div className={cn(['sixcol', 'field'])}>
+                                    <SelectField
+                                        options={ this.state.monthForSelect }
+                                        ref="exp_month"
+                                        id={cn('order_expiration_month')}
+                                        value={ this.state.vehicle.month }
+                                        name="exp_month"
+                                        withWrapper={false}
+                                        onChange={this._changeSelect}
+                                        required={true}
+                                        emptyDesc="- Month -"
+                                    />
+                                </div>
+
+                                <div className={cn(['sixcol', 'last', 'field'])}>
+                                    <SelectField
+                                        options={ this.state.yearForSelect }
+                                        ref="exp_year"
+                                        id={cn('order_expiration_year')}
+                                        value={ this.state.vehicle.year }
+                                        name="exp_year"
+                                        withWrapper={false}
+                                        onChange={this._changeSelect}
+                                        required={true}
+                                        emptyDesc="- Year -"
+                                    />
+                                </div>
+
                                     {this._getError('exp_month')}
                                     {this._getError('exp_year')}
                                 </div>
-                                
+
                                 <MainPrices quote={this.state.quote} order={this.state.order} />
-                                
+
                                 <p className={cn('textcenter')}>
                                     <em>* Outstanding balance will be payable after installation.</em>
                                     <img src={config.imagesFolder + 'verify-security.png'} alt="GoDaddy.com verified and secured" className={cn('verified')} />
@@ -214,7 +248,24 @@ define([
                 </div>
             );
         },
+        _initForSelect: function(interval){
+            var o = [];
+            for (var i=interval[0],end = interval[1]; i <= end;i++) {
+                if(i < 10)  o.push({"value": '0'+i.toString(),"description":i.toString()});
+                else o.push({"value":i,"description":i});
+            }
+            return o;
+        },
+        _changeSelect:function(e){
+            var expr = e.target.name.replace(/exp_/,'');
 
+            var vehicle = _.cloneDeep(this.state.vehicle);
+
+                vehicle[expr] = e.target.value;
+            this.setState({
+                vehicle: vehicle
+            });
+        },
         _fieldChange: function(event) {
             var values = _.cloneDeep(this.state.values);
             values[event.target.name] = event.target.value;
@@ -241,6 +292,7 @@ define([
 
         _isStripeLoaded: false,
         _getError: function(fieldName) {
+            console.log('fieldName:',this.state.errors);
             if (this.state.errors[fieldName]) {
                 return <span className={cn(['message', 'error', 'appointment_fields'])}>
                     <i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE000;' }} /> {Array.isArray(this.state.errors[fieldName]) ? this.state.errors[fieldName][0] : this.state.errors[fieldName]}
@@ -261,7 +313,6 @@ define([
                 this.setState({'disabled': false});
                 return false;
             }
-
             var constraints  = {
                 number: {
                     presence: true,
@@ -275,16 +326,15 @@ define([
                 exp_month: {
                     presence: true,
                     length: {is: 2},
-                    numericality: {onlyInteger: true, lessThanOrEqualTo: 12, greaterThan: 0}
                 },
                 exp_year: {
-                    presence: true,
+                    presence    : true,
                     length: {is: 4},
-                    numericality: {onlyInteger: true}
                 }
             };
 
             var errors = validate(stripeValues, constraints);
+            console.log('errors:',errors);
             this.setState({errors: (errors || {})});
             return (errors === undefined);
         },
@@ -301,14 +351,17 @@ define([
         },
 
         _handleFormSubmit: function(event) {
+            console.log('this.refs:',this.refs);
             event.preventDefault();
             this.setState({'disabled': true});
 
             var stripeValues = {
                 number: this.refs.number.value(),
                 cvc: this.refs.cvc.value(),
-                exp_month: this.refs.exp_month.value,
-                exp_year: this.refs.exp_year.value 
+                exp_month: this.state.vehicle.month,
+                exp_year: this.state.vehicle.year
+                // exp_month: this.refs.exp_month.value,
+                // exp_year: this.refs.exp_year.value
             };
 
             if (this._checkStripeValues(stripeValues)) {
