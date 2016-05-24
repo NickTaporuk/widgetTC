@@ -42,9 +42,7 @@ define([
                 errors: {},
                 values: {
                     vehicle: {}
-                },
-                yearForSelect:{},
-                monthForSelect:{}
+                }
             };
         },
 
@@ -255,7 +253,7 @@ define([
             }
             return o;
         },
-        
+
         _fieldChange: function(event) {
             var values = _.cloneDeep(this.state.values);
             values[event.target.name] = event.target.value;
