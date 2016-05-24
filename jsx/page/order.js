@@ -44,9 +44,7 @@ define([
                     vehicle: {}
                 },
                 yearForSelect:{},
-                monthForSelect:{},
-                vehicle: {year: '', month: ''},
-                mapSelect:{month:[1,12],year:[2016,2050]}
+                monthForSelect:{}
             };
         },
 
@@ -66,9 +64,7 @@ define([
         },
 
         componentDidMount: function() {
-            var searchState = appStore.getPageState('search'),
-                yearSelect  = this._initForSelect(this.state.mapSelect.year),
-                monthSelect = this._initForSelect(this.state.mapSelect.month);
+            var searchState     = appStore.getPageState('search');
 
             var vehicleValues = Object.keys(this.state.values.vehicle).length > 0
                 ? this.state.values.vehicle
@@ -94,9 +90,7 @@ define([
                     quote: responses[1],
                     order: responses[2],
                     status: responses[2].status,
-                    stripeKey: responses[3].ecommerce.services.stripe.publishable_key,
-                    yearForSelect   : yearSelect,
-                    monthForSelect  : monthSelect
+                    stripeKey: responses[3].ecommerce.services.stripe.publishable_key
                 })
             });
             var self = this;
@@ -124,6 +118,15 @@ define([
             if (!this.state.ready) {
                 return null;
             }
+            var today           = new Date(),
+                todayYear       = today.getFullYear(),
+                intervalYearAdd = 34,
+                endIntervalYear = todayYear + intervalYearAdd,
+                yearInterval    = [todayYear,endIntervalYear],
+                monthInterval   = [1,12];
+
+            var yearSelect      = this._initForSelect(yearInterval),
+                monthSelect     = this._initForSelect(monthInterval);
 
             return (
                 <div>
@@ -205,13 +208,11 @@ define([
 
                                 <div className={cn(['sixcol', 'field'])}>
                                     <SelectField
-                                        options={ this.state.monthForSelect }
+                                        options={ monthSelect }
                                         ref="exp_month"
                                         id={cn('order_expiration_month')}
-                                        value={ this.state.vehicle.month }
                                         name="exp_month"
                                         withWrapper={false}
-                                        onChange={this._changeSelect}
                                         required={true}
                                         emptyDesc="- Month -"
                                     />
@@ -219,13 +220,11 @@ define([
 
                                 <div className={cn(['sixcol', 'last', 'field'])}>
                                     <SelectField
-                                        options={ this.state.yearForSelect }
+                                        options={ yearSelect }
                                         ref="exp_year"
                                         id={cn('order_expiration_year')}
-                                        value={ this.state.vehicle.year }
                                         name="exp_year"
                                         withWrapper={false}
-                                        onChange={this._changeSelect}
                                         required={true}
                                         emptyDesc="- Year -"
                                     />
@@ -256,16 +255,7 @@ define([
             }
             return o;
         },
-        _changeSelect:function(e){
-            var expr = e.target.name.replace(/exp_/,'');
-
-            var vehicle = _.cloneDeep(this.state.vehicle);
-
-                vehicle[expr] = e.target.value;
-            this.setState({
-                vehicle: vehicle
-            });
-        },
+        
         _fieldChange: function(event) {
             var values = _.cloneDeep(this.state.values);
             values[event.target.name] = event.target.value;
@@ -355,12 +345,9 @@ define([
             var stripeValues = {
                 number: this.refs.number.value(),
                 cvc: this.refs.cvc.value(),
-                exp_month: this.state.vehicle.month,
-                exp_year: this.state.vehicle.year
-                // exp_month: this.refs.exp_month.value,
-                // exp_year: this.refs.exp_year.value
+                exp_month: this.refs.exp_month.value(),
+                exp_year: this.refs.exp_year.value()
             };
-
             if (this._checkStripeValues(stripeValues)) {
                 var self = this;
                 window.Stripe.setPublishableKey(this.state.stripeKey);
