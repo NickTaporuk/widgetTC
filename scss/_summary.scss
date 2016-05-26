@@ -5,13 +5,20 @@
 ****************************************/
 
 #tcwlw_widget {
+	.tcwlw_table_wrapper{
+		margin-bottom: 0em;
+	}
+	td{
+		vertical-align: top;
+	}
+
 	.tcwlw_summary_wrapper {
 		@include padding-top($baseSpacing/2);
-		
+
 		.tcwlw_discount_row,
 		.tcwlw_rebate_row {
 			@include font-size(1);
-			
+
 			td {
 				font-weight: normal;
 
@@ -74,7 +81,7 @@
 				@include margin(0, 0, $baseSpacing/3);
 				text-align: left;
 			}
-		}		
+		}
 
 		// Media
 
