@@ -140,7 +140,6 @@ define([
             }
 
             var tire = this.state.tire;
-            console.log('this.props.type:',this.props.type);
             return (
                 <div>
                     <Back />
