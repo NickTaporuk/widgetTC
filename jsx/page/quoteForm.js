@@ -140,7 +140,7 @@ define([
             }
 
             var tire = this.state.tire;
-
+            console.log('this.props.type:',this.props.type);
             return (
                 <div>
                     <Back />
@@ -149,9 +149,9 @@ define([
                         <form action="appointment-confirmation.php" className={cn('appointment_form')} onSubmit={this._handleFormSubmit}>
                             
                             <fieldset className={cn(['sixcol', 'col_left', 'appointment_fields'])}>
-                                <Field type="text" name="name" onChange={this._fieldChange} defaultValue={this.state.values.name} ref="name" label={ config.sa ? 'Customer Name' : 'Your Name' } required={!config.sa} error={this._getError('name')} />
-                                <Field type="email" name="email" onChange={this._fieldChange} defaultValue={this.state.values.email} ref="email" label="Email Address" required={!config.sa || this.props.type === 'email'} error={this._getError('email')} />
-                                <Field type="tel" name="phone" onChange={this._fieldChange} defaultValue={this.state.values.phone} ref="phone" label="Phone Number" required={!config.sa} error={this._getError('phone')} />
+                                <Field type="text" name="name" onChange={this._fieldChange} defaultValue={this.state.values.name} ref="name" label={ config.sa ? 'Customer Name' : 'Your Name' } required={ !config.sa || this.props.type == 'request' } error={this._getError('name')} />
+                                <Field type="email" name="email" onChange={this._fieldChange} defaultValue={this.state.values.email} ref="email" label="Email Address" required={ !config.sa || this.props.type === 'email' || this.props.type == 'request'} error={this._getError('email')} />
+                                <Field type="tel" name="phone" onChange={this._fieldChange} defaultValue={this.state.values.phone} ref="phone" label="Phone Number" required={ !config.sa || this.props.type == 'request' } error={this._getError('phone')} />
 
                                 { this.props.type === 'appointment'
                                     ?   <Field type="select" name="way_to_contact" onChange={this._fieldChange} defaultValue={this.state.values.way_to_contact} ref="way_to_contact" label="Best way to contact"
