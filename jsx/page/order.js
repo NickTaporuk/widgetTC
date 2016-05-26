@@ -42,11 +42,27 @@ define([
                 errors: {},
                 values: {
                     vehicle: {}
-                }
+                },
+                intervalDate:{month:[],years:[]}
             };
         },
 
         componentWillMount: function() {
+            var today           = new Date(),
+                todayYear       = today.getFullYear(),
+                intervalYearAdd = 34,
+                endIntervalYear = todayYear + intervalYearAdd,
+                yearInterval    = [todayYear,endIntervalYear],
+                monthInterval   = [1,12];
+            var yearSelect      = this._initForSelect(yearInterval),
+                monthSelect     = this._initForSelect(monthInterval);
+            var intervalDate    = _.cloneDeep(this.state.intervalDate);
+                intervalDate.month = monthSelect;
+                intervalDate.years = yearSelect;
+            this.setState({
+                intervalDate: intervalDate
+            });
+
             var lastState   = appStore.getPageState(this);
             if (lastState) {
                 this.setState({
@@ -116,7 +132,7 @@ define([
             if (!this.state.ready) {
                 return null;
             }
-            var today           = new Date(),
+/*            var today           = new Date(),
                 todayYear       = today.getFullYear(),
                 intervalYearAdd = 34,
                 endIntervalYear = todayYear + intervalYearAdd,
@@ -124,7 +140,7 @@ define([
                 monthInterval   = [1,12];
 
             var yearSelect      = this._initForSelect(yearInterval),
-                monthSelect     = this._initForSelect(monthInterval);
+                monthSelect     = this._initForSelect(monthInterval);*/
 
             return (
                 <div>
@@ -206,7 +222,7 @@ define([
 
                                 <div className={cn(['sixcol', 'field'])}>
                                     <SelectField
-                                        options={ monthSelect }
+                                        options={ this.state.intervalDate.month }
                                         ref="exp_month"
                                         id={cn('order_expiration_month')}
                                         name="exp_month"
@@ -218,7 +234,7 @@ define([
 
                                 <div className={cn(['sixcol', 'last', 'field'])}>
                                     <SelectField
-                                        options={ yearSelect }
+                                        options={ this.state.intervalDate.years }
                                         ref="exp_year"
                                         id={cn('order_expiration_year')}
                                         name="exp_year"
