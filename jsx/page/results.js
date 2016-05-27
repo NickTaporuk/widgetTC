@@ -96,9 +96,6 @@ define([
                             <SelectField onChange={this._handleFieldChange} options={fieldOptions.display}  label="Display:" name="display"  className={cn('filter_field')} emptyDesc={false} defaultValue={fieldValues.display} />
                             <SelectField onChange={this._handleFieldChange} options={fieldOptions.order_by} label="Sort by:" name="order_by" className={cn('filter_field')} emptyDesc={false} defaultValue={fieldValues.order_by} />
                         </div>
-                        {
-                            tires.length > 0 ? null : <h3 className={cn('message')}><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE000;' }} /> We did not find any tires based on your search criteria. Please try searching again later as inventory changes frequently.</h3>
-                        }
                         <div className={cn('filters')} id={cn('filters')}>
                             {this._getFilterBlocks()}
                         </div>
@@ -115,10 +112,10 @@ define([
                                     (tires.length > 0)
                                     ? 
                                     <ol className={cn('results_list')}>
-                                        {tires}                                    
+                                        {tires}
                                     </ol>
-                                    : 
-                                    null
+                                    :
+                                            <h3 className={cn('message')}><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE000;' }} /> We did not find any tires based on your search criteria. Please try searching again later as inventory changes frequently.</h3>
                                 }
                             </div>
                             <div className={cn('twelvecol')}>
@@ -192,7 +189,6 @@ define([
         },
 
         _getFilterBlocks: function() {
-            if (this.state.tires.length > 0) {
                 var filters = null;
                 if (Object.keys(this.state.filters).length > 0) {
                     var values = this.props.filters || {brand: [], category: [], run_flat: [], light_track: []};
@@ -211,7 +207,6 @@ define([
                         }
                     }, this);
                 }
-            }
             return filters;
         },
 
