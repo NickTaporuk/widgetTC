@@ -274,7 +274,7 @@ define([
             }
             if (this._isReadyForSearch()) {
                 var params = _.cloneDeep(this.state.fieldValues[this.state.activeTab]);
-                var locationId = lockr.get('location_id');
+                var locationId = config.locationId ? config.locationId : lockr.get('location_id');
                 if ( locationId ) {
                     params.location_id = locationId;
 
