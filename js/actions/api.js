@@ -321,7 +321,7 @@ define([
             return load();
         },
 
-        loadQuote: function(tireId, quantity, services, withDiscount, customDiscount, track) {
+        loadQuote: function(tireId, quantity, services, withDiscount, customDiscount, vehicle, track) {
             return ajax.make({
                 url: 'quote/display',
                 method: 'post',
@@ -331,6 +331,7 @@ define([
                     optional_services: services,
                     with_discount: withDiscount || false,
                     custom_discount: customDiscount || null,
+                    vehicle: vehicle || null,
                     track: track || null
                 },
                 oneTimeCache: true,
