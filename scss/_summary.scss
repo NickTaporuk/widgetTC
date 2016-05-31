@@ -11,10 +11,12 @@
 
 	.tcwlw_summary_wrapper {
 		@include padding-top($baseSpacing/2);
-
-		td{
-			vertical-align: top;
+		.tcwlw_toggle_cell {
+			&td{
+				vertical-align: top;
+			}
 		}
+
 		.tcwlw_discount_row,
 		.tcwlw_rebate_row {
 			@include font-size(1);
