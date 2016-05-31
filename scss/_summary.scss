@@ -8,13 +8,13 @@
 	.tcwlw_table_wrapper{
 		margin-bottom: 0em;
 	}
-	td{
-		vertical-align: top;
-	}
 
 	.tcwlw_summary_wrapper {
 		@include padding-top($baseSpacing/2);
 
+		td{
+			vertical-align: top;
+		}
 		.tcwlw_discount_row,
 		.tcwlw_rebate_row {
 			@include font-size(1);
