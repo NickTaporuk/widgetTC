@@ -24,40 +24,8 @@ window.TCWidget = {
             }
         });
 
-        requirejs(['config', 'lib/helper', 'lockr', 'classnames'], function (config, h, lockr, cn) {
-            if (!params.apikey) {
-                throw new Error('Api key is required');
-            } else {
-                lockr.prefix = config.prefix + params.apikey;
-                cn.prefix = config.prefix;
-            }
-            if (!params.container) {
-                throw new Error('Container is required');
-            }
-
-            //add passed params to config
-            config.setParams({
-                apikey: params.apikey,
-                container: params.container
-            });
-            if (params.sa) {
-                config.setParam('sa', params.sa);
-            }
-            if (params.scriptPlace) {
-                config.setParam('scriptPlace', params.scriptPlace);
-            }
-            if (params.apiBaseUrl) {
-                config.setParam('apiBaseUrl', params.apiBaseUrl);
-            }
-            if (params.locationId) {
-                config.setParam('locationId', params.locationId);
-            }
-            if (params.allowUrl !== undefined) {
-                config.setParam('allowUrl', params.allowUrl);
-            }
-
-            h.loadCss(config.mainCss);
-            h.loadCss('https://fonts.googleapis.com/icon?family=Material+Icons');
+        requirejs(['config'], function (config) {
+            config.init(params);
 
             requirejs(['react', 'reactDOM', 'load!components/wrapper', 'load!actions/act', 'load!components/overlay', 'classnames', 'actions/api', 'ajax'],
                 function (React, ReactDOM, Wrapper, Act, Overlay, cn, Api, ajax) {
