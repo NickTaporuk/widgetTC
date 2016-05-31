@@ -132,15 +132,6 @@ define([
             if (!this.state.ready) {
                 return null;
             }
-/*            var today           = new Date(),
-                todayYear       = today.getFullYear(),
-                intervalYearAdd = 34,
-                endIntervalYear = todayYear + intervalYearAdd,
-                yearInterval    = [todayYear,endIntervalYear],
-                monthInterval   = [1,12];
-
-            var yearSelect      = this._initForSelect(yearInterval),
-                monthSelect     = this._initForSelect(monthInterval);*/
 
             return (
                 <div>
