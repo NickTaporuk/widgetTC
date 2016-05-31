@@ -429,7 +429,7 @@
 			display: inline-block;
 			@include ie7-inline-block();
 			vertical-align: middle;
-			text-indent: 0em !important;
+			text-indent: 0em;
 		}
 	}
 
