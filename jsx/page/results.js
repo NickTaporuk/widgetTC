@@ -109,13 +109,7 @@ define([
                             </div>
                             <div className={cn('twelvecol')}>
                                 {
-                                    (tires.length > 0)
-                                    ? 
-                                    <ol className={cn('results_list')}>
-                                        {tires}
-                                    </ol>
-                                    :
-                                            <h3 className={cn('message')}><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE000;' }} /> We did not find any tires based on your search criteria. Please try searching again later as inventory changes frequently.</h3>
+                                    (tires.length > 0) ? <ol className={cn('results_list')}>{tires}</ol> : <h3 className={cn('message')}><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE000;' }} /> We did not find any tires based on your search criteria. Please try searching again later as inventory changes frequently.</h3>
                                 }
                             </div>
                             <div className={cn('twelvecol')}>
@@ -189,24 +183,24 @@ define([
         },
 
         _getFilterBlocks: function() {
-                var filters = null;
-                if (Object.keys(this.state.filters).length > 0) {
-                    var values = this.props.filters || {brand: [], category: [], run_flat: [], light_track: []};
-                    var filtersInfo = [
-                        {key: 'run_flat', desc: 'Run-Flat', all: 'All/None'}, 
-                        {key: 'light_truck', desc: 'Light Track', all: 'All/None'}, 
-                        {key: 'brand', desc: 'Brand', all: 'All Brands'},
-                        {key: 'category', desc: 'Category', all: 'All Categories'}
-                    ];
-                    filters = [];
-                    filtersInfo.forEach(function(info, i) {
-                        if (this.state.filters[info.key].parameters.length > 1) {
-                            filters.push((
-                                <FilterBlock key={i} by={info.desc} topDirection={ !this.state.totalCount } name={info.key} allDesc={info.all} defaultValue={ values[info.key] ? _.toArray(values[info.key]) : [] } data={ this.state.filters[info.key] } onChange={this._handleFilterChange} />
-                            ));
-                        }
-                    }, this);
-                }
+            var filters = null;
+            if (Object.keys(this.state.filters).length > 0) {
+                var values = this.props.filters || {brand: [], category: [], run_flat: [], light_track: []};
+                var filtersInfo = [
+                    {key: 'run_flat', desc: 'Run-Flat', all: 'All/None'},
+                    {key: 'light_truck', desc: 'Light Track', all: 'All/None'},
+                    {key: 'brand', desc: 'Brand', all: 'All Brands'},
+                    {key: 'category', desc: 'Category', all: 'All Categories'}
+                ];
+                filters = [];
+                filtersInfo.forEach(function(info, i) {
+                    if (this.state.filters[info.key].parameters.length > 1) {
+                        filters.push((
+                            <FilterBlock key={i} by={info.desc} topDirection={ !this.state.totalCount } name={info.key} allDesc={info.all} defaultValue={ values[info.key] ? _.toArray(values[info.key]) : [] } data={ this.state.filters[info.key] } onChange={this._handleFilterChange} />
+                        ));
+                    }
+                }, this);
+            }
             return filters;
         },
 
