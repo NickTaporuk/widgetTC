@@ -93,9 +93,14 @@ define([
         componentDidMount: function() {
             var self = this;
             var searchState = appStore.getPageState('search');
-            var vehicleValues = this.state.values.vehicle.year
+            var vehicleValues = this.state.values.vehicle.year || !searchState
                 ? this.state.values.vehicle
-                : (searchState ? searchState.fieldValues.vehicle : {});
+                : {
+                    year: searchState.fieldValues.vehicle.year,
+                    make: searchState.fieldValues.vehicle.make,
+                    model: searchState.fieldValues.vehicle.model,
+                    trim: searchState.fieldValues.vehicle.trim
+                };
             
             var promises;
             if (this.props.type == 'request') {
@@ -254,9 +259,6 @@ define([
             var options = _.cloneDeep(this.state.options);
             var values = _.cloneDeep(this.state.values);
             values.vehicle = _.assign(values.vehicle, newValues);
-            if (newOptions.car_tire_id[0]) {
-                values.vehicle.car_tire_id = newOptions.car_tire_id[0].value;
-            }
             this.setState({
                 options: _.assign(options, newOptions),
                 values: values
@@ -284,7 +286,7 @@ define([
                 email: this.refs.email.value(),
                 phone: this.refs.phone.value(),
                 notes: this.refs.notes.value(),
-                vehicle_info: this._getVehicleInfo()
+                vehicle: this.state.values.vehicle
             };
             if (this.refs.datetime) {
                 values.preferred_time = this.refs.datetime.value();
@@ -315,14 +317,6 @@ define([
                     errors: errors
                 });
             });
-        },
-
-        _getVehicleInfo: function() {
-            if (this.state.values.vehicle.trim) {
-                return this.state.values.vehicle.year + ' ' + this.state.values.vehicle.make + ' ' + this.state.values.vehicle.model + ' ' + this.state.values.vehicle.trim;
-            } else {
-                return '';
-            }
         },
 
         _vehicleChange: function(event) {
