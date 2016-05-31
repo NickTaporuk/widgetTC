@@ -78,7 +78,7 @@ define([
         },
 
         componentDidMount: function() {
-            var searchState     = appStore.getPageState('search');
+            var searchState = appStore.getPageState('search');
 
             var vehicleValues = Object.keys(this.state.values.vehicle).length > 0
                 ? this.state.values.vehicle
@@ -322,7 +322,7 @@ define([
                     length: {is: 2},
                 },
                 exp_year: {
-                    presence    : true,
+                    presence: true,
                     length: {is: 4},
                 }
             };
