@@ -140,15 +140,26 @@ define([
                 Promise.all([
                     Api.searchTires(searchParams),
                     Api.loadTireParameters(),
-                    Api.loadLocation(self.props.location_id)
+                    Api.loadLocation(self.props.location_id),
+                    (self.props.car_tire_id ? Api.loadVehicleOptions({model:self.props.model,year:self.props.year,make:self.props.make,trim:self.props.trim},'car_tire_id'):null)
                 ]).then(function (responses) {
                     var results = responses[0];
                     var tireParameters = responses[1];
-                    var location = responses[2];
+                    var location = responses[2],
+                        tireDescriptions = '';
+
+                    if(responses[3] !== null){
+                        var vechicleArr = responses[3].car_tire_id.filter(function(vechicle) {
+                            return vechicle.value == self.props.car_tire_id;
+                        });
+
+                        tireDescriptions = vechicleArr[0].description;
+                    }
 
                     var queryParams = '';
                     if (self.props.car_tire_id) {
-                        queryParams = self.props.year + ' ' + self.props.make + ' ' + self.props.model + ' ' + self.props.trim;
+
+                        queryParams = self.props.year + ' ' + self.props.make + ' ' + self.props.model + ' ' + self.props.trim+'   '+tireDescriptions;
                     } else if (self.props.part_number) {
                         queryParams = self.props.part_number;
                     } else {
