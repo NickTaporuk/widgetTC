@@ -96,9 +96,6 @@ define([
                             <SelectField onChange={this._handleFieldChange} options={fieldOptions.display}  label="Display:" name="display"  className={cn('filter_field')} emptyDesc={false} defaultValue={fieldValues.display} />
                             <SelectField onChange={this._handleFieldChange} options={fieldOptions.order_by} label="Sort by:" name="order_by" className={cn('filter_field')} emptyDesc={false} defaultValue={fieldValues.order_by} />
                         </div>
-                        {
-                            tires.length > 0 ? null : <h3 className={cn('message')}><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE000;' }} /> We did not find any tires based on your search criteria. Please try searching again later as inventory changes frequently.</h3>
-                        }
                         <div className={cn('filters')} id={cn('filters')}>
                             {this._getFilterBlocks()}
                         </div>
@@ -112,13 +109,7 @@ define([
                             </div>
                             <div className={cn('twelvecol')}>
                                 {
-                                    (tires.length > 0)
-                                    ? 
-                                    <ol className={cn('results_list')}>
-                                        {tires}                                    
-                                    </ol>
-                                    : 
-                                    null
+                                    (tires.length > 0) ? <ol className={cn('results_list')}>{tires}</ol> : <h3 className={cn('message')}><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE000;' }} /> We did not find any tires based on your search criteria. Please try searching again later as inventory changes frequently.</h3>
                                 }
                             </div>
                             <div className={cn('twelvecol')}>
@@ -192,25 +183,23 @@ define([
         },
 
         _getFilterBlocks: function() {
-            if (this.state.tires.length > 0) {
-                var filters = null;
-                if (Object.keys(this.state.filters).length > 0) {
-                    var values = this.props.filters || {brand: [], category: [], run_flat: [], light_track: []};
-                    var filtersInfo = [
-                        {key: 'run_flat', desc: 'Run-Flat', all: 'All/None'}, 
-                        {key: 'light_truck', desc: 'Light Track', all: 'All/None'}, 
-                        {key: 'brand', desc: 'Brand', all: 'All Brands'},
-                        {key: 'category', desc: 'Category', all: 'All Categories'}
-                    ];
-                    filters = [];
-                    filtersInfo.forEach(function(info, i) {
-                        if (this.state.filters[info.key].parameters.length > 1) {
-                            filters.push((
-                                <FilterBlock key={i} by={info.desc} topDirection={ !this.state.totalCount } name={info.key} allDesc={info.all} defaultValue={ values[info.key] ? _.toArray(values[info.key]) : [] } data={ this.state.filters[info.key] } onChange={this._handleFilterChange} />
-                            ));
-                        }
-                    }, this);
-                }
+            var filters = null;
+            if (Object.keys(this.state.filters).length > 0) {
+                var values = this.props.filters || {brand: [], category: [], run_flat: [], light_track: []};
+                var filtersInfo = [
+                    {key: 'run_flat', desc: 'Run-Flat', all: 'All/None'},
+                    {key: 'light_truck', desc: 'Light Track', all: 'All/None'},
+                    {key: 'brand', desc: 'Brand', all: 'All Brands'},
+                    {key: 'category', desc: 'Category', all: 'All Categories'}
+                ];
+                filters = [];
+                filtersInfo.forEach(function(info, i) {
+                    if (this.state.filters[info.key].parameters.length > 1) {
+                        filters.push((
+                            <FilterBlock key={i} by={info.desc} topDirection={ !this.state.totalCount } name={info.key} allDesc={info.all} defaultValue={ values[info.key] ? _.toArray(values[info.key]) : [] } data={ this.state.filters[info.key] } onChange={this._handleFilterChange} />
+                        ));
+                    }
+                }, this);
             }
             return filters;
         },
