@@ -31,6 +31,16 @@ define([
         apiBaseUrl: 'https://wl.tireconnect.ca/api/v1/',
         scriptPlace: 'https://app.tireconnect.ca',
 
+        clientType: 0,
+        defaultCategory: '',
+        defaultNumbersOfTires: 4,
+        defaultOrder: 'best_mutch',
+        defaultQuoteCallBack: false,
+        defaultSearching: 'by_vehicle',
+        itemsPerPage: 6,
+        showInStock: true,
+        showTireconnectLogo: false,
+        colors: null,
 
         init: function(params) {
             if (!params.apikey) {
@@ -65,7 +75,7 @@ define([
                     break;
                 case 'colors':
                     config.colors = value;
-                    if (value[1]) {
+                    if (value && value[1]) {
                         changeColorScheme(value[0], value[1]);
                     }
                     break;

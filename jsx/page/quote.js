@@ -21,35 +21,15 @@ define([
     return {
         displayName: 'get_a_quote',
 
-        getInitialState: function () {
-            return {
-                ready: false
-            }
-        },
-
         componentWillMount: function () {
             var lastState = appStore.getPageState(this);
             if (lastState) {
                 this.setState(lastState);
-            }
-        },
-
-        componentDidMount: function () {
-            var self = this;
-            if (!this.state.ready) {
-                Promise.all([
-                    Api.loadDealerConfig()
-                ]).then(function (responses) {
-                    self.setState({
-                        ready: true,
-                        follow_up: config.sa ? false : responses[0].default_quote_call_back
-                    });
+            } else {
+                this.setState({
+                    follow_up: config.sa ? false : config.defaultQuoteCallBack
                 });
             }
-        },
-
-        shouldComponentUpdate: function(nextProps, nextState) {
-            return nextState.ready !== this.state.ready;
         },
 
         componentWillUnmount: function () {
@@ -57,10 +37,6 @@ define([
         },
 
         render: function() {
-            if (!this.state.ready) {
-                return null;
-            }
-
             return (
                 <div>
                     <Back />

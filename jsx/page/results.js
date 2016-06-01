@@ -4,6 +4,7 @@ define([
     'lib/helper',
     'classnames',
     'lodash',
+    'config',
     'load!actions/act',
     'actions/api',
     'load!components/elements/select',
@@ -19,6 +20,7 @@ define([
     h,
     cn,
     _,
+    config,
     Act,
     Api,
     SelectField,
@@ -124,61 +126,59 @@ define([
         _init: function () {
             var self = this;
 
-            Api.loadDealerConfig().then(function(dealerConfig){
-                var searchParams = _.cloneDeep(self.props);
-                searchParams.items_per_page = dealerConfig.items_per_page;
+            var searchParams = _.cloneDeep(self.props);
+            searchParams.items_per_page = config.itemsPerPage;
 
-                Promise.all([
-                    Api.searchTires(searchParams),
-                    Api.loadTireParameters(),
-                    Api.loadLocation(self.props.location_id)
-                ]).then(function (responses) {
-                    var results = responses[0];
-                    var tireParameters = responses[1];
-                    var location = responses[2];
+            Promise.all([
+                Api.searchTires(searchParams),
+                Api.loadTireParameters(),
+                Api.loadLocation(self.props.location_id)
+            ]).then(function (responses) {
+                var results = responses[0];
+                var tireParameters = responses[1];
+                var location = responses[2];
 
-                    var queryParams = '';
-                    if (self.props.car_tire_id) {
-                        queryParams = self.props.year + ' ' + self.props.make + ' ' + self.props.model + ' ' + self.props.trim;
-                    } else if (self.props.part_number) {
-                        queryParams = self.props.part_number;
-                    } else {
-                        queryParams = self.props.width + '/' + self.props.height + 'R' + self.props.rim;
-                    }
+                var queryParams = '';
+                if (self.props.car_tire_id) {
+                    queryParams = self.props.year + ' ' + self.props.make + ' ' + self.props.model + ' ' + self.props.trim;
+                } else if (self.props.part_number) {
+                    queryParams = self.props.part_number;
+                } else {
+                    queryParams = self.props.width + '/' + self.props.height + 'R' + self.props.rim;
+                }
 
-                    if (dealerConfig.client_type == 3 && results.filters.brand) {
-                        results.filters.brand.required_brands = ['Bridgestone', 'Firestone', 'Fuzion'];
-                    }
+                if (config.clientType == 3 && results.filters.brand) {
+                    results.filters.brand.required_brands = ['Bridgestone', 'Firestone', 'Fuzion'];
+                }
 
-                    var displayOptions = _.cloneDeep(tireParameters.display);
-                    if (!self.props.car_tire_id) {
-                        _.remove(displayOptions, function (item) {
-                            return item.value == 'oem';
-                        });
-                    }
+                var displayOptions = _.cloneDeep(tireParameters.display);
+                if (!self.props.car_tire_id) {
+                    _.remove(displayOptions, function (item) {
+                        return item.value == 'oem';
+                    });
+                }
 
-                    var state = {
-                        ready: true,
-                        page: results.page,
-                        tires: results.tires,
-                        totalCount: results.nb_results,
-                        filters: results.filters,
+                var state = {
+                    ready: true,
+                    page: results.page,
+                    tires: results.tires,
+                    totalCount: results.nb_results,
+                    filters: results.filters,
 
-                        fieldOptions: {
-                            display: displayOptions,
-                            order_by: tireParameters.order_by
-                        },
+                    fieldOptions: {
+                        display: displayOptions,
+                        order_by: tireParameters.order_by
+                    },
 
-                        isInMile: location.country !== 'Canada',
-                        itemsOnPage: dealerConfig.items_per_page,
+                    isInMile: location.country !== 'Canada',
+                    itemsOnPage: config.itemsPerPage,
 
-                        defaultSelectedQuantity: dealerConfig.default_selected_quantity,
+                    defaultSelectedQuantity: config.defaultNumbersOfTires,
 
-                        queryParams: queryParams
-                    };
+                    queryParams: queryParams
+                };
 
-                    self.setState(state);
-                });
+                self.setState(state);
             });
         },
 

@@ -44,6 +44,13 @@ define([
             if (lastState) {
                 lastState.ready = false;
                 this.setState(lastState);
+            } else {
+                var fieldValues = _.cloneDeep(this.state.fieldValues);
+                fieldValues.vehicle.base_category = config.defaultCategory;
+                fieldValues.size.base_category = config.defaultCategory;
+                this.setState({
+                    fieldValues: fieldValues
+                });
             }
         },
 
@@ -53,14 +60,13 @@ define([
                 Promise.all([
                     Api.loadTireParameters(),
                     Api.loadVehicleOptions(),
-                    Api.loadLocations(),
-                    Api.loadDealerConfig()
+                    Api.loadLocations()
                 ]).then(function (response) {
                     self.setState({
                         ready: true,
                         fieldOptions: _.merge(response[0], response[1]),
                         locations: response[2],
-                        activeTab: response[3].default_searching ? response[3].default_searching.replace('by_', '') : 'vehicle'
+                        activeTab: config.defaultSearching.replace('by_', '')
                     });
                     if (response[2].length == 1) {
                         lockr.set('location_id', response[2][0].id);
@@ -287,6 +293,7 @@ define([
                         });
                         delete params.base_category;
                     }
+                    params.order_by = config.defaultOrder;
 
                     A.route('results', params);
                 } else {
