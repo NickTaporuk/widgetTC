@@ -34,7 +34,7 @@ define([
         clientType: 0,
         defaultCategory: '',
         defaultNumbersOfTires: 4,
-        defaultOrder: 'best_mutch',
+        defaultOrder: 'best_match',
         defaultQuoteCallBack: false,
         defaultSearching: 'by_vehicle',
         itemsPerPage: 6,
