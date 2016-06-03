@@ -81,7 +81,8 @@ define([
                     break;
                 case 'scriptPlace':
                     config.imagesFolder = value + '/img/';
-                    h.loadCss( value + '/css/style.css' );
+                    config.mainCss = value + '/css/style.css';
+                    h.loadCss( config.mainCss );
                     h.loadCss('https://fonts.googleapis.com/icon?family=Material+Icons');
                     break;
             }
