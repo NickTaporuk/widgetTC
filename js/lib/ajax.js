@@ -15,7 +15,6 @@ define(['config', 'promise', 'lodash'], function(config, Promise, _) {
 		  return $private.XHRConnection( 'GET', url );
 		};
 		$public.post = function post( url, data ) {
-			console.log('url:',url);
 		  return $private.XHRConnection( 'POST', url, data );
 		};
 
