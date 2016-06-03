@@ -50,15 +50,17 @@ define([
         componentWillMount: function() {
             var today           = new Date(),
                 todayYear       = today.getFullYear(),
-                intervalYearAdd = 34,
+                intervalYearAdd = 10,
                 endIntervalYear = todayYear + intervalYearAdd,
                 yearInterval    = [todayYear,endIntervalYear],
                 monthInterval   = [1,12];
+
             var yearSelect      = this._initForSelect(yearInterval),
                 monthSelect     = this._initForSelect(monthInterval);
             var intervalDate    = _.cloneDeep(this.state.intervalDate);
                 intervalDate.month = monthSelect;
                 intervalDate.years = yearSelect;
+
             this.setState({
                 intervalDate: intervalDate
             });
@@ -255,7 +257,7 @@ define([
         _initForSelect: function(interval){
             var o = [];
             for (var i=interval[0],end = interval[1]; i <= end;i++) {
-                if(i < 10)  o.push({"value": '0'+i.toString(),"description":i.toString()});
+                if(i < 10)  o.push({"value": '0'+i.toString(),"description":'0'+i.toString()});
                 else o.push({"value":i,"description":i});
             }
             return o;
