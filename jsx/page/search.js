@@ -49,7 +49,8 @@ define([
                 fieldValues.vehicle.base_category = config.defaultCategory;
                 fieldValues.size.base_category = config.defaultCategory;
                 this.setState({
-                    fieldValues: fieldValues
+                    fieldValues: fieldValues,
+                    activeTab: config.defaultSearching.replace('by_', '')
                 });
             }
         },
@@ -57,16 +58,18 @@ define([
         componentDidMount: function() {
             var self = this;
             if (!this.state.ready) {
+                var lastState = appStore.getPageState(this);
+                var vehicleValues = lastState ? lastState.fieldValues.vehicle : {};
+
                 Promise.all([
                     Api.loadTireParameters(),
-                    Api.loadVehicleOptions(),
+                    Api.loadVehicleOptions(vehicleValues),
                     Api.loadLocations()
                 ]).then(function (response) {
                     self.setState({
                         ready: true,
                         fieldOptions: _.merge(response[0], response[1]),
-                        locations: response[2],
-                        activeTab: config.defaultSearching.replace('by_', '')
+                        locations: response[2]
                     });
                     if (response[2].length == 1) {
                         lockr.set('location_id', response[2][0].id);
