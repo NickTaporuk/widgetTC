@@ -14,7 +14,6 @@ define(['config', 'promise', 'lodash'], function(config, Promise, _) {
 		  url += (url.indexOf('?') === -1 ? '?' : '&') + data;
 		  return $private.XHRConnection( 'GET', url );
 		};
-
 		$public.post = function post( url, data ) {
 		  return $private.XHRConnection( 'POST', url, data );
 		};
