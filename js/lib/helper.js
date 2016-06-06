@@ -123,7 +123,7 @@ define(['config'], function(config) {
                         obj[arr[1]] = paramFromString(string, val, obj[arr[1]]);
                     }
                 } else {
-                    obj[string] = isNaN(parseInt(val)) ? val : val * 1;
+                    obj[string] =  /^[0-9\.]+$/.test(val) ? val * 1 : val;
                 }
                 return obj;
             };
