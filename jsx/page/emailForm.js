@@ -101,6 +101,7 @@ define([
             summaryProps.follow_up = false;
 
             Api.emailQuote(summaryProps).then(function(response) {
+                A.popup.show(response.title, response.data);
                 history.back();
             }).catch(function(errors) {
                 self.setState({

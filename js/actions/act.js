@@ -76,16 +76,11 @@ define([
         }
     }
 
-    function execute(page, params, afterNav) {
-        actions.route(page, params);
-    }
-
     history.bind('popstate', function (state) {
         var page = state && state.page ? state.page : null,
             params = state && state.params ? state.params : {};
-            // params.afterNav = true;
 
-        execute(page, params, true);
+        actions.route(page, params);
     });
 
     function start() {
@@ -96,7 +91,8 @@ define([
                 params: null
             };
         }
-        execute(urlData.page, urlData.params, false);
+
+        actions.route(urlData.page, urlData.params);
     }
 
     return actions;

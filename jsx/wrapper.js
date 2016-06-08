@@ -11,10 +11,10 @@ define([
 ], function(
     React,
     ReactDOM,
-    cn, 
+    cn,
     config,
     Top,
-    Header, 
+    Header,
     Page,
     Preloader,
     Api

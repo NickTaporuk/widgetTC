@@ -1,60 +1,31 @@
 window.TCWidget = {
+    containerNode: null,
     overlayNode: null,
     init: function (params) {
+        var self = this;
+
         requirejs.config({
             baseUrl: './js/',
             paths: {
                 lockr: 'bower_components/lockr/lockr',
-                classnames: 'lib/classnames'
+                classnames: 'lib/classnames',
+                isMobile: 'bower_components/isMobile/isMobile',
+                lodash: 'bower_components/lodash/lodash',
+                validate: 'bower_components/validate/validate',
+                moment: 'bower_components/moment/moment',
+                dispatcher: 'lib/dispatcher',
+                ajax: 'lib/ajax',
+                react: 'bower_components/react/react',
+                reactDOM: 'bower_components/react/react-dom',
+                microEvent: 'bower_components/microevent/microevent',
+                promise: 'bower_components/es6-promise-polyfill/promise',
+                load: 'loader',
+                stripe: 'https://js.stripe.com/v2/stripe'
             }
         });
 
-        requirejs(['config', 'lib/helper', 'lockr', 'classnames'], function (config, h, lockr, cn) {
-            if (!params.apikey) {
-                throw new Error('Api key is required');
-            } else {
-                lockr.prefix = config.prefix + params.apikey;
-                cn.prefix = config.prefix;
-            }
-            if (!params.container) {
-                throw new Error('Container is required');
-            }
-
-            //add passed params to config
-            config.setParams({
-                apikey: params.apikey,
-                container: params.container
-            });
-            if (params.sa) {
-                config.setParam('sa', params.sa);
-            }
-            if (params.scriptPlace) {
-                config.setParam('scriptPlace', params.scriptPlace);
-            }
-            if (params.apiBaseUrl) {
-                config.setParam('apiBaseUrl', params.apiBaseUrl);
-            }
-
-            h.loadCss(config.mainCss);
-            h.loadCss('https://fonts.googleapis.com/icon?family=Material+Icons');
-
-            requirejs.config({
-                baseUrl: './js/',
-                paths: {
-                    isMobile: 'bower_components/isMobile/isMobile',
-                    lodash: 'bower_components/lodash/lodash',
-                    validate: 'bower_components/validate/validate',
-                    moment: 'bower_components/moment/moment',
-                    dispatcher: 'lib/dispatcher',
-                    ajax: 'lib/ajax',
-                    react: 'bower_components/react/react',
-                    reactDOM: 'bower_components/react/react-dom',
-                    microEvent: 'bower_components/microevent/microevent',
-                    promise: 'bower_components/es6-promise-polyfill/promise',
-                    load: 'loader',
-                    stripe: 'https://js.stripe.com/v2/stripe'
-                }
-            });
+        requirejs(['config'], function (config) {
+            config.init(params);
 
             requirejs(['react', 'reactDOM', 'load!components/wrapper', 'load!actions/act', 'load!components/overlay', 'classnames', 'actions/api', 'ajax'],
                 function (React, ReactDOM, Wrapper, Act, Overlay, cn, Api, ajax) {
@@ -62,7 +33,7 @@ window.TCWidget = {
                     var render = function () {
                         ajax.clearCache();
 
-                        var container = document.getElementById(params.container);
+                        self.containerNode = document.getElementById(params.container);
 
                         if (!self.overlayNode) {
                             // append overlays (popup/message/loading/shadow) to the end of body
@@ -72,12 +43,11 @@ window.TCWidget = {
                             body.appendChild(self.overlayNode);
                         }
 
-                        ReactDOM.unmountComponentAtNode(container); // needed if init has been called again
-                        ReactDOM.unmountComponentAtNode(self.overlayNode); // needed if init has been called again
+                        self.destroy();
 
                         ReactDOM.render(
                             React.createElement(Wrapper),
-                            container
+                            self.containerNode
                         );
 
                         ReactDOM.render(
@@ -98,5 +68,12 @@ window.TCWidget = {
                     }
                 });
         });
+    },
+    destroy: function() {
+        if (this.containerNode) {
+            var ReactDOM = requirejs('reactDOM');
+            ReactDOM.unmountComponentAtNode(this.containerNode); // needed if init has been called again
+            ReactDOM.unmountComponentAtNode(this.overlayNode); // needed if init has been called again
+        }
     }
 };

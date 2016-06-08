@@ -1,4 +1,6 @@
 define(['config'], function(config) {
+	var styles = {};
+
 	var h = {
 		priceFormat: function(_number,_decimal,_separator)
 		{
@@ -52,11 +54,15 @@ define(['config'], function(config) {
 	        return true;
 	    },
 	    loadCss: function(url) {
-          var link = document.createElement("link");
-          link.type = "text/css";
-          link.rel = "stylesheet";
-          link.href = url;
-          document.getElementsByTagName("head")[0].appendChild(link);
+            var key = url.replace(/[^a-zA-Z0-9]/g, '');
+            if (!styles[key]) {
+                var link = document.createElement("link");
+                link.type = "text/css";
+                link.rel = "stylesheet";
+                link.href = url;
+                styles[key] = true;
+                document.getElementsByTagName("head")[0].appendChild(link);
+            }
         },
         getOffset: function(elem) {
 	    	// (1)
@@ -117,7 +123,7 @@ define(['config'], function(config) {
                         obj[arr[1]] = paramFromString(string, val, obj[arr[1]]);
                     }
                 } else {
-                    obj[string] = isNaN(parseInt(val)) ? val : val * 1;
+                    obj[string] =  /^[0-9\.]+$/.test(val) ? val * 1 : val;
                 }
                 return obj;
             };

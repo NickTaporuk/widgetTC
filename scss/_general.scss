@@ -192,3 +192,8 @@ body {
 		}
 	}
 }
+// Task GWL-947
+#tcwlw_widget.tcwlw_stand-alone {
+	max-width: $maxSAWidgetWidth;
+	margin: 0 auto;
+}

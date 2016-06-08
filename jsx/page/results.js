@@ -4,6 +4,7 @@ define([
     'lib/helper',
     'classnames',
     'lodash',
+    'config',
     'load!actions/act',
     'actions/api',
     'load!components/elements/select',
@@ -19,6 +20,7 @@ define([
     h,
     cn,
     _,
+    config,
     Act,
     Api,
     SelectField,
@@ -89,16 +91,13 @@ define([
                         <div className={cn('results_title')}>
                             <p className={cn('results_query')}>
                                 <span>Found <strong className={cn('results_count')}>{this.state.totalCount}</strong> tires for:</span>
-                                <span className={cn('results_query_param')}>{this.state.queryParams}</span>
+                                <span className={cn('results_query_param')} dangerouslySetInnerHTML={{ __html: this.state.queryParams }} />
                             </p>
                         </div>
                         <div id={cn('optional_fields')} className={cn(['box', 'results_filters'])}>
                             <SelectField onChange={this._handleFieldChange} options={fieldOptions.display}  label="Display:" name="display"  className={cn('filter_field')} emptyDesc={false} defaultValue={fieldValues.display} />
                             <SelectField onChange={this._handleFieldChange} options={fieldOptions.order_by} label="Sort by:" name="order_by" className={cn('filter_field')} emptyDesc={false} defaultValue={fieldValues.order_by} />
                         </div>
-                        {
-                            tires.length > 0 ? null : <h3 className={cn('message')}><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE000;' }} /> We did not find any tires based on your search criteria. Please try searching again later as inventory changes frequently.</h3>
-                        }
                         <div className={cn('filters')} id={cn('filters')}>
                             {this._getFilterBlocks()}
                         </div>
@@ -112,13 +111,7 @@ define([
                             </div>
                             <div className={cn('twelvecol')}>
                                 {
-                                    (tires.length > 0)
-                                    ? 
-                                    <ol className={cn('results_list')}>
-                                        {tires}                                    
-                                    </ol>
-                                    : 
-                                    null
+                                    (tires.length > 0) ? <ol className={cn('results_list')}>{tires}</ol> : <h3 className={cn('message')}><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE000;' }} /> We did not find any tires based on your search criteria. Please try searching again later as inventory changes frequently.</h3>
                                 }
                             </div>
                             <div className={cn('twelvecol')}>
@@ -133,84 +126,90 @@ define([
         _init: function () {
             var self = this;
 
-            Api.loadDealerConfig().then(function(dealerConfig){
-                var searchParams = _.cloneDeep(self.props);
-                searchParams.items_per_page = dealerConfig.items_per_page;
+            var searchParams = _.cloneDeep(self.props);
+            searchParams.items_per_page = config.itemsPerPage;
 
-                Promise.all([
-                    Api.searchTires(searchParams),
-                    Api.loadTireParameters(),
-                    Api.loadLocation(self.props.location_id)
-                ]).then(function (responses) {
-                    var results = responses[0];
-                    var tireParameters = responses[1];
-                    var location = responses[2];
+            Promise.all([
+                Api.searchTires(searchParams),
+                Api.loadTireParameters(),
+                Api.loadLocation(self.props.location_id),
+                (self.props.car_tire_id ? Api.loadVehicleOptions({model:self.props.model,year:self.props.year,make:self.props.make,trim:self.props.trim},'car_tire_id'):null)
+            ]).then(function (responses) {
+                var results = responses[0];
+                var tireParameters = responses[1];
+                var location = responses[2],
+                    tireDescriptions = '';
 
-                    var queryParams = '';
-                    if (self.props.car_tire_id) {
-                        queryParams = self.props.year + ' ' + self.props.make + ' ' + self.props.model + ' ' + self.props.trim;
-                    } else if (self.props.part_number) {
-                        queryParams = self.props.part_number;
-                    } else {
-                        queryParams = self.props.width + '/' + self.props.height + 'R' + self.props.rim;
-                    }
+                if(responses[3] !== null){
+                    var vechicleArr = responses[3].car_tire_id.filter(function(vechicle) {
+                        return vechicle.value == self.props.car_tire_id;
+                    });
 
-                    if (dealerConfig.client_type == 3 && results.filters.brand) {
-                        results.filters.brand.required_brands = ['Bridgestone', 'Firestone', 'Fuzion'];
-                    }
+                    tireDescriptions = vechicleArr[0].description;
+                }
 
-                    var displayOptions = _.cloneDeep(tireParameters.display);
-                    if (!self.props.car_tire_id) {
-                        _.remove(displayOptions, function (item) {
-                            return item.value == 'oem';
-                        });
-                    }
+                var queryParams = '';
+                if (self.props.car_tire_id) {
+                    queryParams = self.props.year + ' ' + self.props.make + ' ' + self.props.model + ' ' + self.props.trim + ' &nbsp;&nbsp;' + tireDescriptions;
+                } else if (self.props.part_number) {
+                    queryParams = self.props.part_number;
+                } else {
+                    queryParams = self.props.width + '/' + self.props.height + 'R' + self.props.rim;
+                }
 
-                    var state = {
-                        ready: true,
-                        page: results.page,
-                        tires: results.tires,
-                        totalCount: results.nb_results,
-                        filters: results.filters,
+                if (config.clientType == 3 && results.filters.brand) {
+                    results.filters.brand.required_brands = ['Bridgestone', 'Firestone', 'Fuzion'];
+                }
 
-                        fieldOptions: {
-                            display: displayOptions,
-                            order_by: tireParameters.order_by
-                        },
+                var displayOptions = _.cloneDeep(tireParameters.display);
+                if (!self.props.car_tire_id) {
+                    _.remove(displayOptions, function (item) {
+                        return item.value == 'oem';
+                    });
+                }
 
-                        isInMile: location.country !== 'Canada',
-                        itemsOnPage: dealerConfig.items_per_page,
+                var state = {
+                    ready: true,
+                    page: results.page,
+                    tires: results.tires,
+                    totalCount: results.nb_results,
+                    filters: results.filters,
 
-                        defaultSelectedQuantity: dealerConfig.default_selected_quantity,
+                    fieldOptions: {
+                        display: displayOptions,
+                        order_by: tireParameters.order_by
+                    },
 
-                        queryParams: queryParams
-                    };
+                    isInMile: location.country !== 'Canada',
+                    itemsOnPage: config.itemsPerPage,
 
-                    self.setState(state);
-                });
+                    defaultSelectedQuantity: config.defaultNumbersOfTires,
+
+                    queryParams: queryParams
+                };
+
+                self.setState(state);
             });
         },
 
         _getFilterBlocks: function() {
-            if (this.state.tires.length > 0) {
-                var filters = null;
-                if (Object.keys(this.state.filters).length > 0) {
-                    var values = this.props.filters || {brand: [], category: [], run_flat: [], light_track: []};
-                    var filtersInfo = [
-                        {key: 'run_flat', desc: 'Run-Flat', all: 'All/None'}, 
-                        {key: 'light_truck', desc: 'Light Track', all: 'All/None'}, 
-                        {key: 'brand', desc: 'Brand', all: 'All Brands'},
-                        {key: 'category', desc: 'Category', all: 'All Categories'}
-                    ];
-                    filters = [];
-                    filtersInfo.forEach(function(info, i) {
-                        if (this.state.filters[info.key].parameters.length > 1) {
-                            filters.push((
-                                <FilterBlock key={i} by={info.desc} topDirection={ !this.state.totalCount } name={info.key} allDesc={info.all} defaultValue={ values[info.key] ? _.toArray(values[info.key]) : [] } data={ this.state.filters[info.key] } onChange={this._handleFilterChange} />
-                            ));
-                        }
-                    }, this);
-                }
+            var filters = null;
+            if (Object.keys(this.state.filters).length > 0) {
+                var values = this.props.filters || {brand: [], category: [], run_flat: [], light_track: []};
+                var filtersInfo = [
+                    {key: 'run_flat', desc: 'Run-Flat', all: 'All/None'},
+                    {key: 'light_truck', desc: 'Light Track', all: 'All/None'},
+                    {key: 'brand', desc: 'Brand', all: 'All Brands'},
+                    {key: 'category', desc: 'Category', all: 'All Categories'}
+                ];
+                filters = [];
+                filtersInfo.forEach(function(info, i) {
+                    if (this.state.filters[info.key].parameters.length > 1) {
+                        filters.push((
+                            <FilterBlock key={i} by={info.desc} topDirection={ !this.state.totalCount } name={info.key} allDesc={info.all} defaultValue={ values[info.key] ? _.toArray(values[info.key]) : [] } data={ this.state.filters[info.key] } onChange={this._handleFilterChange} />
+                        ));
+                    }
+                }, this);
             }
             return filters;
         },

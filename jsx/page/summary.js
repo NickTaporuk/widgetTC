@@ -172,9 +172,26 @@ define([
             var tireParams = h.base64Decode(props.tire_id).split('||');
             var locationId = tireParams[3];
 
+            var searchState = appStore.getPageState('search');
+            var vehicleValues = searchState && searchState.activeTab == 'vehicle' ? {
+                year: searchState.fieldValues.vehicle.year,
+                make: searchState.fieldValues.vehicle.make,
+                model: searchState.fieldValues.vehicle.model,
+                trim: searchState.fieldValues.vehicle.trim,
+                car_tire_id: searchState.fieldValues.vehicle.car_tire_id
+            } : {};
+
             var promises = [
                 Api.loadTire(props.tire_id),
-                Api.loadQuote(props.tire_id, props.quantity, props.optional_services, props.with_discount, props.custom_discount, track || null),
+                Api.loadQuote(
+                    props.tire_id,
+                    props.quantity,
+                    props.optional_services,
+                    props.with_discount,
+                    props.custom_discount,
+                    vehicleValues,
+                    track || null
+                ),
                 Api.loadDealerConfig(),
                 Api.loadLocationConfig(locationId)
             ];

@@ -24,14 +24,13 @@ define([
         componentDidMount: function() {
             var self = this;
             Promise.all([
-                Api.loadDealerInfo(),
-                Api.loadDealerConfig()
+                Api.loadDealerInfo()
             ]).then(function (responses) {
                 self.setState({
                     ready: true,
                     companyName: responses[0].company_name,
                     logo: responses[0].logo,
-                    showTCLogo: responses[1].show_tireconnect_logo
+                    showTCLogo: config.showTireconnectLogo
                 });
             });
         },

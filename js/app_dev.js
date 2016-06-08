@@ -41,7 +41,6 @@ var serverSettings = {
 	scriptPlace: params.live ? 'https://app.tireconnect.ca' : 'https://dev.tireconnect.ca/app',
 	apiBaseUrl: params.live ? 'https://wl.tireconnect.ca/api2.php/' : 'https://dev.tireconnect.ca/api2.php/'
 };
-
 var domain = window.location.host;
 var hasLocalSettigns = typeof localSettings[domain] !== 'undefined';
 var settings = {
@@ -50,13 +49,16 @@ var settings = {
 	apiBaseUrl: (params.api || !hasLocalSettigns ? serverSettings.apiBaseUrl : localSettings[domain].apiBaseUrl)
 };
 
+console.log(settings);
 
 requirejs([ (params.optim ? (settings.scriptPlace + '/js/widget.js') : 'app') ], function() {
 	TCWidget.init({
-	  apikey: settings.apikey,
-	  container: 'content',
-	  sa: params.sa,
-	  scriptPlace: settings.scriptPlace,
-	  apiBaseUrl:  settings.apiBaseUrl
+	  // apikey: settings.apikey,
+        apikey: '4b9825b268b0ec4a88c2ddfdee87c818',
+        // locationId: 1,
+	    container: 'content',
+	    sa: params.sa,
+	    scriptPlace: settings.scriptPlace,
+	    apiBaseUrl:  settings.apiBaseUrl
 	});
 });

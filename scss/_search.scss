@@ -51,7 +51,21 @@
 
 	.tcwlw_fields_wrapper {
 		padding-left: 8px;
-
+		.tcwlw_number_widget {
+			background: $gray;
+			@include font-size($baseFontSize);
+			font-weight: bold;
+			line-height: 2.1;
+			color: white;
+			position: absolute;
+			@include top(-0.4);
+			left: 0;
+			@include width(2.2);
+			@include height(2.2);
+			@include rounded(50%);
+			display: block;
+			text-align: center;
+		}
 		.tcwlw_field {
 			float: none;
 			color: $secondaryColor;
@@ -63,24 +77,6 @@
 			display: inline-block;
 			@include ie7-inline-block();
 			vertical-align: top;
-			counter-increment: steps-counter;
-
-			&:before {
-				content: counter(steps-counter);
-				background: $secondaryColor;
-				@include font-size($baseFontSize);
-				font-weight: bold;
-				line-height: 2.1;
-				color: white;
-				position: absolute;
-				@include top(-0.4);
-				left: 0;
-				@include width(2.2);
-				@include height(2.2);
-				@include rounded(50%);
-				display: block;
-				text-align: center;
-			}
 
 			p {
 				color: $grayDarkest;
@@ -89,10 +85,6 @@
 			select {
 				@include margin-bottom($baseSpacing);
 			}
-		}
-
-		.tcwlw_fields_wrapper_2 {
-			counter-reset: steps-counter 3;
 		}
 	}
 
@@ -154,6 +146,15 @@
 	// Media
 
 	@include respond-to(smaller-screen) {
+      .tcwlw_fields_wrapper {
+        .tcwlw_number_widget {
+          line-height: 2;
+          @include top(-0.6);
+          @include left(-0.1);
+          @include width(2);
+          @include height(2);
+        }
+      }
 		.tcwlw_search_by {
 			.tcwlw_tab {
 				width: 100%;
@@ -182,14 +183,6 @@
 				min-width: 0;
 				margin-right: 0;
 				padding: 0;
-
-				&:before {
-					line-height: 2;
-					@include top(-0.6);
-					@include left(-0.1);
-					@include width(2);
-					@include height(2);
-				}
 
 				> label {
 					@include margin-top(-0.1);

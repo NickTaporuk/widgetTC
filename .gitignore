@@ -1,5 +1,6 @@
 js/components/.module-cache/
 js/bower_components/
+js/widget.js
 node_modules/
 components/
 .sass-cache/
