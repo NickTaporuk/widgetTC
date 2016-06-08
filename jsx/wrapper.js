@@ -157,15 +157,6 @@ define([
             'border-color: ' + color1 +';'
         );
 
-        //text color 2
-        addCSSRule(
-            '#widget a:hover, ' +
-            // '#widget a:focus, ' +
-            // '#widget_outer a:focus, ' +
-            '#widget_outer a:hover',
-            'color: ' + color1
-        );
-
         //bg color2
         addCSSRule(
             '#widget .bg_color, ' +
