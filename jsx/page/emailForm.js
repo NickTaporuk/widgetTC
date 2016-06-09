@@ -8,7 +8,8 @@ define([
     'actions/api',
     'load!stores/appStore',
     'promise',
-    'lib/history'
+    'lib/history',
+    'config'
 ], function(
     React,
     cn,
@@ -19,7 +20,8 @@ define([
     Api,
     appStore,
     Promise,
-    history
+    history,
+    config
 ) {
 
     return {
@@ -34,6 +36,17 @@ define([
         componentDidMount: function() {
             var self = this;
             var summaryProps = appStore.getPageProps('summary');
+            var state = appStore.getPageState('quote_form');
+
+            if (config.emailUserState) {
+                this.setState({
+                    email : config.emailUserState
+                });
+            } else if(state !== null && state.hasOwnProperty('values')) {
+                this.setState({
+                    email : state.values.email
+                });
+            }
 
             Promise.all([
                 Api.loadQuote(summaryProps.tire_id, summaryProps.quantity, summaryProps.optional_services, summaryProps.with_discount, summaryProps.custom_discount)
@@ -46,6 +59,7 @@ define([
         },
 
         componentWillUnmount: function () {
+            config.setParam('emailUserState',this.refs.email.value);
             appStore.savePageData(this);
         },
 
@@ -66,10 +80,10 @@ define([
                             <fieldset className={cn(['sixcol', 'last', 'right', 'col_right', 'appointment_fields'])}>
                                 <div className={cn('control_wrapper')}>
                                     <label htmlFor={cn('order_email')}>Email Address <span className="req">*</span></label>
-                                    <input type="email" id={cn('order_email')} required ref="email" />
+                                    <input type="email" id={cn('order_email')} required ref="email" defaultValue={ this.state.email }/>
                                     {this._getError('email')}
                                 </div>
-                                {this._getBtn()}
+                                { this._getBtn() }
                             </fieldset>
                         </form>
                     </div>

@@ -74,15 +74,21 @@ define([
                 errors: {}
             }
         },
-
         componentWillMount: function() {
-            var lastState = appStore.getPageState(this);
+            var lastState = appStore.getPageState('quote_form');
+
             if (lastState) {
+                if(config.hasOwnProperty('emailUserState')) {
+                    lastState.values.email = config.emailUserState;
+                }
                 this.setState({
                     values: lastState.values
                 });
             } else {
                 var values = _.cloneDeep(this.state.values);
+                if(config.hasOwnProperty('emailUserState')) {
+                    values.email = config.emailUserState;
+                }
                 values.preferred_time = moment().add(1, 'd').minutes(0).hour(13).format('YYYY-MM-DD HH:mm');
                 this.setState({
                     values: values
@@ -131,6 +137,7 @@ define([
         },
 
         componentWillUnmount: function () {
+            config.setParam('emailUserState',this.refs.email.value());
             appStore.savePageData(this);
         },
         componentDidUpdate: function(prevProps, prevState) {

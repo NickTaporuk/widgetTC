@@ -49,7 +49,6 @@ var settings = {
 	apiBaseUrl: (params.api || !hasLocalSettigns ? serverSettings.apiBaseUrl : localSettings[domain].apiBaseUrl)
 };
 
-console.log(settings);
 
 requirejs([ (params.optim ? (settings.scriptPlace + '/js/widget.js') : 'app') ], function() {
 	TCWidget.init({
