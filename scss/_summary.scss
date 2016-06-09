@@ -5,11 +5,13 @@
 ****************************************/
 
 #tcwlw_widget {
+
     .tcwlw_appointment_form {
         .tcwlw_brand_btn {
             @include margin-top(1);
         }
     }
+
     .tcwlw_summary_wrapper {
         @include padding-top($baseSpacing/6);
         td.tcwlw_toggle_cell {
