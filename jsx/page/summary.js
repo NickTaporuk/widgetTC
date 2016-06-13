@@ -221,8 +221,8 @@ define([
                     print: <a href="#print" onClick={this._handlePrintClick} className={cn(['brand_btn_light', 'btn_small'])}><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE8AD;' }} /> Print Quote</a>
                 };
             } else {
-                this.state.dealerConfig.show_quote ? _.assign(btns,{quote: <a href="#quote" onClick={this._handleQuoteClick} className={this.state.dealerConfig.show_appointment ? cn(['brand_btn_light', 'btn_small']):cn(['brand_btn_light'])}><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE14F;' }} /> Get a Quote</a>}):null;
-                this.state.dealerConfig.show_appointment ? _.assign(btns,{appointment: <a href="#appointment" onClick={this._handleAppointmentClick} className={this.state.dealerConfig.show_quote ? cn(['brand_btn_light', 'btn_small']):cn(['brand_btn_light'])}><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE192;' }} /> Make an Appointment</a>}):null;
+                this.state.dealerConfig.show_quote ? btns.quote = <a href="#quote" onClick={this._handleQuoteClick} className={cn({'brand_btn_light': true, 'btn_small': this.state.dealerConfig.show_appointment })}><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE14F;' }} /> Get a Quote</a> : null ;
+                this.state.dealerConfig.show_appointment ? btns.appointment = <a href="#appointment" onClick={this._handleAppointmentClick} className={ cn({'brand_btn_light':true, 'btn_small' : this.state.dealerConfig.show_quote }) }><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE192;' }} /> Make an Appointment</a> : null;
 
                 if (this.state.withOrderBtn) {
                     btns.order = <a href="#order" onClick={this._handleOrderClick} className={cn('brand_btn')}>Order Your Tires <i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE5C8;' }} /></a>
