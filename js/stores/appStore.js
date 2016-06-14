@@ -42,7 +42,8 @@ define([
 
         getAllCustomerInfo : function () {
             return customerInfo;
-        } };
+        }
+    };
 
     return store;
 
