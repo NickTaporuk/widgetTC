@@ -5,7 +5,8 @@ define([
 ) {
     var pageState = {};
     var pageProps = {};
-
+    //customer data storage
+    var customerInfo = {};
 
     var store = {
         getPageState: function (pageComponent) {
@@ -29,8 +30,19 @@ define([
 
         savePageProps: function (pageComponent, props) {
             pageProps[pageComponent.constructor.displayName] = props;
-        }
-    };
+        },
+
+        setCustomerInfo : function(name,value) {
+            customerInfo[name] = value;
+        },
+
+        getCustomerInfo : function(name) {
+            return customerInfo[name];
+        },
+
+        getAllCustomerInfo : function () {
+            return customerInfo;
+        } };
 
     return store;
 

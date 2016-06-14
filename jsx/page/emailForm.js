@@ -36,15 +36,20 @@ define([
         componentDidMount: function() {
             var self = this;
             var summaryProps = appStore.getPageProps('summary');
-            var state = appStore.getPageState('quote_form');
+            var lastState    = appStore.getPageState('email_form');
+            var customer     = appStore.getAllCustomerInfo();
 
-            if (config.emailUserState) {
+            if (lastState) {
+                var mergedData           = _.merge(lastState,customer);
                 this.setState({
-                    email : config.emailUserState
+                    values: mergedData.values
                 });
-            } else if(state !== null && state.hasOwnProperty('values')) {
+            } else {
+                var values = _.cloneDeep(this.state.values);
+                var mergedData = _.merge(values,customer.values);
+
                 this.setState({
-                    email : state.values.email
+                    values: mergedData
                 });
             }
 
@@ -59,7 +64,7 @@ define([
         },
 
         componentWillUnmount: function () {
-            config.setParam('emailUserState',this.refs.email.value);
+            appStore.setCustomerInfo('values', {'email':this.refs.email.value});
             appStore.savePageData(this);
         },
 
@@ -80,7 +85,7 @@ define([
                             <fieldset className={cn(['sixcol', 'last', 'right', 'col_right', 'appointment_fields'])}>
                                 <div className={cn('control_wrapper')}>
                                     <label htmlFor={cn('order_email')}>Email Address <span className="req">*</span></label>
-                                    <input type="email" id={cn('order_email')} required ref="email" defaultValue={ this.state.email }/>
+                                    <input type="email" id={cn('order_email')} required ref="email" defaultValue={ this.state.values.email }/>
                                     {this._getError('email')}
                                 </div>
                                 { this._getBtn() }

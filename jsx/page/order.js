@@ -65,16 +65,22 @@ define([
                 intervalDate: intervalDate
             });
 
-            var lastState   = appStore.getPageState(this);
+            var lastState            = appStore.getPageState('order');
+            var customer             = appStore.getAllCustomerInfo();
+
             if (lastState) {
+                var mergedData = _.merge(lastState,customer);
+
                 this.setState({
-                    values: lastState.values
+                    values: mergedData.values
                 });
             } else {
                 var values = _.cloneDeep(this.state.values);
                 values.preferred_time = moment().add(1, 'd').minutes(0).hour(13).format('YYYY-MM-DD HH:mm');
+                var mergedData = _.merge(values,customer.values);
+
                 this.setState({
-                    values: values
+                    values: mergedData
                 });
             }
         },
@@ -88,7 +94,6 @@ define([
             var summaryProps = appStore.getPageProps('summary');
             summaryProps.id = summaryProps.tire_id;
             delete summaryProps.tire_id;
-            // var summaryState = appStore.getPageState('summary');
 
             Promise.all([
                 Api.loadVehicleOptions(vehicleValues),
@@ -121,6 +126,7 @@ define([
         },
         
         componentWillUnmount: function() {
+            appStore.setCustomerInfo('values',this.state.values);
             appStore.savePageData(this);
         },
 

@@ -76,22 +76,22 @@ define([
         },
         componentWillMount: function() {
             var lastState = appStore.getPageState('quote_form');
+            var customer   = appStore.getAllCustomerInfo();
 
             if (lastState) {
-                if(config.hasOwnProperty('emailUserState')) {
-                    lastState.values.email = config.emailUserState;
-                }
+                var mergedData = _.merge(lastState, customer);
+
                 this.setState({
-                    values: lastState.values
+                    values: mergedData.values
                 });
+
             } else {
                 var values = _.cloneDeep(this.state.values);
-                if(config.hasOwnProperty('emailUserState')) {
-                    values.email = config.emailUserState;
-                }
+                var mergedData = _.merge(values, customer.values);
+
                 values.preferred_time = moment().add(1, 'd').minutes(0).hour(13).format('YYYY-MM-DD HH:mm');
                 this.setState({
-                    values: values
+                    values: mergedData
                 });
             }
         },
@@ -138,6 +138,7 @@ define([
 
         componentWillUnmount: function () {
             config.setParam('emailUserState',this.refs.email.value());
+            appStore.setCustomerInfo('values',this.state.values);
             appStore.savePageData(this);
         },
         componentDidUpdate: function(prevProps, prevState) {
