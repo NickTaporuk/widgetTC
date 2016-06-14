@@ -137,7 +137,6 @@ define([
         },
 
         componentWillUnmount: function () {
-            config.setParam('emailUserState',this.refs.email.value());
             appStore.setCustomerInfo('values',this.state.values);
             appStore.savePageData(this);
         },
