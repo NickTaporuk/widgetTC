@@ -65,8 +65,8 @@ define([
                 intervalDate: intervalDate
             });
 
-            var lastState            = appStore.getPageState('order');
-            var customer             = appStore.getAllCustomerInfo();
+            var lastState   = appStore.getPageState('order');
+            var customer    = appStore.getAllCustomerInfo();
 
             if (lastState) {
                 var mergedData = _.merge(lastState,customer);
