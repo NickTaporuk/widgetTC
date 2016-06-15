@@ -63,37 +63,21 @@ define([
                     phone: '',
                     way_to_contact: 'phone',
                     preferred_time: '',
-                    notes: '',
-                    vehicle: {
-                        year: '',
-                        make: '',
-                        model: '',
-                        trim: ''
-                    }
+                    notes: ''
                 },
                 errors: {}
             }
         },
         componentWillMount: function() {
             var lastState = appStore.getPageState('quote_form');
-            var customer   = appStore.getAllCustomerInfo();
+            var customer   = appStore.getCustomerInfo();
 
-            if (lastState) {
-                var mergedData = _.merge(lastState, customer);
-
-                this.setState({
-                    values: mergedData.values
-                });
-
-            } else {
-                var values = _.cloneDeep(this.state.values);
-                var mergedData = _.merge(values, customer.values);
-
-                values.preferred_time = moment().add(1, 'd').minutes(0).hour(13).format('YYYY-MM-DD HH:mm');
-                this.setState({
-                    values: mergedData
-                });
+            if (!lastState) {
+                customer.preferred_time = moment().add(1, 'd').minutes(0).hour(13).format('YYYY-MM-DD HH:mm');
             }
+            this.setState({
+                values: customer
+            });
         },
 
         componentDidMount: function() {
@@ -137,7 +121,7 @@ define([
         },
 
         componentWillUnmount: function () {
-            appStore.setCustomerInfo('values',this.state.values);
+            appStore.setCustomerInfo(this.state.values);
             appStore.savePageData(this);
         },
         componentDidUpdate: function(prevProps, prevState) {

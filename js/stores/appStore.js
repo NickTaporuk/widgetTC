@@ -6,7 +6,14 @@ define([
     var pageState = {};
     var pageProps = {};
     //customer data storage
-    var customerInfo = {};
+    var customerInfo = {
+        vehicle: {
+            year: '',
+            make: '',
+            model: '',
+            trim: ''
+        }
+    };
 
     var store = {
         getPageState: function (pageComponent) {
@@ -32,17 +39,13 @@ define([
             pageProps[pageComponent.constructor.displayName] = props;
         },
 
-        setCustomerInfo : function(name,value) {
-            customerInfo[name] = value;
+        setCustomerInfo : function(info) {
+            _.merge(customerInfo,info);
         },
 
         getCustomerInfo : function(name) {
-            return customerInfo[name];
+            return name ? customerInfo[name] : customerInfo;
         },
-
-        getAllCustomerInfo : function () {
-            return customerInfo;
-        }
     };
 
     return store;

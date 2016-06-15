@@ -36,22 +36,11 @@ define([
         componentDidMount: function() {
             var self = this;
             var summaryProps = appStore.getPageProps('summary');
-            var lastState    = appStore.getPageState('email_form');
-            var customer     = appStore.getAllCustomerInfo();
-
-            if (lastState) {
-                var mergedData           = _.merge(lastState,customer);
-                this.setState({
-                    values: mergedData.values
-                });
-            } else {
-                var values = _.cloneDeep(this.state.values);
-                var mergedData = _.merge(values,customer.values);
+            var customer     = appStore.getCustomerInfo();
 
                 this.setState({
-                    values: mergedData
+                    values: customer
                 });
-            }
 
             Promise.all([
                 Api.loadQuote(summaryProps.tire_id, summaryProps.quantity, summaryProps.optional_services, summaryProps.with_discount, summaryProps.custom_discount)
@@ -64,7 +53,7 @@ define([
         },
 
         componentWillUnmount: function () {
-            appStore.setCustomerInfo('values', {'email':this.refs.email.value});
+            appStore.setCustomerInfo({'email': this.refs.email.value});
             appStore.savePageData(this);
         },
 

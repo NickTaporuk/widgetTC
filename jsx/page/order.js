@@ -40,9 +40,7 @@ define([
                 ready: false,
                 disabled: false,
                 errors: {},
-                values: {
-                    vehicle: {}
-                },
+                values: {},
                 intervalDate:{month:[],years:[]}
             };
         },
@@ -66,23 +64,15 @@ define([
             });
 
             var lastState   = appStore.getPageState('order');
-            var customer    = appStore.getAllCustomerInfo();
+            var customer    = appStore.getCustomerInfo();
 
-            if (lastState) {
-                var mergedData = _.merge(lastState,customer);
-
-                this.setState({
-                    values: mergedData.values
-                });
-            } else {
-                var values = _.cloneDeep(this.state.values);
-                values.preferred_time = moment().add(1, 'd').minutes(0).hour(13).format('YYYY-MM-DD HH:mm');
-                var mergedData = _.merge(values,customer.values);
-
-                this.setState({
-                    values: mergedData
-                });
+            if (!lastState) {
+                customer.preferred_time = moment().add(1, 'd').minutes(0).hour(13).format('YYYY-MM-DD HH:mm');
             }
+
+            this.setState({
+                values: customer
+            });
         },
 
         componentDidMount: function() {
@@ -126,7 +116,7 @@ define([
         },
         
         componentWillUnmount: function() {
-            appStore.setCustomerInfo('values',this.state.values);
+            appStore.setCustomerInfo(this.state.values);
             appStore.savePageData(this);
         },
 
