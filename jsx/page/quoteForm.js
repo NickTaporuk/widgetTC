@@ -57,24 +57,12 @@ define([
         getInitialState: function () {
             return {
                 ready: false,
-                values: {
-                    name: '',
-                    email: '',
-                    phone: '',
-                    way_to_contact: 'phone',
-                    preferred_time: '',
-                    notes: ''
-                },
+                values: {},
                 errors: {}
             }
         },
         componentWillMount: function() {
-            var lastState = appStore.getPageState('quote_form');
             var customer   = appStore.getCustomerInfo();
-
-            if (!lastState) {
-                customer.preferred_time = moment().add(1, 'd').minutes(0).hour(13).format('YYYY-MM-DD HH:mm');
-            }
             this.setState({
                 values: customer
             });
@@ -122,8 +110,8 @@ define([
 
         componentWillUnmount: function () {
             appStore.setCustomerInfo(this.state.values);
-            appStore.savePageData(this);
         },
+        
         componentDidUpdate: function(prevProps, prevState) {
             if (Object.keys(this.state.errors).length > 0 && !_.isEqual(this.state.errors, prevState.errors)) {
                 this._scrollToError();

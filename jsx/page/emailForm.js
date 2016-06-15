@@ -8,8 +8,7 @@ define([
     'actions/api',
     'load!stores/appStore',
     'promise',
-    'lib/history',
-    'config'
+    'lib/history'
 ], function(
     React,
     cn,
@@ -20,8 +19,7 @@ define([
     Api,
     appStore,
     Promise,
-    history,
-    config
+    history
 ) {
 
     return {
@@ -38,23 +36,19 @@ define([
             var summaryProps = appStore.getPageProps('summary');
             var customer     = appStore.getCustomerInfo();
 
-                this.setState({
-                    values: customer
-                });
-
             Promise.all([
                 Api.loadQuote(summaryProps.tire_id, summaryProps.quantity, summaryProps.optional_services, summaryProps.with_discount, summaryProps.custom_discount)
             ]).then(function (responses) {
                 self.setState({
                     ready: true,
-                    quote: responses[0]
+                    quote: responses[0],
+                    values: customer
                 });
             });
         },
 
         componentWillUnmount: function () {
             appStore.setCustomerInfo({'email': this.refs.email.value});
-            appStore.savePageData(this);
         },
 
         render: function() {
