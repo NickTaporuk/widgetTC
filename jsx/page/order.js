@@ -40,9 +40,7 @@ define([
                 ready: false,
                 disabled: false,
                 errors: {},
-                values: {
-                    vehicle: {}
-                },
+                values: {},
                 intervalDate:{month:[],years:[]}
             };
         },
@@ -57,26 +55,17 @@ define([
 
             var yearSelect      = this._initForSelect(yearInterval),
                 monthSelect     = this._initForSelect(monthInterval);
-            var intervalDate    = _.cloneDeep(this.state.intervalDate);
-                intervalDate.month = monthSelect;
-                intervalDate.years = yearSelect;
+
+            var intervalDate        = _.cloneDeep(this.state.intervalDate);
+                intervalDate.month  = monthSelect;
+                intervalDate.years  = yearSelect;
+
+            var customer = appStore.getCustomerInfo();
 
             this.setState({
+                values: customer,
                 intervalDate: intervalDate
             });
-
-            var lastState   = appStore.getPageState(this);
-            if (lastState) {
-                this.setState({
-                    values: lastState.values
-                });
-            } else {
-                var values = _.cloneDeep(this.state.values);
-                values.preferred_time = moment().add(1, 'd').minutes(0).hour(13).format('YYYY-MM-DD HH:mm');
-                this.setState({
-                    values: values
-                });
-            }
         },
 
         componentDidMount: function() {
@@ -88,7 +77,6 @@ define([
             var summaryProps = appStore.getPageProps('summary');
             summaryProps.id = summaryProps.tire_id;
             delete summaryProps.tire_id;
-            // var summaryState = appStore.getPageState('summary');
 
             Promise.all([
                 Api.loadVehicleOptions(vehicleValues),
@@ -121,7 +109,7 @@ define([
         },
         
         componentWillUnmount: function() {
-            appStore.savePageData(this);
+            appStore.setCustomerInfo(this.state.values);
         },
 
         componentDidUpdate: function(prevProps, prevState) {

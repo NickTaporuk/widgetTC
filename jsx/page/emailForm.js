@@ -34,19 +34,21 @@ define([
         componentDidMount: function() {
             var self = this;
             var summaryProps = appStore.getPageProps('summary');
+            var customer     = appStore.getCustomerInfo();
 
             Promise.all([
                 Api.loadQuote(summaryProps.tire_id, summaryProps.quantity, summaryProps.optional_services, summaryProps.with_discount, summaryProps.custom_discount)
             ]).then(function (responses) {
                 self.setState({
                     ready: true,
-                    quote: responses[0]
+                    quote: responses[0],
+                    values: customer
                 });
             });
         },
 
         componentWillUnmount: function () {
-            appStore.savePageData(this);
+            appStore.setCustomerInfo({'email': this.refs.email.value});
         },
 
         render: function() {
@@ -66,10 +68,10 @@ define([
                             <fieldset className={cn(['sixcol', 'last', 'right', 'col_right', 'appointment_fields'])}>
                                 <div className={cn('control_wrapper')}>
                                     <label htmlFor={cn('order_email')}>Email Address <span className="req">*</span></label>
-                                    <input type="email" id={cn('order_email')} required ref="email" />
+                                    <input type="email" id={cn('order_email')} required ref="email" defaultValue={ this.state.values.email }/>
                                     {this._getError('email')}
                                 </div>
-                                {this._getBtn()}
+                                { this._getBtn() }
                             </fieldset>
                         </form>
                     </div>

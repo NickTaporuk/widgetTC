@@ -57,37 +57,15 @@ define([
         getInitialState: function () {
             return {
                 ready: false,
-                values: {
-                    name: '',
-                    email: '',
-                    phone: '',
-                    way_to_contact: 'phone',
-                    preferred_time: '',
-                    notes: '',
-                    vehicle: {
-                        year: '',
-                        make: '',
-                        model: '',
-                        trim: ''
-                    }
-                },
+                values: {},
                 errors: {}
             }
         },
-
         componentWillMount: function() {
-            var lastState = appStore.getPageState(this);
-            if (lastState) {
-                this.setState({
-                    values: lastState.values
-                });
-            } else {
-                var values = _.cloneDeep(this.state.values);
-                values.preferred_time = moment().add(1, 'd').minutes(0).hour(13).format('YYYY-MM-DD HH:mm');
-                this.setState({
-                    values: values
-                });
-            }
+            var customer   = appStore.getCustomerInfo();
+            this.setState({
+                values: customer
+            });
         },
 
         componentDidMount: function() {
@@ -131,8 +109,9 @@ define([
         },
 
         componentWillUnmount: function () {
-            appStore.savePageData(this);
+            appStore.setCustomerInfo(this.state.values);
         },
+        
         componentDidUpdate: function(prevProps, prevState) {
             if (Object.keys(this.state.errors).length > 0 && !_.isEqual(this.state.errors, prevState.errors)) {
                 this._scrollToError();
