@@ -181,6 +181,11 @@ define([
             '#widget_outer a:hover',
             'color: ' + color2
         );
+        //text color 2
+        addCSSRule(
+            '#widget .tab a:hover ',
+            'color: ' + color1
+        );
         //bg color2
         addCSSRule(
             '#widget .bg_color, ' +
