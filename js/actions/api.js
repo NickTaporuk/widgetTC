@@ -492,7 +492,7 @@ define([
         },
 
         orderCheckout: function(orderId, data) {
-            var validationErrors = validateParamsForQuote(data, ['name', 'email', 'phone', 'vehicle_info']);
+            var validationErrors = validateParamsForQuote(data, ['name', 'email', 'phone', 'vehicle.trim']);
             if (validationErrors) {
                 return Promise.reject(validationErrors);
             } else {
