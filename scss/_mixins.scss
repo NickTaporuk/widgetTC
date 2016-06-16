@@ -334,7 +334,7 @@
 	text-shadow: none;
 	height: auto;
 	@include margin-bottom($baseSpacing/6);
-	@include padding($baseLineHeight/1.5, $baseLineHeight);
+	@include padding($baseLineHeight/1.58, $baseLineHeight);
 	border-width: 1px;
 	border-style: solid;
 	border-color: $grayDarkest;

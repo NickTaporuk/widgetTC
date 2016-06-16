@@ -40,9 +40,7 @@ define([
                 ready: false,
                 disabled: false,
                 errors: {},
-                values: {
-                    vehicle: {}
-                },
+                values: {},
                 intervalDate:{month:[],years:[]}
             };
         },
@@ -57,26 +55,17 @@ define([
 
             var yearSelect      = this._initForSelect(yearInterval),
                 monthSelect     = this._initForSelect(monthInterval);
-            var intervalDate    = _.cloneDeep(this.state.intervalDate);
-                intervalDate.month = monthSelect;
-                intervalDate.years = yearSelect;
+
+            var intervalDate        = _.cloneDeep(this.state.intervalDate);
+                intervalDate.month  = monthSelect;
+                intervalDate.years  = yearSelect;
+
+            var customer = appStore.getCustomerInfo();
 
             this.setState({
+                values: customer,
                 intervalDate: intervalDate
             });
-
-            var lastState   = appStore.getPageState(this);
-            if (lastState) {
-                this.setState({
-                    values: lastState.values
-                });
-            } else {
-                var values = _.cloneDeep(this.state.values);
-                values.preferred_time = moment().add(1, 'd').minutes(0).hour(13).format('YYYY-MM-DD HH:mm');
-                this.setState({
-                    values: values
-                });
-            }
         },
 
         componentDidMount: function() {
@@ -88,7 +77,6 @@ define([
             var summaryProps = appStore.getPageProps('summary');
             summaryProps.id = summaryProps.tire_id;
             delete summaryProps.tire_id;
-            // var summaryState = appStore.getPageState('summary');
 
             Promise.all([
                 Api.loadVehicleOptions(vehicleValues),
@@ -121,6 +109,7 @@ define([
         },
         
         componentWillUnmount: function() {
+            appStore.setCustomerInfo(this.state.values);
             appStore.savePageData(this);
         },
 
@@ -185,7 +174,7 @@ define([
                                             <SelectField name="trim" options={this.state.options.trim} disabled={this.state.status == 'incomplete'} emptyDesc="- Trim -" withWrapper={false} onChange={this._vehicleChange} value={this.state.values.vehicle.trim} />
                                         </div>
                                     </div>
-                                    {this._getError('vehicle_info')}
+                                    {this._getError('vehicle.trim')}
                                 </div>
 
                                 <Field type="textarea" name="notes" onChange={this._fieldChange} defaultValue={this.state.values.notes} ref="notes" label="Notes" error={this._getError('notes')} disabled={this.state.status == 'incomplete'} />
@@ -275,18 +264,6 @@ define([
             return current.isAfter( moment().add(1, 'd').subtract(1,'day') );
         },
 
-        _getVehicleSelector: function(fieldName) {
-            var options = [];
-            this.state.vehicle[fieldName]
-
-
-            return (
-                <select id={cn('vehicle_' + fieldName)} name={fieldName}>
-                    <option value="">- Year -</option>
-                </select>
-            );
-        },
-
         _isStripeLoaded: false,
         _getError: function(fieldName) {
             if (this.state.errors[fieldName]) {
@@ -334,17 +311,6 @@ define([
             return (errors === undefined);
         },
 
-        _getValues: function () {
-            return {
-                name: this.refs.name.value(),
-                email: this.refs.email.value(),
-                phone: this.refs.phone.value(),
-                preferred_time: this.refs.datetime.value(),
-                notes: this.refs.notes.value(),
-                vehicle: this.state.values.vehicle
-            };
-        },
-
         _handleFormSubmit: function(event) {
             event.preventDefault();
             this.setState({'disabled': true});
@@ -375,7 +341,7 @@ define([
                             phone: self.refs.phone.value(),
                             preferred_time: self.refs.datetime.value(),
                             notes: self.refs.notes.value(),
-                            vehicle_info: self._getVehicleInfo()
+                            vehicle: self.state.values.vehicle
                         };
 
                         var payment = function() {
@@ -423,14 +389,6 @@ define([
                 if (this.refs[field]) {
                     h.scrollToTop( this.refs[field].getDOMNode() );
                 }
-            }
-        },
-
-        _getVehicleInfo: function() {
-            if (this.state.values.vehicle.trim) {
-                return this.state.values.vehicle.year + ' ' + this.state.values.vehicle.make + ' ' + this.state.values.vehicle.model + ' ' + this.state.values.vehicle.trim;
-            } else {
-                return '';
             }
         },
 
