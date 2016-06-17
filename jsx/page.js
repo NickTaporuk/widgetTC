@@ -67,6 +67,7 @@ define([
             var content = null;
 
             var props = pageStore.getProps();
+            console.log('this.state.name:',this.state.name);
             switch (this.state.name) {
                 case 'search':
                     content = <Search {...props} />;

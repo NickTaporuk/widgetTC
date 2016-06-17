@@ -5,6 +5,11 @@
 ****************************************/
 
 #tcwlw_widget {
+    .tcwlw_summary_page {
+        table {
+            margin-bottom: 0
+        }
+    }
     .tcwlw_summary_wrapper {
         @include padding-top($baseSpacing/6);
         td.tcwlw_toggle_cell {

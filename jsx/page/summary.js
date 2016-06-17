@@ -83,7 +83,7 @@ define([
                 <div>
                     <Back />
 
-                    <div className={cn(['max_width', 'summary_wrapper'])}>
+                    <div className={cn(['max_width', 'summary_wrapper','summary_page'])}>
                         <div className={cn('table_wrapper')}>
                             <table className={cn('table')}>
                                 <thead>

@@ -234,7 +234,7 @@
 		position: relative;
 		width: 100%;
 		// @include max-width(78);
-		@include margin-bottom($baseSpacing);
+		//@include margin-bottom($baseSpacing);
 		margin-left: auto;
 		margin-right: auto;
 		overflow: auto;
@@ -242,7 +242,7 @@
 
 		table {
 			min-width: 250px;
-			margin-bottom: 0;
+			//margin-bottom: 0;
 		}
 	}
 
