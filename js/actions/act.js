@@ -61,7 +61,7 @@ define([
         // delete params.afterNav;
         visitedPages[page] = params || true;
 
-        var path = '#!' + page + (params && Object.keys(params).length > 0 ? '?' + h.objToQuery(params) : '');
+        var path = '#/!' + page + (params && Object.keys(params).length > 0 ? '?' + h.objToQuery(params) : '');
 
         var state = {
             page: page,
