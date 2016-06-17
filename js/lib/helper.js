@@ -133,7 +133,7 @@ define(['config'], function(config) {
                 pair = null,
                 parts = query.match(/^([^\?]*)(\?)?(.*)$/),
                 params = parts[3],
-                page = parts[1].replace('#!', ''),
+                page = parts[1].replace(/#\/?!/, ''),
                 qArr = params ? params.split('&') : [];
 
             if (params) {
