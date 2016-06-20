@@ -1,9 +1,11 @@
 define([
     'lodash',
-    'moment'
+    'moment',
+    'lockr'
 ], function(
     _,
-    moment
+    moment,
+    lockr
 ) {
     var pageState = {};
     var pageProps = {};
@@ -26,25 +28,35 @@ define([
     var store = {
         getPageState: function (pageComponent) {
             var page = typeof pageComponent == 'string' ? pageComponent : pageComponent.constructor.displayName;
-            return pageState[page] ?  _.cloneDeep(pageState[page]) : null;
+            return pageState[page] ?  _.cloneDeep(pageState[page]) : (lockr.get('state_' + page) || null);
         },
 
         getPageProps: function (pageComponent) {
             var page = typeof pageComponent == 'string' ? pageComponent : pageComponent.constructor.displayName;
-            return pageProps[page] ? _.cloneDeep(pageProps[page]) : null;
+            return pageProps[page] ? _.cloneDeep(pageProps[page]) : (lockr.get('props_' + page) || null);
         },
 
-        savePageData: function (pageComponent) {
-            store.savePageState(pageComponent, pageComponent.state);
-            store.savePageProps(pageComponent, pageComponent.props);
+        savePageData: function (pageComponent, saveInStorage) {
+            store.savePageState(pageComponent, pageComponent.state, saveInStorage);
+            store.savePageProps(pageComponent, pageComponent.props, saveInStorage);
         },
 
-        savePageState: function (pageComponent, state) {
-            pageState[pageComponent.constructor.displayName] = state;
+        savePageState: function (pageComponent, state, saveInStorage) {
+            var name = pageComponent.constructor.displayName;
+            if (saveInStorage) {
+                lockr.set('state_' + name, state);
+            } else {
+                pageState[name] = state;
+            }
         },
 
-        savePageProps: function (pageComponent, props) {
-            pageProps[pageComponent.constructor.displayName] = props;
+        savePageProps: function (pageComponent, props, saveInStorage) {
+            var name = pageComponent.constructor.displayName;
+            if (saveInStorage) {
+                lockr.set('props_' + name, props);
+            } else {
+                pageProps[name] = props;
+            }
         },
 
         setCustomerInfo : function(info) {
@@ -53,7 +65,7 @@ define([
 
         getCustomerInfo : function(name) {
             return name ? customerInfo[name] : customerInfo;
-        },
+        }
     };
 
     return store;

@@ -79,7 +79,7 @@ define([
         },
 
         componentWillUnmount: function () {
-            appStore.savePageData(this);
+            appStore.savePageData(this, true);
         },
         
         render: function() {
