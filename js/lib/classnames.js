@@ -9,44 +9,44 @@
 /* global define */
 
 (function () {
-	'use strict';
+    'use strict';
 
-	var hasOwn = {}.hasOwnProperty;
+    var hasOwn = {}.hasOwnProperty;
 
-	function classNames () {
-		var classes = '';
+    function classNames () {
+        var classes = '';
 
-		for (var i = 0; i < arguments.length; i++) {
-			var arg = arguments[i];
-			if (!arg) continue;
+        for (var i = 0; i < arguments.length; i++) {
+            var arg = arguments[i];
+            if (!arg) continue;
 
-			var argType = typeof arg;
+            var argType = typeof arg;
 
-			if (argType === 'string' || argType === 'number') {
-				classes += ' ' + classNames.prefix + arg;
-			} else if (Array.isArray(arg)) {
-				classes += ' ' + classNames.apply(null, arg);
-			} else if (argType === 'object') {
-				for (var key in arg) {
-					if (hasOwn.call(arg, key) && arg[key]) {
-						classes += ' ' + classNames.prefix + key;
-					}
-				}
-			}
-		}
+            if (argType === 'string' || argType === 'number') {
+                classes += ' ' + classNames.prefix + arg;
+            } else if (Array.isArray(arg)) {
+                classes += ' ' + classNames.apply(null, arg);
+            } else if (argType === 'object') {
+                for (var key in arg) {
+                    if (hasOwn.call(arg, key) && arg[key]) {
+                        classes += ' ' + classNames.prefix + key;
+                    }
+                }
+            }
+        }
 
-		return classes.substr(1);
-	}
-	classNames.prefix = 'tcwlw_';
+        return classes.substr(1);
+    }
+    classNames.prefix = 'tcwlw_';
 
-	if (typeof module !== 'undefined' && module.exports) {
-		module.exports = classNames;
-	} else if (typeof define === 'function' && typeof define.amd === 'object' && define.amd) {
-		// register as 'classnames', consistent with npm package name
-		define('classnames', function () {
-			return classNames;
-		});
-	} else {
-		window.classNames = classNames;
-	}
+    if (typeof module !== 'undefined' && module.exports) {
+        module.exports = classNames;
+    } else if (typeof define === 'function' && typeof define.amd === 'object' && define.amd) {
+        // register as 'classnames', consistent with npm package name
+        define('classnames', function () {
+            return classNames;
+        });
+    } else {
+        window.classNames = classNames;
+    }
 }());

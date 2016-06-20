@@ -24,11 +24,22 @@ window.TCWidget = {
             }
         });
 
-        requirejs(['config'], function (config) {
+        // 'lib/cssLoader' need to be loaded here for optimizer
+        requirejs(['config', 'lib/cssLoader'], function (config) {
             config.init(params);
 
-            requirejs(['react', 'reactDOM', 'load!components/wrapper', 'load!actions/act', 'load!components/overlay', 'classnames', 'actions/api', 'ajax'],
-                function (React, ReactDOM, Wrapper, Act, Overlay, cn, Api, ajax) {
+            requirejs(
+                [
+                    'react', 'reactDOM',
+                    'load!components/wrapper', 'load!actions/act', 'load!components/overlay',
+                    'classnames', 'actions/api', 'ajax', 'colors',
+                    'lib/cssLoader!' + config.mainCss
+                ],
+                function (React, ReactDOM, Wrapper, Act, Overlay, cn, Api, ajax, colors) {
+
+                    if (config.colors) {
+                        colors.changeColorScheme(config.colors[0], config.colors[1]);
+                    }
 
                     var render = function () {
                         ajax.clearCache();
