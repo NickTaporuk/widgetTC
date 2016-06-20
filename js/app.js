@@ -6,6 +6,7 @@ window.TCWidget = {
 
         requirejs.config({
             baseUrl: './js/',
+            waitSeconds: 15,
             paths: {
                 lockr: 'bower_components/lockr/lockr',
                 classnames: 'lib/classnames',
