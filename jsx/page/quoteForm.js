@@ -11,6 +11,7 @@ define([
     'actions/api',
     'moment',
     'load!stores/appStore',
+    'load!stores/customerStore',
     'promise',
     'lib/history',
     'lodash'
@@ -27,6 +28,7 @@ define([
     Api,
     moment,
     appStore,
+    customerStore,
     Promise,
     history,
     _
@@ -62,9 +64,8 @@ define([
             }
         },
         componentWillMount: function() {
-            var customer   = appStore.getCustomerInfo();
             this.setState({
-                values: customer
+                values: customerStore.getCustomerInfo()
             });
         },
 
@@ -109,7 +110,7 @@ define([
         },
 
         componentWillUnmount: function () {
-            appStore.setCustomerInfo(this.state.values);
+            appStore.savePageData(this);
         },
         
         componentDidUpdate: function(prevProps, prevState) {

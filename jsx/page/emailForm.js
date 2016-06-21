@@ -7,6 +7,7 @@ define([
     'load!components/page/common/back',
     'actions/api',
     'load!stores/appStore',
+    'load!stores/customerStore',
     'promise',
     'lib/history'
 ], function(
@@ -18,6 +19,7 @@ define([
     Back,
     Api,
     appStore,
+    customerStore,
     Promise,
     history
 ) {
@@ -34,7 +36,7 @@ define([
         componentDidMount: function() {
             var self = this;
             var summaryProps = appStore.getPageProps('summary');
-            var customer     = appStore.getCustomerInfo();
+            var customer     = customerStore.getCustomerInfo();
 
             Promise.all([
                 Api.loadQuote(summaryProps.tire_id, summaryProps.quantity, summaryProps.optional_services, summaryProps.with_discount, summaryProps.custom_discount)
@@ -48,7 +50,7 @@ define([
         },
 
         componentWillUnmount: function () {
-            appStore.setCustomerInfo({'email': this.refs.email.value});
+            appStore.savePageData(this);
         },
 
         render: function() {

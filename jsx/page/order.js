@@ -12,6 +12,7 @@ define([
     'config',
     'actions/api',
     'load!stores/appStore',
+    'load!stores/customerStore',
     'promise',
     'lodash'
 ], function(
@@ -28,6 +29,7 @@ define([
     config,
     Api,
     appStore,
+    customerStore,
     Promise,
     _
 ) {
@@ -60,7 +62,7 @@ define([
                 intervalDate.month  = monthSelect;
                 intervalDate.years  = yearSelect;
 
-            var customer = appStore.getCustomerInfo();
+            var customer = customerStore.getCustomerInfo();
 
             this.setState({
                 values: customer,
@@ -109,7 +111,6 @@ define([
         },
         
         componentWillUnmount: function() {
-            appStore.setCustomerInfo(this.state.values);
             appStore.savePageData(this);
         },
 
@@ -379,7 +380,7 @@ define([
             }
         },
 
-        _scrollToError: function(errors) {
+        _scrollToError: function() {
             var fields = Object.keys(this.state.errors);
             if (fields.length > 0) {
                 var field = fields[0];
