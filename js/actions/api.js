@@ -99,7 +99,7 @@ define([
     }
 
 
-    Api = {
+    var Api = {
         loadLocations: function() {
             if (config.locationId) {
                 return ajax.make({
