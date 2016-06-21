@@ -4,5 +4,5 @@ js/widget.js
 node_modules/
 components/
 .sass-cache/
-css/
+css/style.css*
 .idea/
