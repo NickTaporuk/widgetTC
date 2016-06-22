@@ -23,12 +23,31 @@ define([
     _,
     lockr
 ) {
+
+    var tireParameters, vehicleOptions, locations;
+
     return {
         displayName: 'search',
 
+        statics: {
+            prepare: function() {
+                var lastState = appStore.getPageState('search');
+                var vehicleValues = lastState ? lastState.fieldValues.vehicle : {};
+
+                return Promise.all([
+                    Api.loadTireParameters(),
+                    Api.loadVehicleOptions(vehicleValues),
+                    Api.loadLocations()
+                ]).then(function (response) {
+                    tireParameters = response[0];
+                    vehicleOptions = response[1];
+                    locations = response[2];
+                });
+            }
+        },
+
         getInitialState: function() {
             return  {
-                ready: false,
                 activeTab: 'size',
                 fieldOptions: {},
                 fieldValues: {
@@ -40,53 +59,26 @@ define([
         },
 
         componentWillMount: function () {
+            console.log(this);
             var lastState = appStore.getPageState(this);
-            if (lastState) {
-                lastState.ready = false;
-                this.setState(lastState);
-            } else {
-                var fieldValues = _.cloneDeep(this.state.fieldValues);
-                fieldValues.vehicle.base_category = config.defaultCategory;
-                fieldValues.size.base_category = config.defaultCategory;
-                this.setState({
-                    fieldValues: fieldValues,
-                    activeTab: config.defaultSearching.replace('by_', '')
-                });
+            if (!lastState) {
+                lastState = _.cloneDeep(this.state);
+                lastState.fieldValues.vehicle.base_category = config.defaultCategory;
+                lastState.fieldValues.size.base_category = config.defaultCategory;
+                lastState.activeTab = config.defaultSearching.replace('by_', '');
+
+                lastState.fieldOptions = _.merge(tireParameters[0], vehicleOptions[1]);
+                lastState.locations = locations[2];
             }
-        },
 
-        componentDidMount: function() {
-            var self = this;
-            if (!this.state.ready) {
-                var lastState = appStore.getPageState(this);
-                var vehicleValues = lastState ? lastState.fieldValues.vehicle : {};
-
-                Promise.all([
-                    Api.loadTireParameters(),
-                    Api.loadVehicleOptions(vehicleValues),
-                    Api.loadLocations()
-                ]).then(function (response) {
-                    self.setState({
-                        ready: true,
-                        fieldOptions: _.merge(response[0], response[1]),
-                        locations: response[2]
-                    });
-                    if (response[2].length == 1) {
-                        lockr.set('location_id', response[2][0].id);
-                    }
-                });
+            if (locations[2].length == 1) {
+                lockr.set('location_id', locations[2][0].id);
             }
-        },
 
-        componentWillUnmount: function () {
-            appStore.savePageData(this, true);
+            this.setState(lastState);
         },
         
         render: function() {
-            if (!this.state.ready) {
-                return null;
-            }
-
             return (
                 <div className={cn('search_wrapper')} id={cn('search_wrapper')}>
                     <div className={cn('search_inner')}>

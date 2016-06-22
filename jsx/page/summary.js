@@ -26,23 +26,53 @@ define([
     Promise
 ) {
 
+    var tire, quote, dealerConfig, locationConfig;
+
     return {
         displayName: 'summary',
 
-        getInitialState: function() {
-            return {
-                ready: false
-            };
-        },
+        statics: {
+            prepare: function(props, isUpdate)  {
+                var tireParams = h.base64Decode(props.tire_id).split('||');
+                var locationId = tireParams[3];
 
-        componentDidMount: function() {
-            if (!this.state.ready) {
-                this._init(true);
+                var searchState = appStore.getPageState('search');
+                var vehicleValues = searchState && searchState.activeTab == 'vehicle' ? {
+                    year: searchState.fieldValues.vehicle.year,
+                    make: searchState.fieldValues.vehicle.make,
+                    model: searchState.fieldValues.vehicle.model,
+                    trim: searchState.fieldValues.vehicle.trim,
+                    car_tire_id: searchState.fieldValues.vehicle.car_tire_id
+                } : {};
+
+                return Promise.all([
+                    Api.loadTire(props.tire_id),
+                    Api.loadQuote(
+                        props.tire_id,
+                        props.quantity,
+                        props.optional_services,
+                        props.with_discount,
+                        props.custom_discount,
+                        vehicleValues,
+                        (isUpdate ? null : true)
+                    ),
+                    Api.loadDealerConfig(),
+                    Api.loadLocationConfig(locationId)
+                ]).then(function(responses) {
+                    tire = responses[0];
+                    quote = responses[1];
+                    dealerConfig = responses[2];
+                    locationConfig = responses[3];
+                });
             }
         },
 
-        componentDidUpdate: function(prevProps, prevState) {
-            if (!_.isEqual(this.props, prevProps)) {
+        componentWillMount: function() {
+            this._init();
+        },
+
+        componentWillUpdate: function(nextProps) {
+            if (!_.isEqual(this.props, nextProps)) {
                 this._init();
             }
         },
@@ -56,10 +86,6 @@ define([
         },
 
         render: function() {
-            if (!this.state.ready) {
-                return null;
-            }
-
             var tire = this.state.tire;
             var quote = this.state.quote;
             if (Object.keys(quote) <= 0 || Object.keys(tire) <= 0) {
@@ -165,51 +191,13 @@ define([
             );
         },
 
-        _init: function (track) {
-            var self = this,
-                props = this.props;
-
-            var tireParams = h.base64Decode(props.tire_id).split('||');
-            var locationId = tireParams[3];
-
-            var searchState = appStore.getPageState('search');
-            var vehicleValues = searchState && searchState.activeTab == 'vehicle' ? {
-                year: searchState.fieldValues.vehicle.year,
-                make: searchState.fieldValues.vehicle.make,
-                model: searchState.fieldValues.vehicle.model,
-                trim: searchState.fieldValues.vehicle.trim,
-                car_tire_id: searchState.fieldValues.vehicle.car_tire_id
-            } : {};
-
-            var promises = [
-                Api.loadTire(props.tire_id),
-                Api.loadQuote(
-                    props.tire_id,
-                    props.quantity,
-                    props.optional_services,
-                    props.with_discount,
-                    props.custom_discount,
-                    vehicleValues,
-                    track || null
-                ),
-                Api.loadDealerConfig(),
-                Api.loadLocationConfig(locationId)
-            ];
-
-            Promise.all(promises).then(function(responses) {
-                var tire = responses[0];
-                var quote = responses[1];
-                var dealerConfig = responses[2];
-
-
-                self.setState({
-                    ready: true,
-                    withOrderBtn: !config.sa && dealerConfig.ecommerce && dealerConfig.ecommerce.services && dealerConfig.ecommerce.services.stripe && dealerConfig.ecommerce.services.stripe.publishable_key,
-                    quote: quote,
-                    tire: tire,
-                    callNumber: responses[3].call_number,
-                    dealerConfig: responses[2]
-                });
+        _init: function () {
+            this.setState({
+                withOrderBtn: !config.sa && dealerConfig.ecommerce && dealerConfig.ecommerce.services && dealerConfig.ecommerce.services.stripe && dealerConfig.ecommerce.services.stripe.publishable_key,
+                quote: quote,
+                tire: tire,
+                callNumber: locationConfig.call_number,
+                dealerConfig: dealerConfig
             });
         },
 

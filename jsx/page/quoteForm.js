@@ -34,6 +34,8 @@ define([
     _
 ) {
 
+    var vehicleValues, vehicleOptions, tire, quote;
+
     var types = {
         email: {
             submit: {action: 'emailQuote', text: 'Send email'},
@@ -56,61 +58,59 @@ define([
     return {
         displayName: 'quote_form',
 
-        getInitialState: function () {
-            return {
-                ready: false,
-                values: {},
-                errors: {}
-            }
-        },
-        componentWillMount: function() {
-            this.setState({
-                values: customerStore.getCustomerInfo()
-            });
-        },
+        statics: {
+            prepare: function(props) {
+                var searchState = appStore.getPageState('search');
+                var customerInfo = customerStore.getCustomerInfo();
 
-        componentDidMount: function() {
-            var self = this;
-            var searchState = appStore.getPageState('search');
-            var vehicleValues = this.state.values.vehicle.year || !searchState
-                ? this.state.values.vehicle
-                : {
+                vehicleValues = customerInfo.vehicle.year || !searchState
+                    ? customerInfo.vehicle
+                    : {
                     year: searchState.fieldValues.vehicle.year,
                     make: searchState.fieldValues.vehicle.make,
                     model: searchState.fieldValues.vehicle.model,
                     trim: searchState.fieldValues.vehicle.trim
                 };
-            
-            var promises;
-            if (this.props.type == 'request') {
-                promises = [
-                    Api.loadVehicleOptions(vehicleValues),
-                    Api.loadTire(this.props.tire_id)
-                ];
-            } else {
-                var summaryProps = appStore.getPageProps('summary');
-                promises = [
-                    Api.loadVehicleOptions(vehicleValues),
-                    Api.loadTire(summaryProps.tire_id),
-                    Api.loadQuote(summaryProps.tire_id, summaryProps.quantity, summaryProps.optional_services, summaryProps.with_discount, summaryProps.custom_discount),
-                ];
-            }
 
-            Promise.all(promises).then(function (responses) {
-                var values = _.cloneDeep(self.state.values);
-                values.vehicle = vehicleValues;
-                self.setState({
-                    ready: true,
-                    values: values,
-                    options: responses[0],
-                    tire: responses[1],
-                    quote: responses[2] || null
+                var promises;
+                if (props.type == 'request') {
+                    promises = [
+                        Api.loadVehicleOptions(vehicleValues),
+                        Api.loadTire(props.tire_id)
+                    ];
+                } else {
+                    var summaryProps = appStore.getPageProps('summary');
+                    promises = [
+                        Api.loadVehicleOptions(vehicleValues),
+                        Api.loadTire(summaryProps.tire_id),
+                        Api.loadQuote(summaryProps.tire_id, summaryProps.quantity, summaryProps.optional_services, summaryProps.with_discount, summaryProps.custom_discount),
+                    ];
+                }
+
+                return Promise.all(promises).then(function (responses) {
+                    vehicleOptions = responses[0];
+                    tire = responses[1];
+                    quote = responses[2] || null;
                 });
-            });
+            }
         },
 
-        componentWillUnmount: function () {
-            appStore.savePageData(this);
+        getInitialState: function () {
+            return {
+                values: {},
+                errors: {}
+            }
+        },
+
+        componentWillMount: function() {
+            var values = _.cloneDeep(customerStore.getCustomerInfo());
+            values.vehicle = vehicleValues;
+            this.setState({
+                values: values,
+                options: vehicleOptions,
+                tire: tire,
+                quote: quote
+            });
         },
         
         componentDidUpdate: function(prevProps, prevState) {
@@ -120,10 +120,6 @@ define([
         },
 
         render: function() {
-            if (!this.state.ready) {
-                return null;
-            }
-
             var tire = this.state.tire;
             return (
                 <div>

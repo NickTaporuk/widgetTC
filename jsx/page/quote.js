@@ -5,8 +5,7 @@ define([
     'load!actions/act',
     'load!components/page/common/back',
     'actions/api',
-    'load!stores/appStore',
-    'promise'
+    'load!stores/appStore'
 ], function(
     React,
     cn,
@@ -14,8 +13,7 @@ define([
     A,
     Back,
     Api,
-    appStore,
-    Promise
+    appStore
 ) {
    
     return {
@@ -30,10 +28,6 @@ define([
                     follow_up: config.sa ? false : config.defaultQuoteCallBack
                 });
             }
-        },
-
-        componentWillUnmount: function () {
-            appStore.savePageData(this);
         },
 
         render: function() {
