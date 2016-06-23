@@ -13,7 +13,8 @@ define([
     'load!components/page/results/filterBlock',
     'load!components/page/common/back',
     'load!stores/appStore',
-    'promise'
+    'promise',
+    'load!stores/compareTiresStore'
 ], function (
     React,
     ReactDOM ,
@@ -29,7 +30,8 @@ define([
     FilterBlock,
     Back,
     appStore,
-    Promise
+    Promise,
+    compareTiresStore
 ) {
     var lastScrollPos;
 
@@ -38,15 +40,19 @@ define([
 
         getInitialState: function() {
             return {
-                ready: false
+                ready: false,
+                comparingTires: []
             };
         },
-
+        componentWillMount: function() {
+            var compareTires = compareTiresStore.getCompareTires();
+            if(compareTires.length > 0) {
+                this.setState({
+                    comparingTires: compareTires
+                });
+            }
+        },
         componentDidMount: function() {
-            // if (this.props.afterNav) {
-            //     console.log('sddsf', lastScrollPos);
-            //     window.scrollTo(0, lastScrollPos);
-            // }
             this._init();
         },
 
@@ -62,6 +68,7 @@ define([
         componentWillUnmount: function () {
             lastScrollPos = h.getScrollPos()[1];
             appStore.savePageData(this);
+            compareTiresStore.addCompareTireIds(this.state.comparingTires);
         },
 
         render: function() {
@@ -80,7 +87,7 @@ define([
             this.state.tires.map(function(tire, i) {
                 var tKey = i + curTime;
                 tires.push((
-                    <Tire key={tKey} defaultQuantity={this.state.defaultSelectedQuantity} tire={tire} isInMile={this.state.isInMile} isTop={(i < 3 && this.state.page == 1)} />
+                    <Tire key={tKey} onComparingChange={ this._handleOnComparingChange } isChangeCheckbox={this._isChangeCheckbox(tire.id)} isComparingActive={ this._isComparingActive(tire.id) } defaultQuantity={this.state.defaultSelectedQuantity} tire={tire} isInMile={this.state.isInMile} isTop={(i < 3 && this.state.page == 1)} />
                 ));
             }.bind(this));
 
@@ -103,11 +110,11 @@ define([
                         </div>
                         <div className={cn('results')}>
                             <div className={cn('twelvecol')}>
-                                <Pagination activePage={this.state.page} itemsOnPage={this.state.itemsOnPage} totalItems={this.state.totalCount} onPageClick={this._handlePageClick} />
-                                {/*<div className={cn('compare_btn_wrapper')}>
-                                    <span className={cn(['font_color', 'compare_number'])}>2</span>
-                                    <a href="#compare" className={cn(['brand_btn_light', 'btn_small', 'compare_btn'])}><i className={cn('material_icons')} dangerouslySetInnerHTML={{ __html: '&#xE915;' }} /> Compare Selected Tires</a>
-                                </div>*/}
+                                <Pagination activePage={this.state.page} itemsOnPage={this.state.itemsOnPage} totalItems={this.state.comparingTires.length} onPageClick={this._handlePageClick} />
+                                <div className={cn("compare_btn_wrapper")}>
+                                    <span className={cn(["font_color", "compare_number"])}>{this.state.comparingTires.length}</span>
+                                    <a href="#" className={cn(["brand_btn_light", "btn_small", "compare_btn"])}><i className={cn("material_icons")}></i> Compare Selected Tires</a>
+                                </div>
                             </div>
                             <div className={cn('twelvecol')}>
                                 {
@@ -191,6 +198,17 @@ define([
                 self.setState(state);
             });
         },
+        _isChangeCheckbox: function(tireId) {
+            return this.state.comparingTires.indexOf(tireId) !== -1;
+        },
+
+        _isComparingActive: function (tireId) {
+            if(this.state.comparingTires.indexOf(tireId) !== -1) {
+                return false
+            } else {
+                return this.state.comparingTires.length >= config.maxSizeCompareTires ;
+            }
+        },
 
         _getFilterBlocks: function() {
             var filters = null;
@@ -211,7 +229,7 @@ define([
                     }
                 }, this);
             }
-            return filters;
+            return filters ;
         },
 
         _scrollToTop: function() {
@@ -242,6 +260,22 @@ define([
             var params = _.cloneDeep(this.props);
             params.page = page;
             Act.route('results', params);
+        },
+
+        _handleOnComparingChange: function(tireId) {
+            var comparingTires = _.cloneDeep(this.state.comparingTires);
+
+            if(comparingTires.indexOf(tireId) !== -1) {
+                _.remove(comparingTires,function(id){
+                    return id == tireId;
+                });
+            } else comparingTires.push(tireId);
+
+            this.setState({
+                comparingTires: comparingTires
+            });
+
+
         }
     }
 });

@@ -49,6 +49,7 @@ define([
         wlUrl: 'https://wl.tireconnect.ca',
         apiBaseUrl: 'https://wl.tireconnect.ca/api/v1/',
         scriptPlace: 'https://app.tireconnect.ca',
+        maxSizeCompareTires: 3,
 
         init: function(params) {
             if (!params.apikey) {

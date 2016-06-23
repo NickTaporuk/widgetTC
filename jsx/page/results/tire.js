@@ -7,7 +7,8 @@ define([
     'load!components/page/results/tire/offerInfo',
     'load!components/page/results/tire/reviews',
     'load!components/page/results/tire/stock',
-    'load!components/page/results/tire/stars'
+    'load!components/page/results/tire/stars',
+    'load!stores/compareTiresStore'
 ], function(
     React,
     config,
@@ -17,7 +18,8 @@ define([
     OfferInfo,
     Reviews,
     Stock,
-    Stars
+    Stars,
+    compareTiresStore
 ) {
 
     return {
@@ -41,6 +43,7 @@ define([
         },
 
         render: function() {
+
             var tire = this.props.tire;
 
             var tab = this.state.activeTab;
@@ -75,9 +78,9 @@ define([
                                 <span className={cn('warranty')}>Warranty: <strong className={cn('warranty_value')}>{warranty ? warranty : 'NA'}</strong> {warranty ? (this.props.isInMile ? 'mi' : 'km') : null}</span>
                             </span>
                         </h3>
-                        {/*<label className={cn('result_compare')}>
-                            <input type="checkbox" defaultChecked={false} /> Add to compare
-                        </label>*/}
+                        <label className={cn('result_compare')}>
+                            <input type="checkbox" defaultChecked={ this.props.isChangeCheckbox } onChange={ this._handleComparingChange } disabled={this.props.isComparingActive}/> Add to compare
+                        </label>
                     </div>
                     <div className={cn('result_body')}>
                         <div className={cn('result_left')}>
@@ -175,7 +178,12 @@ define([
                 </li>
             );
         },
+        _handleComparingChange: function () {
 
+            if (this.props.onComparingChange) {
+                this.props.onComparingChange(this.props.tire.id);
+            }
+        },
         _extendTire: function (tire) {
             if (!tire.external_info) {
                 tire.external_info = {
