@@ -25,9 +25,10 @@ define([
                 case 'page.update':
                     page = payload.page;
                     props[payload.page] = payload.props;
+
+                    store.trigger('change');
                     break;
             }
-            store.trigger('change');
         })
     };
 

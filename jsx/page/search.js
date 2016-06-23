@@ -59,20 +59,19 @@ define([
         },
 
         componentWillMount: function () {
-            console.log(this);
             var lastState = appStore.getPageState(this);
             if (!lastState) {
                 lastState = _.cloneDeep(this.state);
                 lastState.fieldValues.vehicle.base_category = config.defaultCategory;
                 lastState.fieldValues.size.base_category = config.defaultCategory;
                 lastState.activeTab = config.defaultSearching.replace('by_', '');
-
-                lastState.fieldOptions = _.merge(tireParameters[0], vehicleOptions[1]);
-                lastState.locations = locations[2];
             }
 
-            if (locations[2].length == 1) {
-                lockr.set('location_id', locations[2][0].id);
+            lastState.fieldOptions = _.merge(tireParameters, vehicleOptions);
+            lastState.locations = locations;
+
+            if (locations.length == 1) {
+                lockr.set('location_id', locations[0].id);
             }
 
             this.setState(lastState);

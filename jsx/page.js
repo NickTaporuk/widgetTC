@@ -74,13 +74,12 @@ define([
             var self = this,
                 pageComponent = this._getPageComponent();
 
+            if (this.state.name && this.state.name !== pageStore.getPage()) {
+                // save current page data:
+                appStore.savePageData(this.refs.page);
+            }
+
             if (pageComponent && typeof pageComponent.prepare == 'function') {
-
-                if (this.state.name && this.state.name !== pageStore.getPage()) {
-                    // save current page data:
-                    appStore.savePageData(this.refs.page);
-                }
-
                 var pageProps = pageStore.getProps();
 
                 pageComponent.prepare(pageProps, (pageStore.getPage() == this.state.name)).then(function(){

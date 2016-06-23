@@ -56,7 +56,7 @@ define([
                     results = responses[0];
                     tireParameters = responses[1];
                     location = responses[2];
-                    vehicleOptions = responses[3];
+                    vehicleOptions = responses[3] || null;
                 });
             }
         },

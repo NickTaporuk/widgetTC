@@ -61,10 +61,10 @@ define([
         statics: {
             prepare: function(props) {
                 var searchState = appStore.getPageState('search');
-                var customerInfo = customerStore.getCustomerInfo();
+                var customer = customerStore.getCustomerInfo();
 
-                vehicleValues = customerInfo.vehicle.year || !searchState
-                    ? customerInfo.vehicle
+                vehicleValues = customer.vehicle.year || !searchState
+                    ? customer.vehicle
                     : {
                     year: searchState.fieldValues.vehicle.year,
                     make: searchState.fieldValues.vehicle.make,

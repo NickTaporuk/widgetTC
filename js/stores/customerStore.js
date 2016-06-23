@@ -31,7 +31,7 @@ define([
                     break;
                 case 'order':
                 case 'quote_form':
-                    _.merge(customerInfo, pageComponent.state.values);
+                    customerInfo = _.merge(customerInfo, pageComponent.state.values);
                     break;
             }
         }
