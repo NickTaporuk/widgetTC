@@ -11,6 +11,7 @@ define([
     'load!components/page/emailForm',
     'react',
     'load!stores/pageStore',
+    'load!stores/appStore',
     'classnames',
     'config',
     'lodash'
@@ -27,6 +28,7 @@ define([
     EmailForm,
     React,
     pageStore,
+    appStore,
     cn,
     config,
     _
@@ -37,7 +39,8 @@ define([
 
         getInitialState: function() {
             return {
-                name: ''
+                name: '',
+                content: null
             }
         },
 
@@ -60,58 +63,74 @@ define([
         },
 
         render: function() {
-            return this._getContent();
-        },
+            var pageComponent = this._getPageComponent();
+            var pageProps = pageStore.getProps();
+            if (pageProps == null) pageProps = {};
+            pageProps.ref = 'page';
 
-        _getContent: function() {
-            var content = null;
-
-            var props = pageStore.getProps();
-            switch (this.state.name) {
-                case 'search':
-                    content = <Search {...props} />;
-                    break;
-                case 'results':
-                    content = <Results {...props} />;
-                    break;
-                case 'summary':
-                    content = <Summary {...props} />;
-                    break;
-                case 'quote_form':
-                    content = <QuoteForm {...props} />;
-                    break;
-                case 'email_form':
-                    content = <EmailForm {...props} />;
-                    break;
-                case 'get_a_quote':
-                    content = <Quote {...props} />;
-                    break;
-                case 'order':
-                    content = <Order {...props} />;
-                    break;
-                case 'confirmation':
-                    content = <Confirmation {...props} />;
-                    break;
-
-                case '':
-                    content = null;
-                    break;
-            }
-
-            return content;
+            return pageComponent ? React.createElement(pageComponent, pageProps) : null;
         },
 
         _updateState: function () {
-            this.setState({
-                name: pageStore.getPage()
-            });
+            var self = this,
+                pageComponent = this._getPageComponent();
+
+            if (pageComponent && typeof pageComponent.prepare == 'function') {
+
+                if (this.state.name && this.state.name !== pageStore.getPage()) {
+                    // save current page data:
+                    appStore.savePageData(this.refs.page);
+                }
+
+                pageComponent.prepare(pageStore.getProps(), (pageStore.getPage() == this.state.name)).then(function(){
+                    // change or update page after it has been prepared:
+                    self.setState({
+                        name: pageStore.getPage()
+                    });
+                });
+            } else {
+                this.setState({
+                    name: pageStore.getPage()
+                });
+            }
+        },
+
+        _getPageComponent: function() {
+            var component = null;
+            switch (pageStore.getPage()) {
+                case 'search':
+                    component = Search;
+                    break;
+                case 'results':
+                    component = Results;
+                    break;
+                case 'summary':
+                    component = Summary;
+                    break;
+                case 'quote_form':
+                    component = QuoteForm;
+                    break;
+                case 'email_form':
+                    component = EmailForm;
+                    break;
+                case 'get_a_quote':
+                    component = Quote;
+                    break;
+                case 'order':
+                    component = Order;
+                    break;
+                case 'confirmation':
+                    component = Confirmation;
+                    break;
+            }
+            return component;
         },
 
         _scrollToTop: function() {
             var widget = document.getElementById(cn('widget'));
             h.scrollToTop(widget);
         }
-    }
+    };
 
     return Page;
 });

@@ -24,39 +24,31 @@ define([
     history
 ) {
 
+    var quote;
+
     return {
         displayName: 'email_form',
 
-        getInitialState: function () {
-            return {
-                ready: false
+        statics: {
+            prepare: function() {
+                var summaryProps = appStore.getPageProps('summary');
+
+                return Promise.all([
+                    Api.loadQuote(summaryProps.tire_id, summaryProps.quantity, summaryProps.optional_services, summaryProps.with_discount, summaryProps.custom_discount)
+                ]).then(function (responses) {
+                    quote = responses[0]
+                });
             }
         },
 
-        componentDidMount: function() {
-            var self = this;
-            var summaryProps = appStore.getPageProps('summary');
-            var customer     = customerStore.getCustomerInfo();
-
-            Promise.all([
-                Api.loadQuote(summaryProps.tire_id, summaryProps.quantity, summaryProps.optional_services, summaryProps.with_discount, summaryProps.custom_discount)
-            ]).then(function (responses) {
-                self.setState({
-                    ready: true,
-                    quote: responses[0],
-                    values: customer
-                });
+        componentWillMount: function() {
+            this.setState({
+                values: customerStore.getCustomerInfo(),
+                quote: quote
             });
         },
 
-        componentWillUnmount: function () {
-            appStore.savePageData(this);
-        },
-
         render: function() {
-            if (!this.state.ready) {
-                return null;
-            }
 
             return (
                 <div>

@@ -33,11 +33,34 @@ define([
     Promise,
     compareTiresStore
 ) {
-    var lastScrollPos;
+    // prepared variables
+    var results, tireParameters, location, vehicleOptions;
 
     return {
         displayName: 'results',
 
+        statics: {
+            prepare: function(props) {
+                var searchParams = _.cloneDeep(props);
+                searchParams.items_per_page = config.itemsPerPage;
+
+                return Promise.all([
+                    Api.searchTires(searchParams),
+                    Api.loadTireParameters(),
+                    Api.loadLocation(props.location_id),
+                    (!props.car_tire_id ? null : Api.loadVehicleOptions({
+                        model: props.model,
+                        year: props.year,
+                        make: props.make,
+                        trim: props.trim
+                    },'car_tire_id'))
+                ]).then(function (responses) {
+                    results = responses[0];
+                    tireParameters = responses[1];
+                    location = responses[2];
+                    vehicleOptions = responses[3];
+                });
+            }
         getInitialState: function() {
             return {
                 ready: false,
@@ -51,31 +74,27 @@ define([
                     comparingTires: compareTires
                 });
             }
+
+            this._init();
         },
         componentDidMount: function() {
             this._init();
         },
 
-        componentDidUpdate: function(prevProps, prevState) {
-            if ( !_.isEqual(this.props, prevProps) ) {
+        componentWillUpdate: function(nextProps) {
+            if ( !_.isEqual(this.props, nextProps) ) {
                 this._init();
             }
-            if (prevState.page && this.state.page !== prevState.page) {
+            if (nextProps.page && this.props.page !== nextProps.page) {
                 this._scrollToTop();
             }
         },
 
         componentWillUnmount: function () {
-            lastScrollPos = h.getScrollPos()[1];
-            appStore.savePageData(this);
             compareTiresStore.addCompareTireIds(this.state.comparingTires);
         },
 
         render: function() {
-            if (!this.state.ready) {
-                return null;
-            }
-
             var tires = [];
             var fieldOptions = this.state.fieldOptions;
             var fieldValues = {
@@ -133,70 +152,56 @@ define([
         _init: function () {
             var self = this;
 
-            var searchParams = _.cloneDeep(self.props);
-            searchParams.items_per_page = config.itemsPerPage;
+            var tireDescriptions = '';
 
-            Promise.all([
-                Api.searchTires(searchParams),
-                Api.loadTireParameters(),
-                Api.loadLocation(self.props.location_id),
-                (self.props.car_tire_id ? Api.loadVehicleOptions({model:self.props.model,year:self.props.year,make:self.props.make,trim:self.props.trim},'car_tire_id'):null)
-            ]).then(function (responses) {
-                var results = responses[0];
-                var tireParameters = responses[1];
-                var location = responses[2],
-                    tireDescriptions = '';
+            if(vehicleOptions !== null){
+                var vechicleArr = vehicleOptions.car_tire_id.filter(function(vechicle) {
+                    return vechicle.value == self.props.car_tire_id;
+                });
 
-                if(responses[3] !== null){
-                    var vechicleArr = responses[3].car_tire_id.filter(function(vechicle) {
-                        return vechicle.value == self.props.car_tire_id;
-                    });
+                tireDescriptions = vechicleArr[0].description;
+            }
 
-                    tireDescriptions = vechicleArr[0].description;
-                }
+            var queryParams = '';
+            if (self.props.car_tire_id) {
+                queryParams = self.props.year + ' ' + self.props.make + ' ' + self.props.model + ' ' + self.props.trim + ' &nbsp;&nbsp;' + tireDescriptions;
+            } else if (self.props.part_number) {
+                queryParams = self.props.part_number;
+            } else {
+                queryParams = self.props.width + '/' + self.props.height + 'R' + self.props.rim;
+            }
 
-                var queryParams = '';
-                if (self.props.car_tire_id) {
-                    queryParams = self.props.year + ' ' + self.props.make + ' ' + self.props.model + ' ' + self.props.trim + ' &nbsp;&nbsp;' + tireDescriptions;
-                } else if (self.props.part_number) {
-                    queryParams = self.props.part_number;
-                } else {
-                    queryParams = self.props.width + '/' + self.props.height + 'R' + self.props.rim;
-                }
+            if (config.clientType == 3 && results.filters.brand) {
+                results.filters.brand.required_brands = ['Bridgestone', 'Firestone', 'Fuzion'];
+            }
 
-                if (config.clientType == 3 && results.filters.brand) {
-                    results.filters.brand.required_brands = ['Bridgestone', 'Firestone', 'Fuzion'];
-                }
+            var displayOptions = _.cloneDeep(tireParameters.display);
+            if (!self.props.car_tire_id) {
+                _.remove(displayOptions, function (item) {
+                    return item.value == 'oem';
+                });
+            }
 
-                var displayOptions = _.cloneDeep(tireParameters.display);
-                if (!self.props.car_tire_id) {
-                    _.remove(displayOptions, function (item) {
-                        return item.value == 'oem';
-                    });
-                }
+            var state = {
+                page: results.page,
+                tires: results.tires,
+                totalCount: results.nb_results,
+                filters: results.filters,
 
-                var state = {
-                    ready: true,
-                    page: results.page,
-                    tires: results.tires,
-                    totalCount: results.nb_results,
-                    filters: results.filters,
+                fieldOptions: {
+                    display: displayOptions,
+                    order_by: tireParameters.order_by
+                },
 
-                    fieldOptions: {
-                        display: displayOptions,
-                        order_by: tireParameters.order_by
-                    },
+                isInMile: location.country !== 'Canada',
+                itemsOnPage: config.itemsPerPage,
 
-                    isInMile: location.country !== 'Canada',
-                    itemsOnPage: config.itemsPerPage,
+                defaultSelectedQuantity: config.defaultNumbersOfTires,
 
-                    defaultSelectedQuantity: config.defaultNumbersOfTires,
+                queryParams: queryParams
+            };
 
-                    queryParams: queryParams
-                };
-
-                self.setState(state);
-            });
+            self.setState(state);
         },
         _isChangeCheckbox: function(tireId) {
             return this.state.comparingTires.indexOf(tireId) !== -1;
@@ -229,7 +234,7 @@ define([
                     }
                 }, this);
             }
-            return filters ;
+            return filters;
         },
 
         _scrollToTop: function() {
