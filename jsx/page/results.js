@@ -77,9 +77,6 @@ define([
 
             this._init();
         },
-        componentDidMount: function() {
-            this._init();
-        },
 
         componentWillUpdate: function(nextProps) {
             if ( !_.isEqual(this.props, nextProps) ) {
