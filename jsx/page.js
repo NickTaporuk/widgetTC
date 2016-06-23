@@ -40,7 +40,7 @@ define([
         getInitialState: function() {
             return {
                 name: '',
-                content: null
+                pageProps: {}
             }
         },
 
@@ -64,8 +64,7 @@ define([
 
         render: function() {
             var pageComponent = this._getPageComponent();
-            var pageProps = pageStore.getProps();
-            if (pageProps == null) pageProps = {};
+            var pageProps = _.cloneDeep(this.state.pageProps);
             pageProps.ref = 'page';
 
             return pageComponent ? React.createElement(pageComponent, pageProps) : null;
@@ -82,15 +81,19 @@ define([
                     appStore.savePageData(this.refs.page);
                 }
 
-                pageComponent.prepare(pageStore.getProps(), (pageStore.getPage() == this.state.name)).then(function(){
+                var pageProps = pageStore.getProps();
+
+                pageComponent.prepare(pageProps, (pageStore.getPage() == this.state.name)).then(function(){
                     // change or update page after it has been prepared:
                     self.setState({
-                        name: pageStore.getPage()
+                        name: pageStore.getPage(),
+                        pageProps: pageProps
                     });
                 });
             } else {
                 this.setState({
-                    name: pageStore.getPage()
+                    name: pageStore.getPage(),
+                    pageProps: pageStore.getProps()
                 });
             }
         },

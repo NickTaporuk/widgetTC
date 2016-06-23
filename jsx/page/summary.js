@@ -45,6 +45,22 @@ define([
                     car_tire_id: searchState.fieldValues.vehicle.car_tire_id
                 } : {};
 
+
+                var getActiveOptServicesKeys = function(_quote) {
+                    var keys = [];
+                    if (_quote.optional_services) {
+                        Object.keys(_quote.optional_services).map(function (i) {
+                            var service = _quote.optional_services[i];
+                            if (service.applied) {
+                                keys.push(service.key);
+                            }
+                        });
+                    }
+
+                    return keys;
+                };
+
+
                 return Promise.all([
                     Api.loadTire(props.tire_id),
                     Api.loadQuote(
@@ -63,6 +79,10 @@ define([
                     quote = responses[1];
                     dealerConfig = responses[2];
                     locationConfig = responses[3];
+                    
+                    if (props.optional_services == 'use_default') {
+                        props.optional_services = getActiveOptServicesKeys(quote);
+                    }
                 });
             }
         },
@@ -75,14 +95,6 @@ define([
             if (!_.isEqual(this.props, nextProps)) {
                 this._init();
             }
-        },
-
-        componentWillUnmount: function () {
-            appStore.savePageState(this, this.state);
-
-            var props = _.cloneDeep(this.props);
-            props.optional_services = this._getActiveOptServicesKeys();
-            appStore.savePageProps(this, props);
         },
 
         render: function() {
@@ -292,27 +304,12 @@ define([
             </div>
         },
 
-        _getActiveOptServicesKeys: function() {
-            var keys = [];
-            if (this.state.quote.optional_services) {
-                var self = this;
-                Object.keys(this.state.quote.optional_services).map(function (i) {
-                    var service = self.state.quote.optional_services[i];
-                    if (service.applied) {
-                        keys.push(service.key);
-                    }
-                });
-            }
-
-            return keys;
-        },
-
         _getParamsForQuote: function() {
             var discount = this.state.quote.discount;
             return {
                 tire_id: this.props.tire_id,
                 quantity: this.props.quantity,
-                optional_services: this._getActiveOptServicesKeys(),
+                optional_services: this.props.optional_services,
                 with_discount: discount && discount.tried_to_apply,
                 custom_discount: discount && discount.is_custom ? discount.total_value : null
             }
@@ -324,7 +321,7 @@ define([
 
         _handleServiceClick: function(serviceKey, event) {
             event.preventDefault();
-            var optServices = this._getActiveOptServicesKeys();
+            var optServices = _.cloneDeep(this.props.optional_services);
             //add/remove clicked service
             if (optServices.indexOf(serviceKey) === -1) {
                 optServices.push(serviceKey);

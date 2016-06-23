@@ -7,7 +7,7 @@ define([
     _,
     moment
 ) {
-
+    
     var customerInfo = {
         name            : '',
         email           : '',
@@ -41,7 +41,7 @@ define([
 
     return {
         getCustomerInfo: function () {
-            return customerInfo;
+            return _.cloneDeep(customerInfo);
         }
     };
 });

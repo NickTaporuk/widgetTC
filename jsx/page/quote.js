@@ -73,7 +73,7 @@ define([
                 A.route('quote_form', {type: 'print'});
             } else {
                 var summaryProps = appStore.getPageProps('summary');
-                Api.printQuote(summaryProps).then(function(response) {
+                Api.printQuote(summaryProps).then(function() {
                     history.back();
                 });
             }
@@ -85,7 +85,6 @@ define([
                 A.route('quote_form', {type: 'email'});
             } else {
                 A.route('email_form');
-                //A.emailOnlyPage.update();
             }  
         }
     }
