@@ -61,6 +61,7 @@ define([
                     vehicleOptions = responses[3];
                 });
             }
+        },
         getInitialState: function() {
             return {
                 ready: false,
@@ -127,6 +128,7 @@ define([
                         <div className={cn('results')}>
                             <div className={cn('twelvecol')}>
                                 <Pagination activePage={this.state.page} itemsOnPage={this.state.itemsOnPage} totalItems={this.state.comparingTires.length} onPageClick={this._handlePageClick} />
+                                11111111111111
                                 <div className={cn("compare_btn_wrapper")}>
                                     <span className={cn(["font_color", "compare_number"])}>{this.state.comparingTires.length}</span>
                                     <a href="#" className={cn(["brand_btn_light", "btn_small", "compare_btn"])}><i className={cn("material_icons")}></i> Compare Selected Tires</a>
