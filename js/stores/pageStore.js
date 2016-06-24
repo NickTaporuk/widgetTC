@@ -17,12 +17,7 @@ define([
 
         getProps: function (_page) {
             _page =  _page || page;
-            return props[_page] ? props[_page] : null;
-        },
-
-        getProp: function(prop, _page) {
-            _page =  _page || page;
-            return props[_page] && props[_page] ? props[_page][prop] : null;
+            return props[_page] ? _.cloneDeep(props[_page]) : {};
         },
 
         dispatchToken: dispatcher.register(function(payload) {
@@ -30,9 +25,10 @@ define([
                 case 'page.update':
                     page = payload.page;
                     props[payload.page] = payload.props;
+
+                    store.trigger('change');
                     break;
             }
-            store.trigger('change');
         })
     };
 

@@ -61,10 +61,10 @@ define([
         statics: {
             prepare: function(props) {
                 var searchState = appStore.getPageState('search');
-                var customerInfo = customerStore.getCustomerInfo();
+                var customer = customerStore.getCustomerInfo();
 
-                vehicleValues = customerInfo.vehicle.year || !searchState
-                    ? customerInfo.vehicle
+                vehicleValues = customer.vehicle.year || !searchState
+                    ? customer.vehicle
                     : {
                     year: searchState.fieldValues.vehicle.year,
                     make: searchState.fieldValues.vehicle.make,
@@ -72,25 +72,23 @@ define([
                     trim: searchState.fieldValues.vehicle.trim
                 };
 
-                var promises;
+                var promises = [
+                    Api.loadVehicleOptions(vehicleValues)
+                ];
+
                 if (props.type == 'request') {
-                    promises = [
-                        Api.loadVehicleOptions(vehicleValues),
-                        Api.loadTire(props.tire_id)
-                    ];
+                    promises.push(Api.loadTire(props.tire_id));
                 } else {
-                    var summaryProps = appStore.getPageProps('summary');
-                    promises = [
-                        Api.loadVehicleOptions(vehicleValues),
-                        Api.loadTire(summaryProps.tire_id),
-                        Api.loadQuote(summaryProps.tire_id, summaryProps.quantity, summaryProps.optional_services, summaryProps.with_discount, summaryProps.custom_discount),
-                    ];
+                    var summaryState = appStore.getPageState('summary');
+                    tire = summaryState.tire;
+                    quote = summaryState.quote;
                 }
 
                 return Promise.all(promises).then(function (responses) {
                     vehicleOptions = responses[0];
-                    tire = responses[1];
-                    quote = responses[2] || null;
+                    if (responses[1]) {
+                        tire = responses[1];
+                    }
                 });
             }
         },
@@ -103,7 +101,7 @@ define([
         },
 
         componentWillMount: function() {
-            var values = _.cloneDeep(customerStore.getCustomerInfo());
+            var values = customerStore.getCustomerInfo();
             values.vehicle = vehicleValues;
             this.setState({
                 values: values,

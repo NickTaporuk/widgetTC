@@ -10,7 +10,7 @@ define([
 
     var observer = {
         update: function(compareTiresIds) {
-            _.merge(compareTires);
+            _.merge(compareTires, compareTiresIds);
         }
     };
 
@@ -21,16 +21,7 @@ define([
             return compareTires;
         },
         addCompareTireIds:function(tireIds) {
-            _.merge(compareTires,tireIds);
-        },
-        addCompareTireId:function(tireId) {
-            console.log('tireId:',tireId);
-            compareTires.push(tireId);
-        },
-        deleteCompareTireId:function(tireId) {
-            _.remove(compareTires,function(id){
-                return id == tireId;
-            });
+            compareTires = tireIds;
         }
     };
 });

@@ -42,7 +42,7 @@ define([
         getInitialState: function() {
             return {
                 name: '',
-                content: null
+                pageProps: {}
             }
         },
 
@@ -66,32 +66,34 @@ define([
 
         render: function() {
             var pageComponent = this._getPageComponent();
-            var pageProps = pageStore.getProps();
-            if (pageProps == null) pageProps = {};
-            pageProps.ref = 'page';
 
-            return pageComponent ? React.createElement(pageComponent, pageProps) : null;
+            return pageComponent ? React.createElement(pageComponent, this.state.pageProps) : null;
         },
 
         _updateState: function () {
             var self = this,
                 pageComponent = this._getPageComponent();
-            if (pageComponent && typeof pageComponent.prepare == 'function') {
 
-                if (this.state.name && this.state.name !== pageStore.getPage()) {
-                    // save current page data:
-                    appStore.savePageData(this.refs.page);
-                }
+            if (this.state.name && this.state.name !== pageStore.getPage()) {
+                // save current page data:
+                appStore.savePageData(this.refs.page);
+            }
 
-                pageComponent.prepare(pageStore.getProps(), (pageStore.getPage() == this.state.name)).then(function(){
+            var pageProps = pageStore.getProps();
+            pageProps.ref = 'page';
+
+            if (pageComponent && typeof pageComponent.prepare == 'function') {                 
+                pageComponent.prepare(pageProps, (pageStore.getPage() == this.state.name)).then(function(){
                     // change or update page after it has been prepared:
                     self.setState({
-                        name: pageStore.getPage()
+                        name: pageStore.getPage(),
+                        pageProps: pageProps
                     });
                 });
             } else {
                 this.setState({
-                    name: pageStore.getPage()
+                    name: pageStore.getPage(),
+                    pageProps: pageProps
                 });
             }
         },

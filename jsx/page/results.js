@@ -58,7 +58,7 @@ define([
                     results = responses[0];
                     tireParameters = responses[1];
                     location = responses[2];
-                    vehicleOptions = responses[3];
+                    vehicleOptions = responses[3] || null;
                 });
             }
         },
@@ -105,7 +105,7 @@ define([
             this.state.tires.map(function(tire, i) {
                 var tKey = i + curTime;
                 tires.push((
-                    <Tire key={tKey} onComparingChange={ this._handleOnComparingChange } isChangeCheckbox={this._isChangeCheckbox(tire.id)} isComparingActive={ this._isComparingActive(tire.id) } defaultQuantity={this.state.defaultSelectedQuantity} tire={tire} isInMile={this.state.isInMile} isTop={(i < 3 && this.state.page == 1)} />
+                    <Tire key={tKey} onComparingChange={ this._handleOnComparingChange } isTireInComparing={this._isTireInComparing(tire.id)} isComparingActive={ this._isComparingActive(tire.id) } defaultQuantity={this.state.defaultSelectedQuantity} tire={tire} isInMile={this.state.isInMile} isTop={(i < 3 && this.state.page == 1)} />
                 ));
             }.bind(this));
 
@@ -202,7 +202,7 @@ define([
 
             self.setState(state);
         },
-        _isChangeCheckbox: function(tireId) {
+       _isTireInComparing: function(tireId) {
             return this.state.comparingTires.indexOf(tireId) !== -1;
         },
 
@@ -210,7 +210,7 @@ define([
             if(this.state.comparingTires.indexOf(tireId) !== -1) {
                 return false
             } else {
-                return this.state.comparingTires.length >= config.maxSizeCompareTires ;
+                return this.state.comparingTires.length >= config.maxTiresToCompare ;
             }
         },
 

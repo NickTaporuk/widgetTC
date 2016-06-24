@@ -14,18 +14,16 @@ define([
 
         getInitialState: function() {
             return  {
-                loader: true
+                loader: false
             }
         },
 
-        componentWillMount: function() {
-            this._updateStatus();
-        },
         componentDidMount: function() {
             ajaxStore.bind('change', this._updateStatus);
         },
+
         componentWillUnmount: function() {
-            ajaxStore.unbind('change', this._updateStatus);    
+            ajaxStore.unbind('change', this._updateStatus);
         },
 
         render: function() {
@@ -38,7 +36,7 @@ define([
 
         _updateStatus: function() {
             this.setState({
-                loader: ajaxStore.isInProcess() &&  ajaxStore.getFinishCount() > 0
+                loader: ajaxStore.isInProcess() && ajaxStore.getFinishCount() > 0
             });
         }
 

@@ -65,15 +65,13 @@ define([
                 lastState.fieldValues.vehicle.base_category = config.defaultCategory;
                 lastState.fieldValues.size.base_category = config.defaultCategory;
                 lastState.activeTab = config.defaultSearching.replace('by_', '');
-
-                lastState.fieldOptions = _.merge(tireParameters, vehicleOptions);
-
-                lastState.locations = locations;
-
             }
 
+            lastState.fieldOptions = _.merge(tireParameters, vehicleOptions);
+            lastState.locations = locations;
+
             if (locations.length == 1) {
-                lockr.set('location_id', locations.id);
+                lockr.set('location_id', locations[0].id);
             }
 
             this.setState(lastState);

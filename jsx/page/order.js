@@ -33,17 +33,45 @@ define([
     Promise,
     _
 ) {
+    var vehicleValues,  vehicleOptions, quote, order, dealerConfig;
 
     return {
         displayName: 'order',
 
+        statics: {
+            prepare: function() {
+                var summaryState = appStore.getPageState('summary');
+                quote = summaryState.quote;
+
+                var searchState = appStore.getPageState('search');
+
+                var customer = customerStore.getCustomerInfo();
+
+                vehicleValues = customer.vehicle.year
+                    ? customer.vehicle
+                    : (searchState ? searchState.fieldValues.vehicle : {});
+                var summaryProps = appStore.getPageProps('summary');
+                summaryProps.id = summaryProps.tire_id;
+                delete summaryProps.tire_id;
+
+                return Promise.all([
+                    Api.loadVehicleOptions(vehicleValues),
+                    Api.orderCreate({tires: [summaryProps]}),
+                    Api.loadDealerConfig()
+                ]).then(function(responses){
+                    vehicleOptions = responses[0];
+                    order = responses[1];
+                    dealerConfig = responses[2];
+                });
+            }
+        },
+
         getInitialState: function() {
             return {
-                ready: false,
                 disabled: false,
                 errors: {},
                 values: {},
-                intervalDate:{month:[],years:[]}
+                intervalDate:{ month:[], years:[] }
             };
         },
 
@@ -62,43 +90,22 @@ define([
                 intervalDate.month  = monthSelect;
                 intervalDate.years  = yearSelect;
 
-            var customer = customerStore.getCustomerInfo();
+            var values = customerStore.getCustomerInfo();
+            values.vehicle = vehicleValues;
 
             this.setState({
-                values: customer,
-                intervalDate: intervalDate
+                values: values,
+                intervalDate: intervalDate,
+
+                options: vehicleOptions,
+                quote: quote,
+                order: order,
+                status: order.status,
+                stripeKey: dealerConfig.ecommerce.services.stripe.publishable_key
             });
         },
 
         componentDidMount: function() {
-            var searchState = appStore.getPageState('search');
-
-            var vehicleValues = Object.keys(this.state.values.vehicle).length > 0
-                ? this.state.values.vehicle
-                : (searchState ? searchState.fieldValues.vehicle : {});
-            var summaryProps = appStore.getPageProps('summary');
-            summaryProps.id = summaryProps.tire_id;
-            delete summaryProps.tire_id;
-
-            Promise.all([
-                Api.loadVehicleOptions(vehicleValues),
-                Api.loadQuote(summaryProps.id, summaryProps.quantity, summaryProps.optional_services, summaryProps.with_discount, summaryProps.custom_discount),
-                Api.orderCreate({tires: [summaryProps]}),
-                Api.loadDealerConfig()
-            ]).then(function(responses){
-                var values = _.cloneDeep(self.state.values);
-                values.vehicle = vehicleValues;
-
-                self.setState({
-                    ready: true,
-                    options: responses[0],
-                    values: values,
-                    quote: responses[1],
-                    order: responses[2],
-                    status: responses[2].status,
-                    stripeKey: responses[3].ecommerce.services.stripe.publishable_key
-                })
-            });
             var self = this;
             // load stripe here
             if (typeof window.Stripe == 'undefined') {
@@ -109,10 +116,6 @@ define([
                 self._isStripeLoaded = true;
             }
         },
-        
-        componentWillUnmount: function() {
-            appStore.savePageData(this);
-        },
 
         componentDidUpdate: function(prevProps, prevState) {
             if (Object.keys(this.state.errors).length > 0 && !this.state.disabled && !_.isEqual(this.state.errors, prevState.errors)) {
@@ -121,10 +124,6 @@ define([
         },
 
         render: function() {
-            if (!this.state.ready) {
-                return null;
-            }
-
             return (
                 <div>
                     <Back />

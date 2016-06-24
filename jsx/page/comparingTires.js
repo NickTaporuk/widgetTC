@@ -8,7 +8,8 @@ define([
     'load!components/page/common/back',
     'actions/api',
     'promise',
-    'lockr'
+    'lockr',
+    'load!stores/appStore'
 ], function(
     React,
     config,
@@ -19,7 +20,8 @@ define([
     Back,
     Api,
     Promise,
-    lockr
+    lockr,
+    appStore
 ) {
     var results, compareTires;
 
@@ -29,43 +31,29 @@ define([
         statics: {
             prepare: function (props) {
 
-                // var searchParams        = _.cloneDeep(props);
-                var searchParams        = {};
+                var searchParams        = _.cloneDeep(props);
 
-                compareTires = compareTiresStore.getCompareTires();
+                console.log(appStore.getPageState(this));
                 var locationId  = lockr.get('location_id');
                 var compareTiresDecoded = compareTires.map(function(tireId) {
                     return h.base64Decode(tireId).split('||')[1];
                 });
-                console.log('prepare compareTires:', compareTires,'location_id:',locationId,'compareTiresDecoded:',compareTiresDecoded);
-                if(compareTiresDecoded) searchParams.part_number    = compareTiresDecoded[0];
+
                 searchParams.location_id    = locationId;
                 return Promise.all([
                     Api.searchTires(searchParams)
                 ]).then(function (responses) {
-                    // console.log('responses:',responses);
                     results = responses;
                 });
-
-
-
             }
         },
         getInitialState: function() {
-            console.log('getInitialState:');
             return {
                 ready: false,
                 comparingTires: []
             };
         },
-        componentWillMount: function() {
 
-            /*if(compareTires.length > 0) {
-                this.setState({
-                    comparingTires: compareTires
-                });
-            }*/
-        },
         render: function() {
             return (
                 <div>

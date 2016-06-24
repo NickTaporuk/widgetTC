@@ -3,7 +3,9 @@ define(['ajax', 'lib/helper'], function(ajax, h) {
     function loadStyleSheet(path, fn) {
         ajax.make({
             url: path,
-            method: 'get'
+            method: 'get',
+            beforeSend: function() {},
+            complete: function() {}
         }).then(function(response) {
             var styleElement = document.createElement("style");
             var styles = document.createTextNode(response);
