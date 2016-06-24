@@ -9,6 +9,7 @@ define([
     'load!components/page/confirmation',
     'load!components/page/quote',
     'load!components/page/emailForm',
+    'load!components/page/comparingTires',
     'react',
     'load!stores/pageStore',
     'load!stores/appStore',
@@ -26,6 +27,7 @@ define([
     Confirmation,
     Quote,
     EmailForm,
+    ComparingTires,
     React,
     pageStore,
     appStore,
@@ -74,7 +76,6 @@ define([
         _updateState: function () {
             var self = this,
                 pageComponent = this._getPageComponent();
-
             if (pageComponent && typeof pageComponent.prepare == 'function') {
 
                 if (this.state.name && this.state.name !== pageStore.getPage()) {
@@ -100,6 +101,9 @@ define([
             switch (pageStore.getPage()) {
                 case 'search':
                     component = Search;
+                    break;
+                case 'comparing_tires':
+                    component = ComparingTires;
                     break;
                 case 'results':
                     component = Results;

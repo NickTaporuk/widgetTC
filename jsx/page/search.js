@@ -59,7 +59,6 @@ define([
         },
 
         componentWillMount: function () {
-            console.log(this);
             var lastState = appStore.getPageState(this);
             if (!lastState) {
                 lastState = _.cloneDeep(this.state);
@@ -67,12 +66,14 @@ define([
                 lastState.fieldValues.size.base_category = config.defaultCategory;
                 lastState.activeTab = config.defaultSearching.replace('by_', '');
 
-                lastState.fieldOptions = _.merge(tireParameters[0], vehicleOptions[1]);
-                lastState.locations = locations[2];
+                lastState.fieldOptions = _.merge(tireParameters, vehicleOptions);
+
+                lastState.locations = locations;
+
             }
 
-            if (locations[2].length == 1) {
-                lockr.set('location_id', locations[2][0].id);
+            if (locations.length == 1) {
+                lockr.set('location_id', locations.id);
             }
 
             this.setState(lastState);

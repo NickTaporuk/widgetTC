@@ -177,7 +177,6 @@ define([
             }
 
             searchParams.needed_filters = ['brand', 'run_flat', 'light_truck', 'category'];
-
             return ajax.make({
                 url: 'tire/' + method,
                 data: searchParams,

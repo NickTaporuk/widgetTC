@@ -89,6 +89,7 @@ define([
         },
 
         componentWillUnmount: function () {
+            console.log('componentWillUnmount this.state.comparingTires:',this.state.comparingTires);
             compareTiresStore.addCompareTireIds(this.state.comparingTires);
         },
 
@@ -128,10 +129,9 @@ define([
                         <div className={cn('results')}>
                             <div className={cn('twelvecol')}>
                                 <Pagination activePage={this.state.page} itemsOnPage={this.state.itemsOnPage} totalItems={this.state.comparingTires.length} onPageClick={this._handlePageClick} />
-                                11111111111111
                                 <div className={cn("compare_btn_wrapper")}>
                                     <span className={cn(["font_color", "compare_number"])}>{this.state.comparingTires.length}</span>
-                                    <a href="#" className={cn(["brand_btn_light", "btn_small", "compare_btn"])}><i className={cn("material_icons")}></i> Compare Selected Tires</a>
+                                    <a href="#comparing_tires" onClick={ this._handleToComparingTires } className={cn(["brand_btn_light", "btn_small", "compare_btn"])}><i className={cn("material_icons")}></i> Compare Selected Tires</a>
                                 </div>
                             </div>
                             <div className={cn('twelvecol')}>
@@ -273,13 +273,19 @@ define([
                 _.remove(comparingTires,function(id){
                     return id == tireId;
                 });
-            } else comparingTires.push(tireId);
+            } else { 
+                comparingTires.push(tireId);
+            }
 
             this.setState({
                 comparingTires: comparingTires
             });
+            console.log('comparingTires:',comparingTires);
 
-
+        },
+        _handleToComparingTires: function(event) {
+            event.preventDefault();
+            Act.route('comparing_tires');
         }
     }
 });
