@@ -88,9 +88,9 @@ define([
             }
         },
 
-        /*componentWillUnmount: function () {
+        componentWillUnmount: function () {
             compareTiresStore.addCompareTireIds(this.state.comparingTires);
-        },*/
+        },
 
         render: function() {
             var tires = [];
