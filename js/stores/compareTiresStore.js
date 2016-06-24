@@ -22,7 +22,6 @@ define([
         },
         addCompareTireIds:function(tireIds) {
             compareTires = tireIds;
-            console.log('addCompareTireId:',compareTires);
         }
     };
 });

@@ -88,9 +88,9 @@ define([
             }
         },
 
-        componentWillUnmount: function () {
+        /*componentWillUnmount: function () {
             compareTiresStore.addCompareTireIds(this.state.comparingTires);
-        },
+        },*/
 
         render: function() {
             var tires = [];
@@ -104,7 +104,7 @@ define([
             this.state.tires.map(function(tire, i) {
                 var tKey = i + curTime;
                 tires.push((
-                    <Tire key={tKey} onComparingChange={ this._handleOnComparingChange } isChangeCheckbox={this._isChangeCheckbox(tire.id)} isComparingActive={ this._isComparingActive(tire.id) } defaultQuantity={this.state.defaultSelectedQuantity} tire={tire} isInMile={this.state.isInMile} isTop={(i < 3 && this.state.page == 1)} />
+                    <Tire key={tKey} onComparingChange={ this._handleOnComparingChange } isTireInComparing={this._isTireInComparing(tire.id)} isComparingActive={ this._isComparingActive(tire.id) } defaultQuantity={this.state.defaultSelectedQuantity} tire={tire} isInMile={this.state.isInMile} isTop={(i < 3 && this.state.page == 1)} />
                 ));
             }.bind(this));
 
@@ -128,7 +128,6 @@ define([
                         <div className={cn('results')}>
                             <div className={cn('twelvecol')}>
                                 <Pagination activePage={this.state.page} itemsOnPage={this.state.itemsOnPage} totalItems={this.state.comparingTires.length} onPageClick={this._handlePageClick} />
-                                11111111111111
                                 <div className={cn("compare_btn_wrapper")}>
                                     <span className={cn(["font_color", "compare_number"])}>{this.state.comparingTires.length}</span>
                                     <a href="#" className={cn(["brand_btn_light", "btn_small", "compare_btn"])}><i className={cn("material_icons")}></i> Compare Selected Tires</a>
@@ -202,7 +201,7 @@ define([
 
             self.setState(state);
         },
-        _isChangeCheckbox: function(tireId) {
+       _isTireInComparing: function(tireId) {
             return this.state.comparingTires.indexOf(tireId) !== -1;
         },
 
@@ -210,7 +209,7 @@ define([
             if(this.state.comparingTires.indexOf(tireId) !== -1) {
                 return false
             } else {
-                return this.state.comparingTires.length >= config.maxSizeCompareTires ;
+                return this.state.comparingTires.length >= config.maxTiresToCompare ;
             }
         },
 

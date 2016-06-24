@@ -7,8 +7,7 @@ define([
     'load!components/page/results/tire/offerInfo',
     'load!components/page/results/tire/reviews',
     'load!components/page/results/tire/stock',
-    'load!components/page/results/tire/stars',
-    'load!stores/compareTiresStore'
+    'load!components/page/results/tire/stars'
 ], function(
     React,
     config,
@@ -18,8 +17,7 @@ define([
     OfferInfo,
     Reviews,
     Stock,
-    Stars,
-    compareTiresStore
+    Stars
 ) {
 
     return {
@@ -79,7 +77,7 @@ define([
                             </span>
                         </h3>
                         <label className={cn('result_compare')}>
-                            <input type="checkbox" defaultChecked={ this.props.isChangeCheckbox } onChange={ this._handleComparingChange } disabled={this.props.isComparingActive}/> Add to compare
+                            <input type="checkbox" defaultChecked={ this.props.isTireInComparing } onChange={ this._handleComparingChange } disabled={this.props.isComparingActive}/> Add to compare
                         </label>
                     </div>
                     <div className={cn('result_body')}>
