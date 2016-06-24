@@ -64,10 +64,8 @@ define([
 
         render: function() {
             var pageComponent = this._getPageComponent();
-            var pageProps = _.cloneDeep(this.state.pageProps);
-            pageProps.ref = 'page';
 
-            return pageComponent ? React.createElement(pageComponent, pageProps) : null;
+            return pageComponent ? React.createElement(pageComponent, this.state.pageProps) : null;
         },
 
         _updateState: function () {
@@ -79,9 +77,10 @@ define([
                 appStore.savePageData(this.refs.page);
             }
 
-            if (pageComponent && typeof pageComponent.prepare == 'function') {
-                var pageProps = pageStore.getProps();
+            var pageProps = pageStore.getProps();
+            pageProps.ref = 'page';
 
+            if (pageComponent && typeof pageComponent.prepare == 'function') {                 
                 pageComponent.prepare(pageProps, (pageStore.getPage() == this.state.name)).then(function(){
                     // change or update page after it has been prepared:
                     self.setState({
@@ -92,7 +91,7 @@ define([
             } else {
                 this.setState({
                     name: pageStore.getPage(),
-                    pageProps: pageStore.getProps()
+                    pageProps: pageProps
                 });
             }
         },

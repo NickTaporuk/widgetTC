@@ -25,16 +25,18 @@ define([
                     ajaxCount++;
                     change = true;
                     break;
-                    
-                case constants.RESPONSE_RECEIVED: 
-                    ajaxCount--;
+
+                case constants.RESPONSE_RECEIVED:
+                    if (ajaxCount > 0) {
+                        ajaxCount--;
+                    }
                     if (ajaxCount === 0) {
                         finishCount++;
                         change = true;
                     }
                     break;
             }
-            
+
             if (change) {
                 ajaxStore.trigger('change');
             }

@@ -17,7 +17,7 @@ define([
 
         getProps: function (_page) {
             _page =  _page || page;
-            return props[_page] ? props[_page] : {};
+            return props[_page] ? _.cloneDeep(props[_page]) : {};
         },
 
         dispatchToken: dispatcher.register(function(payload) {

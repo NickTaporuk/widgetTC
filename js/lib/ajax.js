@@ -195,7 +195,7 @@ define(['config', 'promise', 'lodash'], function(config, Promise, _) {
                 return inProcess(url, data);
             };
 
-            self.beforeSend();
+            params.beforeSend ? params.beforeSend() : self.beforeSend();
 
             var ajax_a = new Ajax();
 
