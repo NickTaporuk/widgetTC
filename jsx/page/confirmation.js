@@ -15,44 +15,36 @@ define([
     appStore,
     Promise
 ) {
+    var tire, quote, location;
 
     return {
-        getInitialState: function() {
-            return {
-                ready: false
+        statics: {
+            prepare: function() {
+                var summaryState = appStore.getPageState('summary');
+                tire = summaryState.tire;
+                quote = summaryState.quote;
+
+                var tireParams = h.base64Decode(tire.id).split('||');
+                var locationId = tireParams[3];
+
+                return Promise.all([
+                    Api.loadLocation(locationId)
+                ]).then(function(responses){
+                    location = responses[0];
+                });
             }
         },
 
-        componentDidMount: function() {
-            var self = this;
-
-            var summaryProps = appStore.getPageProps('summary');
-
-            var tireParams = h.base64Decode(summaryProps.tire_id).split('||');
-            var locationId = tireParams[3];
-
-            // var locationId = appStore.getPageProps('results').location_id;
-
-            Promise.all([
-                Api.loadTire(summaryProps.tire_id),
-                Api.loadQuote(summaryProps.tire_id, summaryProps.quantity, summaryProps.optional_services, summaryProps.with_discount, summaryProps.custom_discount),
-                Api.loadLocation(locationId)
-            ]).then(function(responses){
-                self.setState({
-                    ready: true,
-                    tire: responses[0],
-                    quote: responses[1],
-                    location: responses[2],
-                    order: appStore.getPageState('order').order
-                })
+        componentWillMount: function() {
+            this.setState({
+                tire: tire,
+                quote: quote,
+                location: location,
+                order: appStore.getPageState('order').order
             });
         },
 
         render: function() {
-            if (!this.state.ready) {
-                return null;
-            }
-
             var tire = this.state.tire;
             var quote = this.state.quote;
             var order = this.state.order;
